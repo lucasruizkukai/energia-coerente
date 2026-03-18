@@ -355,8 +355,7 @@ function App() {
     return (
       <Shell>
         <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Carregando sistema</div>
-          <div style={{ color: THEME.muted }}>Preparando ambiente, autenticacao e dados do atendimento.</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Carregando</div>
         </Panel>
       </Shell>
     );
@@ -369,9 +368,6 @@ function App() {
           <Panel>
             <div style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>{BRAND.name}</div>
             <div style={{ color: THEME.terracotta, fontWeight: 700, marginBottom: 18 }}>{BRAND.subtitle}</div>
-            <div style={{ color: THEME.muted, lineHeight: 1.65, marginBottom: 18 }}>
-              Entre com o login da Jaqueline quando o projeto ja estiver conectado ao Supabase.
-            </div>
             <form onSubmit={handleLogin} style={{ display: "grid", gap: 12 }}>
               <Field label="Email">
                 <input value={authForm.email} onChange={(event) => setAuthForm((current) => ({ ...current, email: event.target.value }))} style={inputStyle} />
@@ -412,17 +408,16 @@ function App() {
               <StatCard label="Financeiro" value={metrics.pendingPayment} />
             </div>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 14 }}>
-            <ModeBadge mode={appMode} />
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, alignItems: "center", flexWrap: "wrap", marginTop: 14 }}>
             {user ? (
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <>
                 <span style={{ color: THEME.muted, fontSize: 13 }}>{user.email}</span>
                 {appMode === "supabase" ? (
                   <button type="button" onClick={handleLogout} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>
                     Sair
                   </button>
                 ) : null}
-              </div>
+              </>
             ) : null}
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
@@ -492,31 +487,6 @@ function App() {
 
         {activeTab === "novo" && <ClientRecord client={draftClient} onSave={saveClient} mobile={mobile} isNew saving={saving} />}
 
-        <Panel style={{ marginTop: 18 }}>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18, alignItems: "start" }}>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Estrutura recomendada do sistema</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.65 }}>
-                A melhor base para esse projeto e manter uma unica entidade principal de atendimento, com dados do cliente, ciclo de 21 dias, registros terapeuticos, financeiro e devolutiva no mesmo fluxo.
-                Isso reduz friccao no uso diario da Jaqueline e facilita depois conectar login, Supabase e automacoes sem refazer a experiencia.
-              </div>
-            </div>
-            <div style={{ display: "grid", gap: 10 }}>
-              {[
-                "1. Dashboard com agenda visual, status e pendencias.",
-                "2. Clientes com busca, filtros e leitura rapida.",
-                "3. Ficha completa com dados base, diagnostico e intervencoes.",
-                "4. Timeline do processo por etapa e por dia.",
-                "5. Financeiro simples dentro do proprio atendimento.",
-                "6. Devolutiva final pronta para consolidar e enviar.",
-              ].map((item) => (
-                <div key={item} style={{ border: `1px solid ${THEME.line}`, borderRadius: 14, padding: "12px 14px", background: "#fffdfa" }}>
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </Panel>
       </main>
     </div>
   );
@@ -530,20 +500,16 @@ function Dashboard({ clients, metrics, mobile, onOpenClient }) {
     return (
       <div style={{ display: "grid", gap: 18 }}>
         <Panel>
-          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Sistema pronto para comecar</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.7, maxWidth: 720 }}>
-            Agora que o login e o banco estao ativos, o proximo passo e cadastrar os primeiros atendimentos reais da Jaqueline.
-            O sistema foi organizado para que cada cliente tenha uma ficha unica com processo, registro terapeutico, financeiro e devolutiva.
-          </div>
+          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Nenhum atendimento cadastrado</div>
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12, marginTop: 18 }}>
-            <ActionTile title="1. Novo cadastro" text="Abra um atendimento com nome, WhatsApp, data de inicio e tipo de sessao." />
-            <ActionTile title="2. Registro terapeutico" text="Preencha queixa, objetivo, diagnostico, causas e intervencoes conforme o processo evolui." />
-            <ActionTile title="3. Devolutiva final" text="Ao final dos 21 dias, consolide a sintese do caso e a orientacao de fechamento." />
+            <ActionTile title="Novo cadastro" text="Abra um atendimento com nome, WhatsApp, data de inicio e tipo de sessao." />
+            <ActionTile title="Registro terapeutico" text="Preencha queixa, objetivo, diagnostico, causas e intervencoes ao longo do processo." />
+            <ActionTile title="Devolutiva final" text="Consolide a sintese do caso e a orientacao de fechamento ao final do ciclo." />
           </div>
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Estrutura pensada para o uso diario</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Tipos de sessao</div>
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
             {SESSION_TYPES.map((session) => (
               <div key={session} style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 16px", background: "#fffdfa" }}>
@@ -561,11 +527,8 @@ function Dashboard({ clients, metrics, mobile, onOpenClient }) {
     <div style={{ display: "grid", gap: 18 }}>
       <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.15fr 0.85fr", gap: 18 }}>
         <Panel>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Visao geral do atendimento</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.7, maxWidth: 680 }}>
-            A V1 foi desenhada para concentrar todo o processo terapeutico online em um unico painel: entrada, acompanhamento dos 21 dias, registros clinicos e fechamento.
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 18 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Visao geral</div>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12 }}>
             <MetricTile label="Clientes" value={clients.length} accent={THEME.text} />
             <MetricTile label="Em andamento" value={metrics.active} accent={THEME.green} />
             <MetricTile label="Pend. pagamento" value={metrics.pendingPayment} accent={THEME.terracotta} />
@@ -574,7 +537,7 @@ function Dashboard({ clients, metrics, mobile, onOpenClient }) {
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>Distribuicao de status</div>
+          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>Status</div>
           <div style={{ display: "grid", gap: 10 }}>
             {byStatus.map((item) => {
               const tone = getStatusTone(item.status);
@@ -594,7 +557,6 @@ function Dashboard({ clients, metrics, mobile, onOpenClient }) {
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 14 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 800 }}>Processo de 21 dias</div>
-              <div style={{ color: THEME.muted, fontSize: 13 }}>Etapas claras para orientar o acompanhamento.</div>
             </div>
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -614,7 +576,7 @@ function Dashboard({ clients, metrics, mobile, onOpenClient }) {
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Clientes mais proximos da devolutiva</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Atendimentos em destaque</div>
           <div style={{ display: "grid", gap: 12 }}>
             {upcoming.map((client) => (
               <button
@@ -678,7 +640,6 @@ function ClientJourney({ client, mobile }) {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 800 }}>Linha do tempo do atendimento</div>
-          <div style={{ color: THEME.muted, fontSize: 13 }}>Controle visual do processo e leitura rapida da etapa atual.</div>
         </div>
         <div style={{ color: THEME.terracotta, fontWeight: 800 }}>Dia {client.diaProcesso} de 21</div>
       </div>
@@ -743,7 +704,6 @@ function ClientRecord({ client, onSave, mobile, isNew = false, saving = false })
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 800 }}>{isNew ? "Novo atendimento" : "Ficha completa do cliente"}</div>
-            <div style={{ color: THEME.muted, fontSize: 13 }}>Cadastro, acompanhamento terapeutico, financeiro e fechamento no mesmo formulario.</div>
           </div>
           <button type="submit" disabled={saving} style={{ border: "none", borderRadius: 16, background: THEME.text, color: "#fff", padding: "12px 18px", cursor: saving ? "wait" : "pointer", fontWeight: 700, opacity: saving ? 0.7 : 1 }}>
             {saving ? "Salvando..." : "Salvar"}
@@ -821,8 +781,7 @@ function FinalFeedback({ client }) {
     <Panel>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
         <div>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Area de devolutiva final</div>
-          <div style={{ color: THEME.muted, fontSize: 13 }}>Resumo organizado para fechamento do atendimento.</div>
+          <div style={{ fontSize: 18, fontWeight: 800 }}>Devolutiva final</div>
         </div>
         <div style={{ color: THEME.green, fontWeight: 800 }}>{client.statusPagamento === "Pago" ? "Pagamento regularizado" : "Pagamento em aberto"}</div>
       </div>
@@ -845,16 +804,6 @@ function Shell({ children }) {
         body { margin: 0; background: ${THEME.bg}; }
       `}</style>
       <div style={{ maxWidth: 1220, margin: "0 auto" }}>{children}</div>
-    </div>
-  );
-}
-
-function ModeBadge({ mode }) {
-  const isSupabase = mode === "supabase";
-  return (
-    <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: `1px solid ${isSupabase ? THEME.green : THEME.line}`, background: isSupabase ? THEME.greenSoft : "#fffdfa", borderRadius: 999, padding: "8px 12px", fontSize: 12, fontWeight: 700, color: isSupabase ? THEME.green : THEME.muted }}>
-      <span>{isSupabase ? "Modo online" : "Modo local"}</span>
-      <span style={{ opacity: 0.8 }}>{isSupabase ? "Supabase conectado" : "Sem Supabase configurado"}</span>
     </div>
   );
 }
