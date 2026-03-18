@@ -17,6 +17,11 @@ const PROCESS_STAGES = [
   { key: "intervention", label: "Intervencoes", days: "Dia 8-17" },
   { key: "closure", label: "Devolutiva", days: "Dia 18-21" },
 ];
+const SESSION_DETAILS = {
+  "Mini Harmonizacao": "Atendimento mais objetivo para reorganizacao inicial e alivio pontual.",
+  "Sessao Essencial": "Processo intermediario para reorganizar padroes centrais com acompanhamento estruturado.",
+  "Sessao Profunda": "Jornada mais completa para casos que pedem leitura ampla e intervencao gradual.",
+};
 
 const THEME = {
   bg: "#f6f1e8",
@@ -168,6 +173,19 @@ function getStatusTone(status) {
     Concluido: { bg: "#e7efe2", color: "#4e6446" },
   };
   return tones[status] || { bg: THEME.beige, color: THEME.text };
+}
+
+function buildFinalSummary(client) {
+  const parts = [
+    client.devolutivaFinal,
+    client.diagnosticoEnergetico ? `Diagnostico observado: ${client.diagnosticoEnergetico}.` : "",
+    client.causasIdentificadas ? `Causas identificadas: ${client.causasIdentificadas}.` : "",
+    client.intervencoesRealizadas ? `Intervencoes realizadas: ${client.intervencoesRealizadas}.` : "",
+    client.evolucao ? `Evolucao percebida: ${client.evolucao}.` : "",
+    client.proximosPassos ? `Orientacao final: ${client.proximosPassos}.` : "",
+  ].filter(Boolean);
+
+  return parts.length ? parts.join(" ") : "Ainda sem devolutiva registrada.";
 }
 
 function App() {
@@ -508,6 +526,37 @@ function Dashboard({ clients, metrics, mobile, onOpenClient }) {
   const upcoming = [...clients].sort((a, b) => a.diaProcesso - b.diaProcesso).slice(0, 4);
   const byStatus = STATUS_OPTIONS.map((status) => ({ status, count: clients.filter((client) => client.status === status).length }));
 
+  if (!clients.length) {
+    return (
+      <div style={{ display: "grid", gap: 18 }}>
+        <Panel>
+          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Sistema pronto para comecar</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.7, maxWidth: 720 }}>
+            Agora que o login e o banco estao ativos, o proximo passo e cadastrar os primeiros atendimentos reais da Jaqueline.
+            O sistema foi organizado para que cada cliente tenha uma ficha unica com processo, registro terapeutico, financeiro e devolutiva.
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12, marginTop: 18 }}>
+            <ActionTile title="1. Novo cadastro" text="Abra um atendimento com nome, WhatsApp, data de inicio e tipo de sessao." />
+            <ActionTile title="2. Registro terapeutico" text="Preencha queixa, objetivo, diagnostico, causas e intervencoes conforme o processo evolui." />
+            <ActionTile title="3. Devolutiva final" text="Ao final dos 21 dias, consolide a sintese do caso e a orientacao de fechamento." />
+          </div>
+        </Panel>
+
+        <Panel>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Estrutura pensada para o uso diario</div>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
+            {SESSION_TYPES.map((session) => (
+              <div key={session} style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 16px", background: "#fffdfa" }}>
+                <div style={{ fontWeight: 800, marginBottom: 6 }}>{session}</div>
+                <div style={{ color: THEME.muted, lineHeight: 1.6 }}>{SESSION_DETAILS[session]}</div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.15fr 0.85fr", gap: 18 }}>
@@ -659,9 +708,11 @@ function ClientJourney({ client, mobile }) {
 
 function ClientRecord({ client, onSave, mobile, isNew = false, saving = false }) {
   const [form, setForm] = useState(client);
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     setForm(client);
+    setFormError("");
   }, [client]);
 
   function setField(key, value) {
@@ -670,6 +721,19 @@ function ClientRecord({ client, onSave, mobile, isNew = false, saving = false })
 
   function handleSubmit(event) {
     event.preventDefault();
+    if (!form.nome.trim()) {
+      setFormError("Informe o nome da cliente para salvar o atendimento.");
+      return;
+    }
+    if (!form.whatsapp.trim()) {
+      setFormError("Informe o WhatsApp principal para manter o contato organizado.");
+      return;
+    }
+    if (!form.dataInicio) {
+      setFormError("Defina a data de inicio para calcular corretamente o processo de 21 dias.");
+      return;
+    }
+    setFormError("");
     onSave({ ...form, id: form.id || generateId() });
   }
 
@@ -685,6 +749,11 @@ function ClientRecord({ client, onSave, mobile, isNew = false, saving = false })
             {saving ? "Salvando..." : "Salvar"}
           </button>
         </div>
+        {formError ? (
+          <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff5f1", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", fontWeight: 700 }}>
+            {formError}
+          </div>
+        ) : null}
 
         <SectionTitle title="Dados principais" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
@@ -696,6 +765,7 @@ function ClientRecord({ client, onSave, mobile, isNew = false, saving = false })
             <select value={form.tipoSessao} onChange={(event) => setField("tipoSessao", event.target.value)} style={inputStyle}>
               {SESSION_TYPES.map((item) => <option key={item}>{item}</option>)}
             </select>
+            <div style={{ color: THEME.muted, fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>{SESSION_DETAILS[form.tipoSessao]}</div>
           </Field>
           <Field label="Status">
             <select value={form.status} onChange={(event) => setField("status", event.target.value)} style={inputStyle}>
@@ -722,13 +792,18 @@ function ClientRecord({ client, onSave, mobile, isNew = false, saving = false })
 
         <SectionTitle title="Financeiro e fechamento" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
-          <Field label="Valor"><input value={form.valor} onChange={(event) => setField("valor", event.target.value)} style={inputStyle} /></Field>
+          <Field label="Valor">
+            <input value={form.valor} onChange={(event) => setField("valor", event.target.value.replace(/[^\d,.]/g, ""))} style={inputStyle} placeholder="Ex.: 480,00" />
+          </Field>
           <Field label="Status do pagamento">
             <select value={form.statusPagamento} onChange={(event) => setField("statusPagamento", event.target.value)} style={inputStyle}>
               {PAYMENT_OPTIONS.map((item) => <option key={item}>{item}</option>)}
             </select>
           </Field>
-          <Field label="Dia do processo"><input value={form.dataInicio ? getProcessDay(form.dataInicio) : form.diaProcesso} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          <Field label="Dia do processo">
+            <input value={form.dataInicio ? getProcessDay(form.dataInicio) : form.diaProcesso} readOnly style={{ ...inputStyle, background: "#f4efe8" }} />
+            <div style={{ color: THEME.muted, fontSize: 12, marginTop: 6 }}>Etapa atual: {getStageFromDay(form.dataInicio ? getProcessDay(form.dataInicio) : form.diaProcesso).label}</div>
+          </Field>
         </div>
         <div style={{ display: "grid", gap: 12 }}>
           <Field label="Devolutiva final"><textarea value={form.devolutivaFinal} onChange={(event) => setField("devolutivaFinal", event.target.value)} style={inputStyle} /></Field>
@@ -740,6 +815,8 @@ function ClientRecord({ client, onSave, mobile, isNew = false, saving = false })
 }
 
 function FinalFeedback({ client }) {
+  const generatedSummary = buildFinalSummary(client);
+
   return (
     <Panel>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
@@ -751,6 +828,7 @@ function FinalFeedback({ client }) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
         <SummaryBlock title="Sintese do processo" text={client.devolutivaFinal || "Ainda sem devolutiva registrada."} />
+        <SummaryBlock title="Preview consolidado" text={generatedSummary} />
         <SummaryBlock title="Padroes e causas" text={client.causasIdentificadas || "Sem causas registradas."} />
         <SummaryBlock title="Intervencoes aplicadas" text={client.intervencoesRealizadas || "Sem intervencoes registradas."} />
         <SummaryBlock title="Orientacao final" text={client.proximosPassos || "Sem orientacoes finais definidas."} />
@@ -777,6 +855,15 @@ function ModeBadge({ mode }) {
     <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: `1px solid ${isSupabase ? THEME.green : THEME.line}`, background: isSupabase ? THEME.greenSoft : "#fffdfa", borderRadius: 999, padding: "8px 12px", fontSize: 12, fontWeight: 700, color: isSupabase ? THEME.green : THEME.muted }}>
       <span>{isSupabase ? "Modo online" : "Modo local"}</span>
       <span style={{ opacity: 0.8 }}>{isSupabase ? "Supabase conectado" : "Sem Supabase configurado"}</span>
+    </div>
+  );
+}
+
+function ActionTile({ title, text }) {
+  return (
+    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "15px 16px", background: "#fffdfa" }}>
+      <div style={{ fontWeight: 800, marginBottom: 6 }}>{title}</div>
+      <div style={{ color: THEME.muted, lineHeight: 1.65 }}>{text}</div>
     </div>
   );
 }
