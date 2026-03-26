@@ -424,6 +424,11 @@ function formatProtocols(client) {
   return (client.protocolosUsados || []).length ? client.protocolosUsados.join(", ") : findProtocolName(client.protocolSlug);
 }
 
+function findProtocolSlugByName(name) {
+  const match = TGR_PROTOCOLS.find((item) => item.nome.toLowerCase() === String(name || "").toLowerCase());
+  return match?.slug || "relacoes";
+}
+
 function buildGraphicLibrary() {
   return TGR_GRAPHIC_GROUPS.flatMap((group) =>
     group.graficos.map((graphic) => ({
@@ -628,16 +633,16 @@ function App() {
     setMainTab(nextTab);
   }
 
-  function openRelacoesForClient(client) {
+  function openProtocolForClient(client, protocolName = "Relacoes") {
     if (!client) return;
     setActiveMethod("radiestesia");
     setActiveSubmethod("tgr");
     setActiveMethodTab("protocolos");
-    setActiveTgrProtocol("relacoes");
+    setActiveTgrProtocol(findProtocolSlugByName(protocolName));
     setRelacoesContext({
       clientId: client.id,
       clientName: client.nome,
-      protocolName: formatProtocols(client),
+      protocolName,
     });
     setRelacoesForm((current) => ({
       ...current,
@@ -745,7 +750,7 @@ function App() {
           setRelacoesForm={setRelacoesForm}
           relacoesContext={relacoesContext}
           setMainTab={setMainTab}
-          openRelacoesForClient={openRelacoesForClient}
+          openProtocolForClient={openProtocolForClient}
         />
       </div>
     </Shell>
@@ -781,7 +786,7 @@ function MainContent(props) {
     setRelacoesForm,
     relacoesContext,
     setMainTab,
-    openRelacoesForClient,
+    openProtocolForClient,
   } = props;
 
   if (mainTab === "dashboard") {
@@ -819,7 +824,7 @@ function MainContent(props) {
         removeClient={removeClient}
         saving={saving}
         mobile={mobile}
-        openRelacoesForClient={openRelacoesForClient}
+        openProtocolForClient={openProtocolForClient}
       />
     );
   }
@@ -940,7 +945,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, saving, mobile, openRelacoesForClient }) {
+function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, saving, mobile, openProtocolForClient }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "340px minmax(0, 1fr)", gap: 18 }}>
       <aside style={{ display: "grid", gap: 14, alignSelf: "start" }}>
@@ -969,7 +974,7 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
         <ClientRecord client={selectedClient || { ...emptyClient, id: generateId() }} onSave={saveClient} mobile={mobile} saving={saving} />
         {selectedClient ? (
           <>
-            <ClientHeader client={selectedClient} onDelete={removeClient} onOpenRelacoes={() => openRelacoesForClient(selectedClient)} />
+            <ClientHeader client={selectedClient} onDelete={removeClient} onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)} />
             <ClientJourney client={selectedClient} mobile={mobile} />
             <FinalFeedback client={selectedClient} />
           </>
@@ -1513,24 +1518,34 @@ function FinancialView({ clients, mobile }) {
   );
 }
 
-function ClientHeader({ client, onDelete, onOpenRelacoes }) {
+function ClientHeader({ client, onDelete, onOpenProtocol }) {
   return (
     <Panel>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-        <div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 10 }}>
-            <div style={{ fontSize: 24, fontWeight: 800 }}>{client.nome}</div>
-            <StatusBadge status={client.status} />
+      <div style={{ display: "grid", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 10 }}>
+              <div style={{ fontSize: 24, fontWeight: 800 }}>{client.nome}</div>
+              <StatusBadge status={client.status} />
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14 }}>
+              <span>{client.whatsapp || "Contato nao informado"}</span>
+              <span>{client.email || "Sem email"}</span>
+              <span>TGR - {formatProtocols(client)}</span>
+            </div>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14 }}>
-            <span>{client.whatsapp || "Contato nao informado"}</span>
-            <span>{client.email || "Sem email"}</span>
-            <span>TGR - {formatProtocols(client)}</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4" }}>Remover</button>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="button" onClick={onOpenRelacoes} style={secondaryButtonStyle}>Abrir protocolo Relacoes</button>
-          <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4" }}>Remover</button>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ ...labelStyle, marginBottom: 0 }}>Protocolos da analise</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {(client.protocolosUsados || []).length ? (client.protocolosUsados || []).map((protocol) => (
+              <PillButton key={protocol} active={false} onClick={() => onOpenProtocol(protocol)} label={`Abrir ${protocol}`} />
+            )) : <span style={{ color: THEME.muted, fontSize: 14 }}>Nenhum protocolo selecionado ainda.</span>}
+          </div>
         </div>
       </div>
     </Panel>
