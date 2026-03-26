@@ -26,6 +26,23 @@ const METHOD_TABS = [
   { key: "referencias", label: "Referencias" },
 ];
 
+const METHOD_CATALOG = [
+  { slug: "aka", nome: "AKA", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "radiestesia", nome: "Radiestesia", resumo: "Abriga TGR, FRT e UNE." },
+  { slug: "pendulo-hebreu", nome: "Pendulo Hebreu", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "interface-venusiana", nome: "Interface Venusiana", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "alquimia-das-rosas", nome: "Alquimia das Rosas", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "ascensao-estelar", nome: "Ascensao Estelar", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "circulo-reconectivo", nome: "Circulo Reconectivo", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "money-reiki", nome: "Money Reiki", resumo: "Metodo salvo para futura estruturacao." },
+];
+
+const RADIOESTHESIA_METHODS = [
+  { slug: "tgr", nome: "TGR", resumo: "Protocolos, biometros, graficos, fichas e referencias." },
+  { slug: "frt", nome: "FRT", resumo: "Metodo salvo para futura estruturacao." },
+  { slug: "une", nome: "UNE", resumo: "Metodo salvo para futura estruturacao." },
+];
+
 const STATUS_OPTIONS = ["Novo contato", "Aguardando inicio", "Em atendimento", "Aguardando devolutiva", "Concluido"];
 const PAYMENT_OPTIONS = ["Pendente", "Parcial", "Pago"];
 
@@ -454,7 +471,8 @@ function App() {
   const [authError, setAuthError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uiMessage, setUiMessage] = useState("");
-  const [activeMethod, setActiveMethod] = useState("tgr");
+  const [activeMethod, setActiveMethod] = useState("radiestesia");
+  const [activeSubmethod, setActiveSubmethod] = useState("tgr");
   const [activeMethodTab, setActiveMethodTab] = useState("overview");
   const [activeTgrProtocol, setActiveTgrProtocol] = useState("relacoes");
   const [relacoesForm, setRelacoesForm] = useState(emptyRelacoesForm);
@@ -603,7 +621,8 @@ function App() {
 
   function handleTabChange(nextTab) {
     if (nextTab === "metodos") {
-      setActiveMethod("tgr");
+      setActiveMethod("radiestesia");
+      setActiveSubmethod("tgr");
       setActiveMethodTab("protocolos");
     }
     setMainTab(nextTab);
@@ -611,7 +630,8 @@ function App() {
 
   function openRelacoesForClient(client) {
     if (!client) return;
-    setActiveMethod("tgr");
+    setActiveMethod("radiestesia");
+    setActiveSubmethod("tgr");
     setActiveMethodTab("protocolos");
     setActiveTgrProtocol("relacoes");
     setRelacoesContext({
@@ -715,6 +735,8 @@ function App() {
           saving={saving}
           activeMethod={activeMethod}
           setActiveMethod={setActiveMethod}
+          activeSubmethod={activeSubmethod}
+          setActiveSubmethod={setActiveSubmethod}
           activeMethodTab={activeMethodTab}
           setActiveMethodTab={setActiveMethodTab}
           activeTgrProtocol={activeTgrProtocol}
@@ -749,6 +771,8 @@ function MainContent(props) {
     saving,
     activeMethod,
     setActiveMethod,
+    activeSubmethod,
+    setActiveSubmethod,
     activeMethodTab,
     setActiveMethodTab,
     activeTgrProtocol,
@@ -772,7 +796,8 @@ function MainContent(props) {
           setMainTab("clientes");
         }}
         onOpenMethod={() => {
-          setActiveMethod("tgr");
+          setActiveMethod("radiestesia");
+          setActiveSubmethod("tgr");
           setActiveMethodTab("protocolos");
           setMainTab("metodos");
         }}
@@ -818,6 +843,8 @@ function MainContent(props) {
       <MethodsView
         activeMethod={activeMethod}
         setActiveMethod={setActiveMethod}
+        activeSubmethod={activeSubmethod}
+        setActiveSubmethod={setActiveSubmethod}
         activeMethodTab={activeMethodTab}
         setActiveMethodTab={setActiveMethodTab}
         activeTgrProtocol={activeTgrProtocol}
@@ -877,15 +904,15 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
             <ActionTile title="Clientes" text={`${clients.length} clientes cadastrados`} />
             <ActionTile title="Atendimentos" text={`${appointments.length} atendimentos registrados`} />
             <ActionTile title="Pendencias" text={`${metrics.pendingFeedback} aguardando devolutiva`} />
-            <ActionTile title="Metodo ativo" text="TGR estruturado como primeiro metodo" />
+            <ActionTile title="Metodos" text="Radiestesia estruturada como primeiro bloco ativo" />
           </div>
         </Panel>
 
         <Panel>
           <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Metodos</div>
           <button type="button" onClick={onOpenMethod} style={{ ...secondaryButtonStyle, width: "100%", justifyContent: "space-between", display: "flex", padding: "14px 16px" }}>
-            <span>TGR</span>
-            <span style={{ color: THEME.muted }}>Protocolos, Biometros e Graficos</span>
+            <span>Radiestesia</span>
+            <span style={{ color: THEME.muted }}>TGR, FRT e UNE</span>
           </button>
         </Panel>
       </section>
@@ -983,9 +1010,10 @@ function AppointmentsView({ appointments, clients, mobile, onOpenClient }) {
   );
 }
 
-function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, relacoesContext, appointments, mobile }) {
-  const methodCards = [{ slug: "tgr", nome: "TGR", resumo: "Metodo principal com protocolos, biometros, graficos e fichas." }];
+function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActiveSubmethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, relacoesContext, appointments, mobile }) {
   const tgrAppointmentCount = appointments.filter((appointment) => appointment.methodSlug === "tgr").length;
+  const selectedMethod = METHOD_CATALOG.find((item) => item.slug === activeMethod) || METHOD_CATALOG[0];
+  const selectedSubmethod = RADIOESTHESIA_METHODS.find((item) => item.slug === activeSubmethod) || RADIOESTHESIA_METHODS[0];
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "260px minmax(0, 1fr)", gap: 18 }}>
@@ -993,7 +1021,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActive
         <Panel>
           <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Metodos</div>
           <div style={{ display: "grid", gap: 10 }}>
-            {methodCards.map((method) => (
+            {METHOD_CATALOG.map((method) => (
               <button key={method.slug} type="button" onClick={() => setActiveMethod(method.slug)} style={{ border: `1px solid ${activeMethod === method.slug ? THEME.green : THEME.line}`, background: activeMethod === method.slug ? "#f7fbf4" : "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
                 <div style={{ fontWeight: 800, marginBottom: 4 }}>{method.nome}</div>
                 <div style={{ color: THEME.muted, fontSize: 13 }}>{method.resumo}</div>
@@ -1001,39 +1029,71 @@ function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActive
             ))}
           </div>
         </Panel>
+
+        {activeMethod === "radiestesia" ? (
+          <Panel>
+            <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Submetodos</div>
+            <div style={{ display: "grid", gap: 10 }}>
+              {RADIOESTHESIA_METHODS.map((method) => (
+                <button key={method.slug} type="button" onClick={() => setActiveSubmethod(method.slug)} style={{ border: `1px solid ${activeSubmethod === method.slug ? THEME.green : THEME.line}`, background: activeSubmethod === method.slug ? "#f7fbf4" : "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
+                  <div style={{ fontWeight: 800, marginBottom: 4 }}>{method.nome}</div>
+                  <div style={{ color: THEME.muted, fontSize: 13 }}>{method.resumo}</div>
+                </button>
+              ))}
+            </div>
+          </Panel>
+        ) : null}
       </aside>
 
       <section style={{ display: "grid", gap: 18 }}>
-        <Panel>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-            <div>
-              <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>TGR</div>
-              <div style={{ color: THEME.muted }}>Protocolos, biometros, graficos, fichas e referencias.</div>
+        {activeMethod !== "radiestesia" ? (
+          <Panel>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedMethod.nome}</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo foi salvo no sistema e sera alimentado depois.</div>
             </div>
-            <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
-          </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
-            {METHOD_TABS.map((tab) => (
-              <PillButton key={tab.key} active={activeMethodTab === tab.key} onClick={() => setActiveMethodTab(tab.key)} label={tab.label} />
-            ))}
-          </div>
-        </Panel>
+          </Panel>
+        ) : activeSubmethod !== "tgr" ? (
+          <Panel>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedSubmethod.nome}</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este submetodo de Radiestesia foi salvo e sera estruturado depois.</div>
+            </div>
+          </Panel>
+        ) : (
+          <>
+            <Panel>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Radiestesia - TGR</div>
+                  <div style={{ color: THEME.muted }}>Protocolos, biometros, graficos, fichas e referencias.</div>
+                </div>
+                <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+                {METHOD_TABS.map((tab) => (
+                  <PillButton key={tab.key} active={activeMethodTab === tab.key} onClick={() => setActiveMethodTab(tab.key)} label={tab.label} />
+                ))}
+              </div>
+            </Panel>
 
-        {activeMethodTab === "overview" && <MethodOverview appointments={appointments} mobile={mobile} />}
-        {activeMethodTab === "protocolos" && (
-          <TgrProtocolsView
-            mobile={mobile}
-            activeProtocol={activeTgrProtocol}
-            setActiveProtocol={setActiveTgrProtocol}
-            relacoesForm={relacoesForm}
-            setRelacoesForm={setRelacoesForm}
-            relacoesContext={relacoesContext}
-          />
+            {activeMethodTab === "overview" && <MethodOverview appointments={appointments} mobile={mobile} />}
+            {activeMethodTab === "protocolos" && (
+              <TgrProtocolsView
+                mobile={mobile}
+                activeProtocol={activeTgrProtocol}
+                setActiveProtocol={setActiveTgrProtocol}
+                relacoesForm={relacoesForm}
+                setRelacoesForm={setRelacoesForm}
+                relacoesContext={relacoesContext}
+              />
+            )}
+            {activeMethodTab === "biometros" && <MethodCatalog title="Biometros TGR" items={TGR_BIOMETERS} mobile={mobile} />}
+            {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
+            {activeMethodTab === "fichas" && <MethodCatalog title="Fichas TGR" items={TGR_FICHAS} mobile={mobile} />}
+            {activeMethodTab === "referencias" && <MethodCatalog title="Referencias TGR" items={TGR_REFERENCES} mobile={mobile} />}
+          </>
         )}
-        {activeMethodTab === "biometros" && <MethodCatalog title="Biometros TGR" items={TGR_BIOMETERS} mobile={mobile} />}
-        {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
-        {activeMethodTab === "fichas" && <MethodCatalog title="Fichas TGR" items={TGR_FICHAS} mobile={mobile} />}
-        {activeMethodTab === "referencias" && <MethodCatalog title="Referencias TGR" items={TGR_REFERENCES} mobile={mobile} />}
       </section>
     </div>
   );
