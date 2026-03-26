@@ -53,13 +53,47 @@ const TGR_BIOMETERS = [
   { slug: "rel-emocional", nome: "Relacionamento - Campo Emocional", tema: "Relacoes" },
 ];
 
-const TGR_GRAPHICS = [
-  { slug: "despertar", nome: "Graficos de Despertar", tema: "Protocolos TGR" },
-  { slug: "harmonia", nome: "Graficos de Harmonia", tema: "Protocolos TGR" },
-  { slug: "vitalidade", nome: "Graficos de Vitalidade", tema: "Protocolos TGR" },
-  { slug: "relacoes", nome: "Graficos de Relacoes", tema: "Protocolos TGR" },
-  { slug: "limpeza-protecao", nome: "Graficos de Limpeza e Protecao", tema: "Protocolos TGR" },
-  { slug: "psicoemocionais", nome: "Graficos Psicoemocionais", tema: "Protocolos TGR" },
+const TGR_GRAPHIC_GROUPS = [
+  {
+    slug: "limpeza-protecao",
+    nome: "Limpeza e Protecao",
+    graficos: ["Limpeza geral", "Desmagnetizacao", "Protecao de campo", "Corte de interferencias"],
+  },
+  {
+    slug: "harmonia",
+    nome: "Harmonia",
+    graficos: ["Harmonizacao geral", "Reequilibrio interno", "Coerencia do campo", "Estabilizacao energetica"],
+  },
+  {
+    slug: "vitalidade",
+    nome: "Vitalidade",
+    graficos: ["Ativacao vital", "Recuperacao de energia", "Sustentacao do campo", "Revitalizacao"],
+  },
+  {
+    slug: "relacoes",
+    nome: "Relacoes",
+    graficos: ["Harmonizacao relacional", "Reorganizacao de vinculos", "Limpeza relacional", "Clareza de conexao"],
+  },
+  {
+    slug: "prosperidade",
+    nome: "Prosperidade",
+    graficos: ["Fluxo de prosperidade", "Desbloqueio de realizacao", "Organizacao de merecimento", "Expansao de fluxo"],
+  },
+  {
+    slug: "psicoemocionais",
+    nome: "Psicoemocionais",
+    graficos: ["Equilibrio emocional", "Organizacao mental", "Calmaria interna", "Descompressao psiquica"],
+  },
+  {
+    slug: "despertar",
+    nome: "Despertar",
+    graficos: ["Abertura de consciencia", "Expansao de percepcao", "Reposicionamento interno", "Alinhamento de proposito"],
+  },
+  {
+    slug: "chakras",
+    nome: "Chakras",
+    graficos: ["Chakras gerais", "Alinhamento de centros", "Reorganizacao dos chakras", "Fortalecimento dos centros"],
+  },
 ];
 
 const TGR_FICHAS = [
@@ -86,12 +120,6 @@ const CHAKRA_OPTIONS = [
 ];
 
 const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convivio", "Outro"];
-
-const RELACOES_GRAPHICS = [
-  "Graficos de Relacoes",
-  "Graficos de Apoio Relacional",
-  "Graficos complementares do TGR",
-];
 
 const emptyRelacoesForm = {
   tipoRelacao: "Amorosa",
@@ -905,7 +933,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActive
           />
         )}
         {activeMethodTab === "biometros" && <MethodCatalog title="Biometros TGR" items={TGR_BIOMETERS} mobile={mobile} />}
-        {activeMethodTab === "graficos" && <MethodCatalog title="Graficos TGR" items={TGR_GRAPHICS} mobile={mobile} />}
+        {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
         {activeMethodTab === "fichas" && <MethodCatalog title="Fichas TGR" items={TGR_FICHAS} mobile={mobile} />}
         {activeMethodTab === "referencias" && <MethodCatalog title="Referencias TGR" items={TGR_REFERENCES} mobile={mobile} />}
       </section>
@@ -954,7 +982,31 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
   );
 }
 
+function TgrGraphicsLibrary({ mobile }) {
+  const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
+  const currentGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+
+  return (
+    <div style={{ display: "grid", gap: 18 }}>
+      <MethodCatalog title="Tipos de graficos" items={TGR_GRAPHIC_GROUPS} mobile={mobile} activeSlug={currentGroup.slug} onSelect={setActiveGraphicGroup} />
+      <Panel>
+        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{currentGroup.nome}</div>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+          {currentGroup.graficos.map((graphic) => (
+            <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, background: "#fffdfa", padding: "14px 16px", fontWeight: 700 }}>
+              {graphic}
+            </div>
+          ))}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
 function RelacoesProtocolView({ mobile, form, setForm, context }) {
+  const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
+  const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+
   function setField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
   }
@@ -1101,11 +1153,34 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
         <SectionTitle title="Sintese e conduta" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           <div style={{ gridColumn: "1 / -1" }}>
-            <div style={{ ...labelStyle, marginBottom: 8 }}>Graficos usados</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {RELACOES_GRAPHICS.map((graphic) => (
-                <PillButton key={graphic} active={(form.graficosSelecionados || []).includes(graphic)} onClick={() => toggleGraphic(graphic)} label={graphic} />
-              ))}
+            <div style={{ ...labelStyle, marginBottom: 8 }}>Graficos TGR</div>
+            <div style={{ display: "grid", gap: 14 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {TGR_GRAPHIC_GROUPS.map((group) => (
+                  <PillButton key={group.slug} active={currentGraphicGroup.slug === group.slug} onClick={() => setActiveGraphicGroup(group.slug)} label={group.nome} />
+                ))}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
+                {currentGraphicGroup.graficos.map((graphic) => (
+                  <button
+                    key={graphic}
+                    type="button"
+                    onClick={() => toggleGraphic(graphic)}
+                    style={{
+                      border: `1px solid ${(form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.line}`,
+                      background: (form.graficosSelecionados || []).includes(graphic) ? "#f7fbf4" : "#fffdfa",
+                      borderRadius: 16,
+                      padding: "12px 14px",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      fontWeight: 700,
+                      color: (form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.text,
+                    }}
+                  >
+                    {graphic}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           {(form.graficosSelecionados || []).length ? (
@@ -1171,7 +1246,7 @@ function MethodCatalog({ title, items, mobile, activeSlug, onSelect }) {
             }}
           >
             <div style={{ fontWeight: 800, marginBottom: title === "Protocolos TGR" ? 0 : 6 }}>{item.nome}</div>
-            {title !== "Protocolos TGR" ? <div style={{ color: THEME.muted, lineHeight: 1.6 }}>{item.resumo || item.tema || item.tipo}</div> : null}
+            {title !== "Protocolos TGR" ? <div style={{ color: THEME.muted, lineHeight: 1.6 }}>{item.resumo || item.tema || item.tipo || `${(item.graficos || []).length} opcoes`}</div> : null}
           </button>
         ))}
       </div>
