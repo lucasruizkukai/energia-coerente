@@ -1434,7 +1434,7 @@ function MainContent(props) {
     );
   }
 
-  if (mainTab === "devolutivas") return <FeedbacksView clients={clients} mobile={mobile} />;
+  if (mainTab === "devolutivas") return <FeedbacksView clients={clients} mobile={mobile} selectedClient={selectedClient} />;
   return <FinancialView clients={clients} mobile={mobile} />;
 }
 
@@ -1618,6 +1618,46 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
   const tgrAppointmentCount = appointments.filter((appointment) => appointment.methodSlug === "tgr").length;
   const selectedMethod = METHOD_CATALOG.find((item) => item.slug === activeMethod) || METHOD_CATALOG[0];
   const selectedSubmethod = RADIOESTHESIA_METHODS.find((item) => item.slug === activeSubmethod) || RADIOESTHESIA_METHODS[0];
+  const focusedClient = selectedClient || (relacoesContext ? { nome: relacoesContext.clientName } : null);
+  const focusMode = Boolean(focusedClient);
+
+  if (focusMode) {
+    return (
+      <section style={{ display: "grid", gap: 18 }}>
+        <Panel>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>TGR</div>
+              <div style={{ color: THEME.muted }}>Atendimento em foco de {focusedClient.nome}.</div>
+            </div>
+            <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+            {METHOD_TABS.map((tab) => (
+              <PillButton key={tab.key} active={activeMethodTab === tab.key} onClick={() => setActiveMethodTab(tab.key)} label={tab.label} />
+            ))}
+          </div>
+        </Panel>
+
+        {activeMethodTab === "overview" && <MethodOverview appointments={appointments} mobile={mobile} />}
+        {activeMethodTab === "protocolos" && (
+          <TgrProtocolsView
+            mobile={mobile}
+            activeProtocol={activeTgrProtocol}
+            setActiveProtocol={setActiveTgrProtocol}
+            relacoesForm={relacoesForm}
+            setRelacoesForm={setRelacoesForm}
+            protocolSupportForms={protocolSupportForms}
+            setProtocolSupportForms={setProtocolSupportForms}
+            relacoesContext={relacoesContext}
+            selectedClient={selectedClient}
+            toggleClientProtocol={toggleClientProtocol}
+            saveProtocolToClient={saveProtocolToClient}
+          />
+        )}
+      </section>
+    );
+  }
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "260px minmax(0, 1fr)", gap: 18 }}>
@@ -2204,7 +2244,21 @@ function MethodCatalog({ title, items, mobile, activeSlug, onSelect }) {
   );
 }
 
-function FeedbacksView({ clients, mobile }) {
+function FeedbacksView({ clients, mobile, selectedClient }) {
+  if (selectedClient) {
+    return (
+      <div style={{ display: "grid", gap: 18 }}>
+        <Panel>
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 22, fontWeight: 800 }}>Devolutiva da cliente</div>
+            <div style={{ color: THEME.muted }}>Modo focado para {selectedClient.nome}.</div>
+          </div>
+        </Panel>
+        <FinalFeedback client={selectedClient} />
+      </div>
+    );
+  }
+
   const pending = clients.filter((client) => client.status === "Aguardando devolutiva");
   const completed = clients.filter((client) => client.status === "Concluido");
 
