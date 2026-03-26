@@ -20,7 +20,6 @@ const MAIN_TABS = [
 const METHOD_TABS = [
   { key: "overview", label: "Visao geral" },
   { key: "protocolos", label: "Protocolos" },
-  { key: "graficos", label: "Graficos" },
 ];
 
 const METHOD_CATALOG = [
@@ -735,18 +734,6 @@ function formatProtocols(client) {
 function findProtocolSlugByName(name) {
   const match = TGR_PROTOCOLS.find((item) => item.nome.toLowerCase() === String(name || "").toLowerCase());
   return match?.slug || "relacoes";
-}
-
-function buildGraphicLibrary() {
-  return TGR_GRAPHIC_GROUPS.flatMap((group) =>
-    group.graficos.map((graphic) => ({
-      id: `${group.slug}-${graphic.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
-      nome: graphic,
-      origem: group.nome,
-      contextos: GRAPHIC_CONTEXT_OPTIONS,
-      resumo: `Grafico da apostila ${group.nome}, aplicavel em diferentes analises do TGR conforme o contexto escolhido.`,
-    }))
-  );
 }
 
 const primaryButtonStyle = {
@@ -1519,7 +1506,6 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
                 relacoesContext={relacoesContext}
               />
             )}
-            {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
               </>
             )}
           </>
@@ -1538,7 +1524,7 @@ function MethodOverview({ appointments, mobile }) {
       </Panel>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Ferramentas</div>
-        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Os graficos ficam organizados como biblioteca do metodo, enquanto a propria ficha do app concentra o registro do atendimento.</div>
+        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Os graficos sao escolhidos dentro de cada protocolo, junto do contexto de uso e do tempo ativo no atendimento.</div>
       </Panel>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Uso atual</div>
@@ -1573,74 +1559,6 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
           context={relacoesContext}
         />
       )}
-    </div>
-  );
-}
-
-function TgrGraphicsLibrary({ mobile }) {
-  const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
-  const [activeGraphic, setActiveGraphic] = useState(TGR_GRAPHIC_GROUPS[0].graficos[0]);
-  const [showGraphicDetails, setShowGraphicDetails] = useState(false);
-  const currentGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
-  const graphicLibrary = buildGraphicLibrary();
-  const currentGraphic = graphicLibrary.find((item) => item.nome === activeGraphic && item.origem === currentGroup.nome) || graphicLibrary.find((item) => item.origem === currentGroup.nome) || null;
-
-  useEffect(() => {
-    setActiveGraphic(currentGroup.graficos[0]);
-    setShowGraphicDetails(false);
-  }, [currentGroup]);
-
-  return (
-    <div style={{ display: "grid", gap: 18 }}>
-      <MethodCatalog title="Tipos de graficos" items={TGR_GRAPHIC_GROUPS} mobile={mobile} activeSlug={currentGroup.slug} onSelect={setActiveGraphicGroup} />
-      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "0.95fr 1.05fr", gap: 18 }}>
-        <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{currentGroup.nome}</div>
-          <div style={{ display: "grid", gap: 10 }}>
-            {currentGroup.graficos.map((graphic) => (
-              <button
-                key={graphic}
-                type="button"
-                onClick={() => setActiveGraphic(graphic)}
-                style={{
-                  border: `1px solid ${activeGraphic === graphic ? THEME.green : THEME.line}`,
-                  borderRadius: 16,
-                  background: activeGraphic === graphic ? "#f7fbf4" : "#fffdfa",
-                  padding: "12px 14px",
-                  textAlign: "left",
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  color: activeGraphic === graphic ? THEME.green : THEME.text,
-                }}
-              >
-                {graphic}
-              </button>
-            ))}
-          </div>
-        </Panel>
-        <Panel>
-          {currentGraphic ? (
-            <div style={{ display: "grid", gap: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-                <div>
-                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{currentGraphic.nome}</div>
-                  <div style={{ color: THEME.muted }}>Origem: {currentGraphic.origem}</div>
-                </div>
-                <button type="button" onClick={() => setShowGraphicDetails((current) => !current)} style={secondaryButtonStyle}>
-                  {showGraphicDetails ? "Ocultar detalhes" : "Ver detalhes"}
-                </button>
-              </div>
-              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>{currentGraphic.resumo}</div>
-              {showGraphicDetails ? (
-                <div style={{ display: "grid", gap: 12 }}>
-                  <InfoCard label="Contextos de uso" value={currentGraphic.contextos.join(", ")} />
-                  <InfoCard label="Aplicacao" value="Use este grafico no atendimento escolhendo o contexto e o tempo ativo conforme a leitura realizada." />
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </Panel>
-      </div>
     </div>
   );
 }
