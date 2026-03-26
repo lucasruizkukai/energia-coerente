@@ -55,44 +55,83 @@ const TGR_BIOMETERS = [
 
 const TGR_GRAPHIC_GROUPS = [
   {
-    slug: "limpeza-protecao",
-    nome: "Limpeza e Protecao",
-    graficos: ["Limpeza geral", "Desmagnetizacao", "Protecao de campo", "Corte de interferencias"],
+    slug: "despertar",
+    nome: "Despertar",
+    graficos: [
+      "Antahkarana",
+      "Cosmos 2000",
+      "Cruz Atlante",
+      "Energia Divina",
+      "Fiat Lux",
+      "Grafico dos Mestres",
+      "Cubo de Metatron",
+      "Prosperador",
+      "Prosperidade Divina",
+      "Selo Misterioso do Sol",
+      "Sorte e Sucesso",
+      "Vortex",
+    ],
   },
   {
     slug: "harmonia",
     nome: "Harmonia",
-    graficos: ["Harmonizacao geral", "Reequilibrio interno", "Coerencia do campo", "Estabilizacao energetica"],
+    graficos: [
+      "Desembaracador",
+      "Desembaracador de Relacionamentos",
+      "Desembaracador Material",
+      "Vesica Piscis",
+      "Justica Divina",
+    ],
   },
   {
-    slug: "vitalidade",
-    nome: "Vitalidade",
-    graficos: ["Ativacao vital", "Recuperacao de energia", "Sustentacao do campo", "Revitalizacao"],
-  },
-  {
-    slug: "relacoes",
-    nome: "Relacoes",
-    graficos: ["Harmonizacao relacional", "Reorganizacao de vinculos", "Limpeza relacional", "Clareza de conexao"],
-  },
-  {
-    slug: "prosperidade",
-    nome: "Prosperidade",
-    graficos: ["Fluxo de prosperidade", "Desbloqueio de realizacao", "Organizacao de merecimento", "Expansao de fluxo"],
+    slug: "protecao",
+    nome: "Protecao",
+    graficos: ["9 Circulos", "7 Circulos / Iave", "Psicoprotetor", "Tetragrammaton"],
   },
   {
     slug: "psicoemocionais",
     nome: "Psicoemocionais",
-    graficos: ["Equilibrio emocional", "Organizacao mental", "Calmaria interna", "Descompressao psiquica"],
+    graficos: [
+      "Abertura",
+      "Aceitar e Soltar",
+      "Amor ao Proximo",
+      "Amor Universal",
+      "Confiar com Alegria",
+      "Coragem",
+      "Dependencia e Vicios",
+      "Desilusao Amorosa",
+      "Forca de Vontade",
+      "Mundo Interior",
+      "Positividade",
+      "Pureza Interior",
+      "Nervos",
+    ],
   },
   {
-    slug: "despertar",
-    nome: "Despertar",
-    graficos: ["Abertura de consciencia", "Expansao de percepcao", "Reposicionamento interno", "Alinhamento de proposito"],
+    slug: "vitalidade",
+    nome: "Vitalidade",
+    graficos: [
+      "Archine",
+      "Captador de Energia Solar",
+      "Cruz de Sao Mauro",
+      "Magnetismo Vital e Curativo",
+      "Relaxamento",
+      "Forcas Universais",
+    ],
   },
   {
-    slug: "chakras",
-    nome: "Chakras",
-    graficos: ["Chakras gerais", "Alinhamento de centros", "Reorganizacao dos chakras", "Fortalecimento dos centros"],
+    slug: "limpeza",
+    nome: "Limpeza",
+    graficos: [
+      "Corte Energetico",
+      "Cruz Ansata",
+      "Guedes II",
+      "Keiti",
+      "Limpeza e Recarga",
+      "Nenas",
+      "Scap",
+      "Yoshua",
+    ],
   },
 ];
 
@@ -120,6 +159,7 @@ const CHAKRA_OPTIONS = [
 ];
 
 const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convivio", "Outro"];
+const GRAPHIC_CONTEXT_OPTIONS = ["Relacoes", "Prosperidade e Dinheiro", "Limpeza e Protecao Energetica"];
 
 const emptyRelacoesForm = {
   tipoRelacao: "Amorosa",
@@ -139,6 +179,7 @@ const emptyRelacoesForm = {
   observacoesChakras: "",
   leituraGraficos: "",
   graficosSelecionados: [],
+  contextoGraficos: {},
   tempoAtivacaoGraficos: {},
   sinteseGraficos: "",
   intervencaoIndicada: "",
@@ -319,6 +360,17 @@ function findProtocolName(slug) {
 
 function formatProtocols(client) {
   return (client.protocolosUsados || []).length ? client.protocolosUsados.join(", ") : findProtocolName(client.protocolSlug);
+}
+
+function buildGraphicLibrary() {
+  return TGR_GRAPHIC_GROUPS.flatMap((group) =>
+    group.graficos.map((graphic) => ({
+      id: `${group.slug}-${graphic.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      nome: graphic,
+      origem: group.nome,
+      contextos: GRAPHIC_CONTEXT_OPTIONS,
+    }))
+  );
 }
 
 const primaryButtonStyle = {
@@ -984,21 +1036,56 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
 
 function TgrGraphicsLibrary({ mobile }) {
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
+  const [activeGraphic, setActiveGraphic] = useState(TGR_GRAPHIC_GROUPS[0].graficos[0]);
   const currentGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+  const graphicLibrary = buildGraphicLibrary();
+  const currentGraphic = graphicLibrary.find((item) => item.nome === activeGraphic && item.origem === currentGroup.nome) || graphicLibrary.find((item) => item.origem === currentGroup.nome) || null;
+
+  useEffect(() => {
+    setActiveGraphic(currentGroup.graficos[0]);
+  }, [currentGroup]);
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <MethodCatalog title="Tipos de graficos" items={TGR_GRAPHIC_GROUPS} mobile={mobile} activeSlug={currentGroup.slug} onSelect={setActiveGraphicGroup} />
-      <Panel>
-        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{currentGroup.nome}</div>
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          {currentGroup.graficos.map((graphic) => (
-            <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, background: "#fffdfa", padding: "14px 16px", fontWeight: 700 }}>
-              {graphic}
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "0.95fr 1.05fr", gap: 18 }}>
+        <Panel>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{currentGroup.nome}</div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {currentGroup.graficos.map((graphic) => (
+              <button
+                key={graphic}
+                type="button"
+                onClick={() => setActiveGraphic(graphic)}
+                style={{
+                  border: `1px solid ${activeGraphic === graphic ? THEME.green : THEME.line}`,
+                  borderRadius: 16,
+                  background: activeGraphic === graphic ? "#f7fbf4" : "#fffdfa",
+                  padding: "12px 14px",
+                  textAlign: "left",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  color: activeGraphic === graphic ? THEME.green : THEME.text,
+                }}
+              >
+                {graphic}
+              </button>
+            ))}
+          </div>
+        </Panel>
+        <Panel>
+          {currentGraphic ? (
+            <div style={{ display: "grid", gap: 14 }}>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{currentGraphic.nome}</div>
+                <div style={{ color: THEME.muted }}>Origem: {currentGraphic.origem}</div>
+              </div>
+              <InfoCard label="Contextos de uso" value={currentGraphic.contextos.join(", ")} />
+              <InfoCard label="Aplicacao" value="Este grafico pode ser usado em diferentes analises do TGR, conforme o contexto escolhido no atendimento." />
             </div>
-          ))}
-        </div>
-      </Panel>
+          ) : null}
+        </Panel>
+      </div>
     </div>
   );
 }
@@ -1048,6 +1135,16 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
       ...current,
       tempoAtivacaoGraficos: {
         ...(current.tempoAtivacaoGraficos || {}),
+        [graphic]: value,
+      },
+    }));
+  }
+
+  function setGraphicContext(graphic, value) {
+    setForm((current) => ({
+      ...current,
+      contextoGraficos: {
+        ...(current.contextoGraficos || {}),
         [graphic]: value,
       },
     }));
@@ -1185,16 +1282,21 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
           </div>
           {(form.graficosSelecionados || []).length ? (
             <div style={{ gridColumn: "1 / -1", display: "grid", gap: 10 }}>
-              <div style={{ ...labelStyle, marginBottom: 0 }}>Tempo ativo de cada grafico</div>
+              <div style={{ ...labelStyle, marginBottom: 0 }}>Configuracao dos graficos selecionados</div>
               {(form.graficosSelecionados || []).map((graphic) => (
-                <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
                   <div style={{ fontWeight: 700 }}>{graphic}</div>
-                  <input
-                    value={form.tempoAtivacaoGraficos?.[graphic] || ""}
-                    onChange={(event) => setGraphicDuration(graphic, event.target.value)}
-                    style={inputStyle}
-                    placeholder="Ex.: 7 dias, continuo"
-                  />
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                    <select value={form.contextoGraficos?.[graphic] || "Relacoes"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                      {GRAPHIC_CONTEXT_OPTIONS.map((option) => <option key={option}>{option}</option>)}
+                    </select>
+                    <input
+                      value={form.tempoAtivacaoGraficos?.[graphic] || ""}
+                      onChange={(event) => setGraphicDuration(graphic, event.target.value)}
+                      style={inputStyle}
+                      placeholder="Ex.: 7 dias, continuo"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
