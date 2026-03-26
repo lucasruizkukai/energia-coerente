@@ -1032,7 +1032,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
 
         {activeMethod === "radiestesia" ? (
           <Panel>
-            <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Submetodos</div>
+            <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Radiestesia</div>
             <div style={{ display: "grid", gap: 10 }}>
               {RADIOESTHESIA_METHODS.map((method) => (
                 <button key={method.slug} type="button" onClick={() => setActiveSubmethod(method.slug)} style={{ border: `1px solid ${activeSubmethod === method.slug ? THEME.green : THEME.line}`, background: activeSubmethod === method.slug ? "#f7fbf4" : "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
@@ -1053,15 +1053,46 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
               <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo foi salvo no sistema e sera alimentado depois.</div>
             </div>
           </Panel>
-        ) : activeSubmethod !== "tgr" ? (
-          <Panel>
-            <div style={{ display: "grid", gap: 8 }}>
-              <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedSubmethod.nome}</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este submetodo de Radiestesia foi salvo e sera estruturado depois.</div>
-            </div>
-          </Panel>
         ) : (
           <>
+            <Panel>
+              <div style={{ display: "grid", gap: 14 }}>
+                <div>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Radiestesia</div>
+                  <div style={{ color: THEME.muted }}>TGR, FRT e UNE ficam separados como menus proprios.</div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
+                  {RADIOESTHESIA_METHODS.map((method) => (
+                    <button
+                      key={method.slug}
+                      type="button"
+                      onClick={() => setActiveSubmethod(method.slug)}
+                      style={{
+                        border: `1px solid ${activeSubmethod === method.slug ? THEME.green : THEME.line}`,
+                        background: activeSubmethod === method.slug ? "#f7fbf4" : "#fffdfa",
+                        borderRadius: 18,
+                        padding: "14px 16px",
+                        textAlign: "left",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div style={{ fontWeight: 800, marginBottom: 4 }}>{method.nome}</div>
+                      <div style={{ color: THEME.muted, fontSize: 13 }}>{method.resumo}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </Panel>
+
+            {activeSubmethod !== "tgr" ? (
+              <Panel>
+                <div style={{ display: "grid", gap: 8 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedSubmethod.nome}</div>
+                  <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo de Radiestesia foi salvo e sera estruturado depois.</div>
+                </div>
+              </Panel>
+            ) : (
+              <>
             <Panel>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div>
@@ -1092,6 +1123,8 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
             {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
             {activeMethodTab === "fichas" && <MethodCatalog title="Fichas TGR" items={TGR_FICHAS} mobile={mobile} />}
             {activeMethodTab === "referencias" && <MethodCatalog title="Referencias TGR" items={TGR_REFERENCES} mobile={mobile} />}
+              </>
+            )}
           </>
         )}
       </section>
