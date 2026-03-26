@@ -373,6 +373,25 @@ function formatDate(value) {
   return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 }
 
+function formatFullDate(value) {
+  if (!value) return "Sem data";
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("pt-BR");
+}
+
+function buildAttendanceDateOptions(client) {
+  const history = Array.isArray(client?.atendimentosHistorico) ? client.atendimentosHistorico : [];
+  const dates = [client?.dataInicio, ...history.map((item) => (typeof item === "string" ? item : item?.dataInicio || item?.data || ""))]
+    .filter(Boolean)
+    .filter((value, index, list) => list.indexOf(value) === index);
+
+  return dates.map((value, index) => ({
+    value,
+    label: index === 0 ? `${formatFullDate(value)} · Analise atual` : formatFullDate(value),
+  }));
+}
+
 function getDaysSinceStart(startDate) {
   if (!startDate) return 1;
   const start = new Date(`${startDate}T12:00:00`);
@@ -1573,6 +1592,7 @@ function ClientJourney({ client, mobile }) {
 function ClientRecord({ client, onSave, mobile, saving = false }) {
   const [form, setForm] = useState(client);
   const [formError, setFormError] = useState("");
+  const attendanceDateOptions = useMemo(() => buildAttendanceDateOptions(form), [form]);
 
   useEffect(() => {
     setForm(client);
@@ -1609,6 +1629,20 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
           <div style={{ fontSize: 18, fontWeight: 800 }}>Ficha do atendimento</div>
           <button type="submit" disabled={saving} style={{ ...primaryButtonStyle, opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>{saving ? "Salvando..." : "Salvar"}</button>
         </div>
+        {attendanceDateOptions.length ? (
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "280px 1fr", gap: 12, alignItems: "end" }}>
+            <Field label="Atendimentos por data">
+              <select value={form.dataInicio || attendanceDateOptions[0]?.value || ""} style={{ ...inputStyle, background: "#f4efe8" }} disabled>
+                {attendanceDateOptions.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </select>
+            </Field>
+            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
+              O historico por data fica aqui. Quando o prontuario tiver mais analises, sera possivel voltar por esta lista.
+            </div>
+          </div>
+        ) : null}
         {formError ? <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff5f1", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", fontWeight: 700 }}>{formError}</div> : null}
         <SectionTitle title="Cliente e metodo" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
