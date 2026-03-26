@@ -810,6 +810,7 @@ function MainContent(props) {
     setSelectedId,
     saveClient,
     removeClient,
+    finalizeClient,
     saving,
     activeMethod,
     setActiveMethod,
