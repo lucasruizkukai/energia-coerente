@@ -650,6 +650,17 @@ function App() {
     }
   }
 
+  async function finalizeClient(id) {
+    const currentClient = clients.find((item) => item.id === id);
+    if (!currentClient) return;
+
+    await saveClient({
+      ...currentClient,
+      status: "Concluido",
+    });
+    setUiMessage("Analise finalizada.");
+  }
+
   function handleTabChange(nextTab) {
     if (nextTab === "metodos") {
       setActiveMethod("radiestesia");
@@ -838,20 +849,21 @@ function MainContent(props) {
 
   if (mainTab === "clientes") {
     return (
-      <ClientsView
-        clients={filteredClients}
-        selectedClient={selectedClient}
-        search={search}
-        setSearch={setSearch}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        setSelectedId={setSelectedId}
-        saveClient={saveClient}
-        removeClient={removeClient}
-        saving={saving}
-        mobile={mobile}
-        openProtocolForClient={openProtocolForClient}
-      />
+        <ClientsView
+          clients={filteredClients}
+          selectedClient={selectedClient}
+          search={search}
+          setSearch={setSearch}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          setSelectedId={setSelectedId}
+          saveClient={saveClient}
+          removeClient={removeClient}
+          finalizeClient={finalizeClient}
+          saving={saving}
+          mobile={mobile}
+          openProtocolForClient={openProtocolForClient}
+        />
     );
   }
 
@@ -971,7 +983,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, saving, mobile, openProtocolForClient }) {
+function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, saving, mobile, openProtocolForClient }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "340px minmax(0, 1fr)", gap: 18 }}>
       <aside style={{ display: "grid", gap: 14, alignSelf: "start" }}>
@@ -999,7 +1011,7 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
       <section style={{ display: "grid", gap: 18 }}>
         {selectedClient ? (
           <>
-            <ClientHeader client={selectedClient} onDelete={removeClient} onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)} />
+            <ClientHeader client={selectedClient} onDelete={removeClient} onFinalize={finalizeClient} onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)} />
             <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
             <ClientJourney client={selectedClient} mobile={mobile} />
             <FinalFeedback client={selectedClient} />
@@ -1544,8 +1556,9 @@ function FinancialView({ clients, mobile }) {
   );
 }
 
-function ClientHeader({ client, onDelete, onOpenProtocol }) {
+function ClientHeader({ client, onDelete, onFinalize, onOpenProtocol }) {
   const validProtocols = getValidProtocols(client.protocolosUsados);
+  const attendanceDateOptions = buildAttendanceDateOptions(client);
 
   return (
     <Panel>
@@ -1563,11 +1576,26 @@ function ClientHeader({ client, onDelete, onOpenProtocol }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" onClick={() => onFinalize(client.id)} disabled={client.status === "Concluido"} style={{ ...secondaryButtonStyle, opacity: client.status === "Concluido" ? 0.65 : 1, cursor: client.status === "Concluido" ? "default" : "pointer" }}>
+              Finalizar analise
+            </button>
             <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4" }}>Remover</button>
           </div>
         </div>
 
         <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 280px) 1fr", gap: 12, alignItems: "end" }}>
+            <Field label="Atendimentos por data">
+              <select value={client.dataInicio || attendanceDateOptions[0]?.value || ""} style={{ ...inputStyle, background: "#f4efe8" }} disabled>
+                {attendanceDateOptions.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </select>
+            </Field>
+            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
+              Use esta lista para localizar a analise pela data. Quando o prontuario tiver mais atendimentos, eles aparecerao aqui.
+            </div>
+          </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button type="button" onClick={() => onOpenProtocol(validProtocols[0] || "Relacoes")} style={primaryButtonStyle}>Abrir TGR</button>
           </div>
@@ -1606,7 +1634,6 @@ function ClientJourney({ client, mobile }) {
 function ClientRecord({ client, onSave, mobile, saving = false }) {
   const [form, setForm] = useState(client);
   const [formError, setFormError] = useState("");
-  const attendanceDateOptions = useMemo(() => buildAttendanceDateOptions(form), [form]);
 
   useEffect(() => {
     setForm(client);
@@ -1643,20 +1670,6 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
           <div style={{ fontSize: 18, fontWeight: 800 }}>Ficha do atendimento</div>
           <button type="submit" disabled={saving} style={{ ...primaryButtonStyle, opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>{saving ? "Salvando..." : "Salvar"}</button>
         </div>
-        {attendanceDateOptions.length ? (
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "280px 1fr", gap: 12, alignItems: "end" }}>
-            <Field label="Atendimentos por data">
-              <select value={form.dataInicio || attendanceDateOptions[0]?.value || ""} style={{ ...inputStyle, background: "#f4efe8" }} disabled>
-                {attendanceDateOptions.map((item) => (
-                  <option key={item.value} value={item.value}>{item.label}</option>
-                ))}
-              </select>
-            </Field>
-            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
-              O historico por data fica aqui. Quando o prontuario tiver mais analises, sera possivel voltar por esta lista.
-            </div>
-          </div>
-        ) : null}
         {formError ? <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff5f1", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", fontWeight: 700 }}>{formError}</div> : null}
         <SectionTitle title="Cliente e metodo" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
