@@ -913,6 +913,9 @@ function App() {
     filteredClients.find((client) => client.id === selectedId) ||
     clientsWithProgress.find((client) => client.id === selectedId) ||
     null;
+  const clientFocusMode =
+    (mainTab === "clientes" && Boolean(selectedClient)) ||
+    (mainTab === "metodos" && Boolean(relacoesContext?.clientId));
 
   useEffect(() => {
     if (!selectedClient) {
@@ -1209,12 +1212,54 @@ function App() {
     <Shell>
       <Header user={user} onLogout={handleLogout} mobile={mobile} />
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "18px 14px 40px" : "24px 24px 48px" }}>
-        <TopMetrics metrics={metrics} mobile={mobile} />
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
-          {MAIN_TABS.map((tab) => (
-            <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
-          ))}
-        </div>
+        {!clientFocusMode ? <TopMetrics metrics={metrics} mobile={mobile} /> : null}
+        {!clientFocusMode ? (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
+            {MAIN_TABS.map((tab) => (
+              <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
+            ))}
+          </div>
+        ) : (
+          <Panel style={{ marginTop: 10, marginBottom: 18, padding: "14px 16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800 }}>
+                  {selectedClient?.nome || relacoesContext?.clientName || "Atendimento em foco"}
+                </div>
+                <div style={{ color: THEME.muted, fontSize: 13 }}>
+                  Navegação reduzida para manter o atendimento mais seguro e direto.
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" onClick={() => setMainTab("clientes")} style={secondaryButtonStyle}>Prontuário</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveMethod("radiestesia");
+                    setActiveSubmethod("tgr");
+                    setActiveMethodTab("protocolos");
+                    setMainTab("metodos");
+                  }}
+                  style={secondaryButtonStyle}
+                >
+                  TGR
+                </button>
+                <button type="button" onClick={() => setMainTab("devolutivas")} style={secondaryButtonStyle}>Devolutiva</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedId("");
+                    setRelacoesContext(null);
+                    setMainTab("dashboard");
+                  }}
+                  style={primaryButtonStyle}
+                >
+                  Menu central
+                </button>
+              </div>
+            </div>
+          </Panel>
+        )}
         {uiMessage ? (
           <div style={{ marginBottom: 16 }}>
             <Panel style={{ padding: "12px 16px", background: "#fff8ef" }}>
