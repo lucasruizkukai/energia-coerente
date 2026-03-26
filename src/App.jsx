@@ -439,8 +439,15 @@ function findProtocolName(slug) {
   return TGR_PROTOCOLS.find((item) => item.slug === slug)?.nome || "Despertar";
 }
 
+function getValidProtocols(protocols = []) {
+  return (Array.isArray(protocols) ? protocols : []).filter((protocol) =>
+    PROTOCOL_OPTIONS.includes(protocol)
+  );
+}
+
 function formatProtocols(client) {
-  return (client.protocolosUsados || []).length ? client.protocolosUsados.join(", ") : findProtocolName(client.protocolSlug);
+  const validProtocols = getValidProtocols(client.protocolosUsados);
+  return validProtocols.length ? validProtocols.join(", ") : findProtocolName(client.protocolSlug);
 }
 
 function findProtocolSlugByName(name) {
@@ -1538,6 +1545,8 @@ function FinancialView({ clients, mobile }) {
 }
 
 function ClientHeader({ client, onDelete, onOpenProtocol }) {
+  const validProtocols = getValidProtocols(client.protocolosUsados);
+
   return (
     <Panel>
       <div style={{ display: "grid", gap: 14 }}>
@@ -1559,10 +1568,13 @@ function ClientHeader({ client, onDelete, onOpenProtocol }) {
         </div>
 
         <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" onClick={() => onOpenProtocol(validProtocols[0] || "Relacoes")} style={primaryButtonStyle}>Abrir TGR</button>
+          </div>
           <div style={{ ...labelStyle, marginBottom: 0 }}>Protocolos da analise</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {(client.protocolosUsados || []).length ? (client.protocolosUsados || []).map((protocol) => (
-              <PillButton key={protocol} active={false} onClick={() => onOpenProtocol(protocol)} label={`Abrir ${protocol}`} />
+            {validProtocols.length ? validProtocols.map((protocol) => (
+              <PillButton key={protocol} active={false} onClick={() => onOpenProtocol(protocol)} label={protocol} />
             )) : <span style={{ color: THEME.muted, fontSize: 14 }}>Nenhum protocolo selecionado ainda.</span>}
           </div>
         </div>
