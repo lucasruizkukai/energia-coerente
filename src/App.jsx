@@ -827,22 +827,6 @@ function App() {
   const [relacoesContext, setRelacoesContext] = useState(null);
 
   useEffect(() => {
-    if (!selectedClient) {
-      setRelacoesForm(emptyRelacoesForm);
-      setProtocolSupportForms({});
-      return;
-    }
-
-    const activeAnalysis = selectedClient.analyses?.find((analysis) => analysis.id === selectedClient.currentAnalysisId) || extractAnalysisFromClient(selectedClient);
-    const protocolForms = cloneProtocolForms(activeAnalysis.protocolForms);
-    setRelacoesForm(protocolForms.relacoes);
-    setProtocolSupportForms({
-      "limpeza-protecao": protocolForms["limpeza-protecao"],
-      prosperidade: protocolForms.prosperidade,
-    });
-  }, [selectedClient?.id, selectedClient?.currentAnalysisId]);
-
-  useEffect(() => {
     let mounted = true;
 
     async function bootstrap() {
@@ -929,6 +913,22 @@ function App() {
     filteredClients.find((client) => client.id === selectedId) ||
     clientsWithProgress.find((client) => client.id === selectedId) ||
     null;
+
+  useEffect(() => {
+    if (!selectedClient) {
+      setRelacoesForm(emptyRelacoesForm);
+      setProtocolSupportForms({});
+      return;
+    }
+
+    const activeAnalysis = selectedClient.analyses?.find((analysis) => analysis.id === selectedClient.currentAnalysisId) || extractAnalysisFromClient(selectedClient);
+    const protocolForms = cloneProtocolForms(activeAnalysis.protocolForms);
+    setRelacoesForm(protocolForms.relacoes);
+    setProtocolSupportForms({
+      "limpeza-protecao": protocolForms["limpeza-protecao"],
+      prosperidade: protocolForms.prosperidade,
+    });
+  }, [selectedClient?.id, selectedClient?.currentAnalysisId]);
 
   const metrics = useMemo(() => {
     const active = clientsWithProgress.filter((client) => client.status === "Em atendimento").length;
