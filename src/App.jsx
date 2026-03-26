@@ -21,7 +21,6 @@ const METHOD_TABS = [
   { key: "overview", label: "Visao geral" },
   { key: "protocolos", label: "Protocolos" },
   { key: "graficos", label: "Graficos" },
-  { key: "referencias", label: "Referencias" },
 ];
 
 const METHOD_CATALOG = [
@@ -36,7 +35,7 @@ const METHOD_CATALOG = [
 ];
 
 const RADIOESTHESIA_METHODS = [
-  { slug: "tgr", nome: "TGR", resumo: "Protocolos, graficos e referencias." },
+  { slug: "tgr", nome: "TGR", resumo: "Protocolos e graficos." },
   { slug: "frt", nome: "FRT", resumo: "Metodo salvo para futura estruturacao." },
   { slug: "une", nome: "UNE", resumo: "Metodo salvo para futura estruturacao." },
 ];
@@ -137,12 +136,6 @@ const TGR_GRAPHIC_GROUPS = [
       "Yoshua",
     ],
   },
-];
-
-const TGR_REFERENCES = [
-  { nome: "Apostilas TGR", tipo: "Referencia de estudo" },
-  { nome: "Protocolos completos", tipo: "Referencia operacional" },
-  { nome: "Graficos TGR", tipo: "Ferramentas de consulta" },
 ];
 
 const CHAKRA_OPTIONS = [
@@ -1230,7 +1223,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Radiestesia - TGR</div>
-                  <div style={{ color: THEME.muted }}>Protocolos, graficos e referencias.</div>
+                  <div style={{ color: THEME.muted }}>Protocolos e graficos.</div>
                 </div>
                 <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
               </div>
@@ -1253,7 +1246,6 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
               />
             )}
             {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
-            {activeMethodTab === "referencias" && <MethodCatalog title="Referencias TGR" items={TGR_REFERENCES} mobile={mobile} />}
               </>
             )}
           </>
