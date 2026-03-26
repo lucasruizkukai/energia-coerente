@@ -405,6 +405,115 @@ function buildFinalSummary(client) {
   return parts.length ? parts.join(" ") : "Ainda sem devolutiva registrada.";
 }
 
+function formatFilledEntries(entries = [], prefix = "") {
+  return entries
+    .filter(([, value]) => String(value || "").trim())
+    .map(([label, value]) => `${prefix}${label}: ${String(value).trim()}`);
+}
+
+function appendGeneratedText(currentValue, generatedValue) {
+  const current = String(currentValue || "").trim();
+  const generated = String(generatedValue || "").trim();
+  if (!generated) return currentValue || "";
+  if (!current) return generated;
+  if (current.includes(generated)) return current;
+  return `${current}\n\n${generated}`;
+}
+
+function buildInitialReadingLines(client) {
+  const lines = [];
+
+  if (client.bovis) lines.push(`Bovis: ${client.bovis}`);
+  if (client.hawkins) lines.push(`Hawkins: ${client.hawkins}`);
+
+  lines.push(
+    ...formatFilledEntries([
+      ["Corpo atmico", client.corposSutis?.atmico],
+      ["Corpo budico", client.corposSutis?.budico],
+      ["Corpo mental superior", client.corposSutis?.mentalSuperior],
+      ["Corpo mental inferior", client.corposSutis?.mentalInferior],
+      ["Corpo astral", client.corposSutis?.astral],
+      ["Corpo duplo eterico", client.corposSutis?.duploEterico],
+      ["Corpo fisico", client.corposSutis?.fisico],
+      ["Chakra coronario", client.chakras?.coronario],
+      ["Chakra frontal", client.chakras?.frontal],
+      ["Chakra laringeo", client.chakras?.laringeo],
+      ["Chakra cardiaco", client.chakras?.cardiaco],
+      ["Chakra plexo solar", client.chakras?.plexoSolar],
+      ["Chakra umbilical", client.chakras?.umbilical],
+      ["Chakra basico", client.chakras?.basico],
+      ["Funcao respiratoria", client.funcoes?.respiratoria],
+      ["Funcao nutritiva", client.funcoes?.nutritiva],
+      ["Funcao digestiva", client.funcoes?.digestiva],
+      ["Funcao circulatoria", client.funcoes?.circulatoria],
+      ["Funcao relacional", client.funcoes?.relacional],
+      ["Funcao reprodutiva", client.funcoes?.reprodutiva],
+      ["Funcao estruturante", client.funcoes?.estruturante],
+      ["Funcao evolutiva", client.funcoes?.evolutiva],
+      ["Funcao excretora", client.funcoes?.excretora],
+      ["Campo energetico", client.campos?.energetico],
+      ["Campo mental", client.campos?.mental],
+      ["Campo vital", client.campos?.vital],
+      ["Campo emocional", client.campos?.emocional],
+      ["Campo espiritual", client.campos?.espiritual],
+      ["Campo fisico", client.campos?.fisico],
+      ["Aura - protecao", client.aura?.protecao],
+      ["Aura - tamanho", client.aura?.tamanho],
+      ["Aura - cor excesso", client.aura?.corExcesso],
+      ["Aura - cor falta", client.aura?.corFalta],
+    ])
+  );
+
+  return lines;
+}
+
+function buildDiagnosticSuggestion(client) {
+  const protocols = getValidProtocols(client.protocolosUsados);
+  const lines = [];
+  if (client.bovis || client.hawkins) {
+    lines.push(`Leitura inicial registrada com ${[client.bovis ? `Bovis ${client.bovis}` : "", client.hawkins ? `Hawkins ${client.hawkins}` : ""].filter(Boolean).join(" e ")}.`);
+  }
+  if (protocols.length) {
+    lines.push(`Protocolos em uso nesta analise: ${protocols.join(", ")}.`);
+  }
+  if (client.queixaPrincipal) {
+    lines.push(`Queixa principal em observacao: ${client.queixaPrincipal}.`);
+  }
+  if (client.objetivo) {
+    lines.push(`Objetivo terapeutico declarado: ${client.objetivo}.`);
+  }
+  const readingCount = buildInitialReadingLines(client).length;
+  if (readingCount) {
+    lines.push("Leitura inicial preenchida para apoiar o fechamento diagnostico dos campos alterados.");
+  }
+  return lines.join(" ");
+}
+
+function buildCausesSuggestion(client) {
+  return buildInitialReadingLines(client).join("\n");
+}
+
+function buildAreasSuggestion(client) {
+  const sections = [
+    ["Corpos sutis", Object.values(client.corposSutis || {}).some((value) => String(value || "").trim())],
+    ["Chakras", Object.values(client.chakras || {}).some((value) => String(value || "").trim())],
+    ["Funcoes", Object.values(client.funcoes || {}).some((value) => String(value || "").trim())],
+    ["Campos", Object.values(client.campos || {}).some((value) => String(value || "").trim())],
+    ["Aura", Object.values(client.aura || {}).some((value) => String(value || "").trim())],
+  ]
+    .filter(([, active]) => active)
+    .map(([label]) => label);
+
+  return sections.join("\n");
+}
+
+function buildInterventionsSuggestion(client) {
+  const protocols = getValidProtocols(client.protocolosUsados);
+  const lines = ["Metodo: TGR"];
+  if (protocols.length) lines.push(`Protocolos: ${protocols.join(", ")}`);
+  return lines.join("\n");
+}
+
 function inferProtocolSlug(client) {
   const text = `${client.queixaPrincipal || ""} ${client.objetivo || ""} ${client.diagnosticoEnergetico || ""}`.toLowerCase();
   if (text.includes("relac")) return "relacoes";
@@ -1642,6 +1751,11 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
     onSave({ ...form, id: form.id || generateId() });
   }
 
+  function applyGeneratedField(field, generator) {
+    const generated = generator(form);
+    setField(field, appendGeneratedText(form[field], generated));
+  }
+
   return (
     <Panel>
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 18 }}>
@@ -1685,6 +1799,12 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
           <Field label="Objetivo"><textarea value={form.objetivo} onChange={(event) => setField("objetivo", event.target.value)} style={inputStyle} /></Field>
         </div>
         <SectionTitle title="Leitura e intervencao" />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button type="button" onClick={() => applyGeneratedField("diagnosticoEnergetico", buildDiagnosticSuggestion)} style={secondaryButtonStyle}>Preencher diagnostico base</button>
+          <button type="button" onClick={() => applyGeneratedField("causasIdentificadas", buildCausesSuggestion)} style={secondaryButtonStyle}>Puxar leitura para causas</button>
+          <button type="button" onClick={() => applyGeneratedField("areasAfetadas", buildAreasSuggestion)} style={secondaryButtonStyle}>Listar areas afetadas</button>
+          <button type="button" onClick={() => applyGeneratedField("intervencoesRealizadas", buildInterventionsSuggestion)} style={secondaryButtonStyle}>Montar intervencoes base</button>
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           <Field label="Diagnostico energetico"><textarea value={form.diagnosticoEnergetico} onChange={(event) => setField("diagnosticoEnergetico", event.target.value)} style={inputStyle} /></Field>
           <Field label="Causas identificadas"><textarea value={form.causasIdentificadas} onChange={(event) => setField("causasIdentificadas", event.target.value)} style={inputStyle} /></Field>
