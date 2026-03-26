@@ -20,9 +20,7 @@ const MAIN_TABS = [
 const METHOD_TABS = [
   { key: "overview", label: "Visao geral" },
   { key: "protocolos", label: "Protocolos" },
-  { key: "biometros", label: "Biometros" },
   { key: "graficos", label: "Graficos" },
-  { key: "fichas", label: "Fichas" },
   { key: "referencias", label: "Referencias" },
 ];
 
@@ -38,7 +36,7 @@ const METHOD_CATALOG = [
 ];
 
 const RADIOESTHESIA_METHODS = [
-  { slug: "tgr", nome: "TGR", resumo: "Protocolos, biometros, graficos, fichas e referencias." },
+  { slug: "tgr", nome: "TGR", resumo: "Protocolos, graficos e referencias." },
   { slug: "frt", nome: "FRT", resumo: "Metodo salvo para futura estruturacao." },
   { slug: "une", nome: "UNE", resumo: "Metodo salvo para futura estruturacao." },
 ];
@@ -58,17 +56,6 @@ const TGR_PROTOCOLS = [
 ];
 
 const PROTOCOL_OPTIONS = TGR_PROTOCOLS.map((item) => item.nome);
-
-const TGR_BIOMETERS = [
-  { slug: "numerico", nome: "Biometro Numerico", tema: "Geral" },
-  { slug: "tempo", nome: "Biometro de Tempo", tema: "Geral" },
-  { slug: "vitalidade", nome: "Biometro de Vitalidade", tema: "Vitalidade" },
-  { slug: "limpeza", nome: "Biometro de Limpeza", tema: "Limpeza e Protecao" },
-  { slug: "protecao", nome: "Biometro de Protecao", tema: "Limpeza e Protecao" },
-  { slug: "chakras", nome: "Biometro de Chakras", tema: "Chakras" },
-  { slug: "rel-mental", nome: "Relacionamento - Campo Mental", tema: "Relacoes" },
-  { slug: "rel-emocional", nome: "Relacionamento - Campo Emocional", tema: "Relacoes" },
-];
 
 const TGR_GRAPHIC_GROUPS = [
   {
@@ -152,17 +139,10 @@ const TGR_GRAPHIC_GROUPS = [
   },
 ];
 
-const TGR_FICHAS = [
-  { nome: "Ficha Geral TGR", tipo: "Ficha base" },
-  { nome: "Ficha de Relacoes", tipo: "Ficha por protocolo" },
-  { nome: "Ficha de Limpeza e Protecao", tipo: "Ficha por protocolo" },
-  { nome: "Ficha de Prosperidade", tipo: "Ficha por protocolo" },
-];
-
 const TGR_REFERENCES = [
   { nome: "Apostilas TGR", tipo: "Referencia de estudo" },
   { nome: "Protocolos completos", tipo: "Referencia operacional" },
-  { nome: "Graficos e biometros", tipo: "Ferramentas de consulta" },
+  { nome: "Graficos TGR", tipo: "Ferramentas de consulta" },
 ];
 
 const CHAKRA_OPTIONS = [
@@ -1141,7 +1121,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Radiestesia - TGR</div>
-                  <div style={{ color: THEME.muted }}>Protocolos, biometros, graficos, fichas e referencias.</div>
+                  <div style={{ color: THEME.muted }}>Protocolos, graficos e referencias.</div>
                 </div>
                 <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
               </div>
@@ -1163,9 +1143,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
                 relacoesContext={relacoesContext}
               />
             )}
-            {activeMethodTab === "biometros" && <MethodCatalog title="Biometros TGR" items={TGR_BIOMETERS} mobile={mobile} />}
             {activeMethodTab === "graficos" && <TgrGraphicsLibrary mobile={mobile} />}
-            {activeMethodTab === "fichas" && <MethodCatalog title="Fichas TGR" items={TGR_FICHAS} mobile={mobile} />}
             {activeMethodTab === "referencias" && <MethodCatalog title="Referencias TGR" items={TGR_REFERENCES} mobile={mobile} />}
               </>
             )}
@@ -1181,11 +1159,11 @@ function MethodOverview({ appointments, mobile }) {
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 18 }}>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Protocolos</div>
-        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Cada protocolo deve ser modelado com objetivo, etapas, campos de leitura, graficos relacionados e biometros de apoio.</div>
+        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Cada protocolo deve ser modelado com objetivo, etapas, leitura inicial, graficos usados e conduta terapeutica.</div>
       </Panel>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Ferramentas</div>
-        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Biometros e graficos ficam organizados como ferramentas do metodo, e nao como menus soltos do sistema inteiro.</div>
+        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Os graficos ficam organizados como biblioteca do metodo, enquanto a propria ficha do app concentra o registro do atendimento.</div>
       </Panel>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Uso atual</div>
