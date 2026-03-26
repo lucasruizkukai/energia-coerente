@@ -1449,7 +1449,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
           <Panel>
             <div style={{ display: "grid", gap: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedMethod.nome}</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo foi salvo no sistema e sera alimentado depois.</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo ja esta reservado na estrutura do prontuario e sera detalhado quando entrarmos no conteudo dele.</div>
             </div>
           </Panel>
         ) : (
@@ -1487,7 +1487,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
               <Panel>
                 <div style={{ display: "grid", gap: 8 }}>
                   <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedSubmethod.nome}</div>
-                  <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo de Radiestesia foi salvo e sera estruturado depois.</div>
+                  <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo de Radiestesia ja esta separado no sistema e fica pronto para receber o conteudo proprio quando voce quiser subir.</div>
                 </div>
               </Panel>
             ) : (
