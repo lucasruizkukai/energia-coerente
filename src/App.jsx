@@ -914,8 +914,8 @@ function App() {
     clientsWithProgress.find((client) => client.id === selectedId) ||
     null;
   const clientFocusMode =
-    (mainTab === "clientes" && Boolean(selectedClient)) ||
-    (mainTab === "metodos" && Boolean(relacoesContext?.clientId));
+    (mainTab === "clientes" && Boolean(selectedId)) ||
+    (mainTab === "metodos" && Boolean(relacoesContext?.clientId || selectedId));
 
   useEffect(() => {
     if (!selectedClient) {
