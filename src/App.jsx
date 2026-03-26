@@ -151,6 +151,17 @@ const CHAKRA_OPTIONS = [
 const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convivio", "Outro"];
 const GRAPHIC_CONTEXT_OPTIONS = ["Relacoes", "Prosperidade e Dinheiro", "Limpeza e Protecao Energetica"];
 
+const PROTOCOL_GRAPHIC_DEFAULTS = {
+  despertar: { group: "despertar", context: "Relacoes" },
+  vitalidade: { group: "vitalidade", context: "Limpeza e Protecao Energetica" },
+  harmonia: { group: "harmonia", context: "Relacoes" },
+  relacoes: { group: "harmonia", context: "Relacoes" },
+  "limpeza-protecao": { group: "limpeza", context: "Limpeza e Protecao Energetica" },
+  prosperidade: { group: "despertar", context: "Prosperidade e Dinheiro" },
+  psicoemocionais: { group: "psicoemocionais", context: "Relacoes" },
+  chakras: { group: "vitalidade", context: "Limpeza e Protecao Energetica" },
+};
+
 const emptyRelacoesForm = {
   tipoRelacao: "Amorosa",
   pessoaVinculada: "",
@@ -1835,9 +1846,15 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
 }
 
 function GenericProtocolView({ mobile, protocol, form, setForm, context }) {
-  const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
+  const defaultGraphicConfig = PROTOCOL_GRAPHIC_DEFAULTS[protocol.slug] || { group: TGR_GRAPHIC_GROUPS[0].slug, context: protocol.nome };
+  const [activeGraphicGroup, setActiveGraphicGroup] = useState(defaultGraphicConfig.group);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+
+  useEffect(() => {
+    setActiveGraphicGroup(defaultGraphicConfig.group);
+    setExpandedGraphicConfigs({});
+  }, [protocol.slug, defaultGraphicConfig.group]);
 
   function setField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -1958,8 +1975,8 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context }) {
                 </button>
                 {expandedGraphicConfigs[graphic] ? (
                   <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
-                    <select value={form.contextoGraficos?.[graphic] || protocol.nome} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
-                      {[protocol.nome, ...GRAPHIC_CONTEXT_OPTIONS.filter((option) => option !== protocol.nome)].map((option) => <option key={option}>{option}</option>)}
+                    <select value={form.contextoGraficos?.[graphic] || defaultGraphicConfig.context} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                      {[defaultGraphicConfig.context, ...GRAPHIC_CONTEXT_OPTIONS.filter((option) => option !== defaultGraphicConfig.context)].map((option) => <option key={option}>{option}</option>)}
                     </select>
                     <input
                       value={form.tempoAtivacaoGraficos?.[graphic] || ""}
