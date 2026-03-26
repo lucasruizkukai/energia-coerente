@@ -44,13 +44,9 @@ const STATUS_OPTIONS = ["Novo contato", "Aguardando inicio", "Em atendimento", "
 const PAYMENT_OPTIONS = ["Pendente", "Parcial", "Pago"];
 
 const TGR_PROTOCOLS = [
-  { slug: "despertar", nome: "Despertar", resumo: "Leitura e reorganizacao de padroes centrais de expansao e consciencia." },
-  { slug: "vitalidade", nome: "Vitalidade", resumo: "Analise e ajuste de disposicao, fluxo vital e sustentacao energetica." },
-  { slug: "harmonia", nome: "Harmonia", resumo: "Reequilibrio de campos internos para restaurar estabilidade e coerencia." },
   { slug: "relacoes", nome: "Relacoes", resumo: "Leitura profunda de vinculos, interferencias e padroes relacionais." },
   { slug: "limpeza-protecao", nome: "Limpeza e Protecao", resumo: "Identificacao de sobrecargas, interferencias e camadas de protecao." },
   { slug: "prosperidade", nome: "Prosperidade", resumo: "Mapeamento de bloqueios e organizacao de campos ligados a fluxo e realizacao." },
-  { slug: "psicoemocionais", nome: "Psicoemocionais", resumo: "Leitura dos eixos emocionais e mentais envolvidos no processo." },
 ];
 
 const PROTOCOL_OPTIONS = TGR_PROTOCOLS.map((item) => item.nome);
@@ -151,13 +147,9 @@ const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convi
 const GRAPHIC_CONTEXT_OPTIONS = ["Relacoes", "Prosperidade e Dinheiro", "Limpeza e Protecao Energetica"];
 
 const PROTOCOL_GRAPHIC_DEFAULTS = {
-  despertar: { group: "despertar", context: "Relacoes" },
-  vitalidade: { group: "vitalidade", context: "Limpeza e Protecao Energetica" },
-  harmonia: { group: "harmonia", context: "Relacoes" },
   relacoes: { group: "harmonia", context: "Relacoes" },
   "limpeza-protecao": { group: "limpeza", context: "Limpeza e Protecao Energetica" },
   prosperidade: { group: "despertar", context: "Prosperidade e Dinheiro" },
-  psicoemocionais: { group: "psicoemocionais", context: "Relacoes" },
 };
 
 const emptyRelacoesForm = {
@@ -363,7 +355,7 @@ const sampleClients = [
     whatsapp: "(11) 98765-4321",
     email: "marina@email.com",
     dataInicio: "2026-03-10",
-    protocolosUsados: ["Harmonia", "Vitalidade"],
+    protocolosUsados: ["Relacoes", "Limpeza e Protecao"],
     queixaPrincipal: "Cansaco constante e sensacao de travamento emocional.",
     objetivo: "Retomar clareza, vitalidade e estabilidade nas relacoes.",
     diagnosticoEnergetico: "Sobrecarga no campo emocional e dispersao de energia.",
@@ -721,14 +713,12 @@ function inferProtocolSlug(client) {
   const text = `${client.queixaPrincipal || ""} ${client.objetivo || ""} ${client.diagnosticoEnergetico || ""}`.toLowerCase();
   if (text.includes("relac")) return "relacoes";
   if (text.includes("protec") || text.includes("limpeza")) return "limpeza-protecao";
-  if (text.includes("vital")) return "vitalidade";
-  if (text.includes("harmon")) return "harmonia";
-  if (text.includes("chakra")) return "vitalidade";
-  return "despertar";
+  if (text.includes("prosper") || text.includes("abundan") || text.includes("dinheir")) return "prosperidade";
+  return "relacoes";
 }
 
 function findProtocolName(slug) {
-  return TGR_PROTOCOLS.find((item) => item.slug === slug)?.nome || "Despertar";
+  return TGR_PROTOCOLS.find((item) => item.slug === slug)?.nome || "Relacoes";
 }
 
 function getValidProtocols(protocols = []) {
