@@ -200,6 +200,8 @@ const emptyClient = {
   nome: "",
   whatsapp: "",
   email: "",
+  analyses: [],
+  currentAnalysisId: "",
   dataInicio: "",
   protocolosUsados: [],
   queixaPrincipal: "",
@@ -210,6 +212,71 @@ const emptyClient = {
   intervencoesRealizadas: "",
   observacoes: "",
   status: "Novo contato",
+  bovis: "",
+  hawkins: "",
+  corposSutis: {
+    atmico: "",
+    budico: "",
+    mentalSuperior: "",
+    mentalInferior: "",
+    astral: "",
+    duploEterico: "",
+    fisico: "",
+  },
+  chakras: {
+    coronario: "",
+    frontal: "",
+    laringeo: "",
+    cardiaco: "",
+    plexoSolar: "",
+    umbilical: "",
+    basico: "",
+  },
+  funcoes: {
+    respiratoria: "",
+    nutritiva: "",
+    digestiva: "",
+    circulatoria: "",
+    relacional: "",
+    reprodutiva: "",
+    estruturante: "",
+    evolutiva: "",
+    excretora: "",
+  },
+  campos: {
+    energetico: "",
+    mental: "",
+    vital: "",
+    emocional: "",
+    espiritual: "",
+    fisico: "",
+  },
+  aura: {
+    protecao: "",
+    tamanho: "",
+    corExcesso: "",
+    corFalta: "",
+  },
+  evolucao: "",
+  valor: "",
+  statusPagamento: "Pendente",
+  devolutivaFinal: "",
+  proximosPassos: "",
+};
+
+const emptyAnalysis = {
+  id: "",
+  title: "",
+  dataInicio: "",
+  protocolosUsados: [],
+  queixaPrincipal: "",
+  objetivo: "",
+  diagnosticoEnergetico: "",
+  causasIdentificadas: "",
+  areasAfetadas: "",
+  intervencoesRealizadas: "",
+  observacoes: "",
+  status: "Em atendimento",
   bovis: "",
   hawkins: "",
   corposSutis: {
@@ -334,6 +401,124 @@ function generateId() {
   return `ec-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function cloneStructuredSection(section, fallback) {
+  return {
+    ...fallback,
+    ...(section || {}),
+  };
+}
+
+function buildAnalysisDraft(source = {}, overrides = {}) {
+  return {
+    ...emptyAnalysis,
+    ...source,
+    ...overrides,
+    id: overrides.id || source.id || generateId(),
+    title: overrides.title || source.title || "",
+    dataInicio: overrides.dataInicio || source.dataInicio || getTodayDate(),
+    protocolosUsados: [...(overrides.protocolosUsados || source.protocolosUsados || [])],
+    corposSutis: cloneStructuredSection(overrides.corposSutis || source.corposSutis, emptyAnalysis.corposSutis),
+    chakras: cloneStructuredSection(overrides.chakras || source.chakras, emptyAnalysis.chakras),
+    funcoes: cloneStructuredSection(overrides.funcoes || source.funcoes, emptyAnalysis.funcoes),
+    campos: cloneStructuredSection(overrides.campos || source.campos, emptyAnalysis.campos),
+    aura: cloneStructuredSection(overrides.aura || source.aura, emptyAnalysis.aura),
+  };
+}
+
+function extractAnalysisFromClient(client = {}, overrides = {}) {
+  return buildAnalysisDraft(
+    {
+      id: overrides.id || client.currentAnalysisId || client.id,
+      title: overrides.title || client.title || "",
+      dataInicio: client.dataInicio,
+      protocolosUsados: client.protocolosUsados,
+      queixaPrincipal: client.queixaPrincipal,
+      objetivo: client.objetivo,
+      diagnosticoEnergetico: client.diagnosticoEnergetico,
+      causasIdentificadas: client.causasIdentificadas,
+      areasAfetadas: client.areasAfetadas,
+      intervencoesRealizadas: client.intervencoesRealizadas,
+      observacoes: client.observacoes,
+      status: client.status,
+      bovis: client.bovis,
+      hawkins: client.hawkins,
+      corposSutis: client.corposSutis,
+      chakras: client.chakras,
+      funcoes: client.funcoes,
+      campos: client.campos,
+      aura: client.aura,
+      evolucao: client.evolucao,
+      valor: client.valor,
+      statusPagamento: client.statusPagamento,
+      devolutivaFinal: client.devolutivaFinal,
+      proximosPassos: client.proximosPassos,
+    },
+    overrides
+  );
+}
+
+function applyAnalysisToClient(client, analysis) {
+  const mergedAnalysis = buildAnalysisDraft(analysis);
+  return {
+    ...client,
+    currentAnalysisId: mergedAnalysis.id,
+    dataInicio: mergedAnalysis.dataInicio,
+    protocolosUsados: [...(mergedAnalysis.protocolosUsados || [])],
+    queixaPrincipal: mergedAnalysis.queixaPrincipal,
+    objetivo: mergedAnalysis.objetivo,
+    diagnosticoEnergetico: mergedAnalysis.diagnosticoEnergetico,
+    causasIdentificadas: mergedAnalysis.causasIdentificadas,
+    areasAfetadas: mergedAnalysis.areasAfetadas,
+    intervencoesRealizadas: mergedAnalysis.intervencoesRealizadas,
+    observacoes: mergedAnalysis.observacoes,
+    status: mergedAnalysis.status,
+    bovis: mergedAnalysis.bovis,
+    hawkins: mergedAnalysis.hawkins,
+    corposSutis: cloneStructuredSection(mergedAnalysis.corposSutis, emptyAnalysis.corposSutis),
+    chakras: cloneStructuredSection(mergedAnalysis.chakras, emptyAnalysis.chakras),
+    funcoes: cloneStructuredSection(mergedAnalysis.funcoes, emptyAnalysis.funcoes),
+    campos: cloneStructuredSection(mergedAnalysis.campos, emptyAnalysis.campos),
+    aura: cloneStructuredSection(mergedAnalysis.aura, emptyAnalysis.aura),
+    evolucao: mergedAnalysis.evolucao,
+    valor: mergedAnalysis.valor,
+    statusPagamento: mergedAnalysis.statusPagamento,
+    devolutivaFinal: mergedAnalysis.devolutivaFinal,
+    proximosPassos: mergedAnalysis.proximosPassos,
+  };
+}
+
+function normalizeClientRecord(client = {}) {
+  const rawAnalyses = Array.isArray(client.analyses) && client.analyses.length
+    ? client.analyses.map((analysis) => buildAnalysisDraft(analysis))
+    : [extractAnalysisFromClient(client, { id: client.currentAnalysisId || client.id || generateId(), dataInicio: client.dataInicio || getTodayDate() })];
+
+  const currentAnalysisId = rawAnalyses.some((analysis) => analysis.id === client.currentAnalysisId)
+    ? client.currentAnalysisId
+    : rawAnalyses[0].id;
+
+  const currentSnapshot = extractAnalysisFromClient(client, { id: currentAnalysisId });
+  const analyses = rawAnalyses.map((analysis) => (
+    analysis.id === currentAnalysisId
+      ? buildAnalysisDraft(analysis, currentSnapshot)
+      : analysis
+  ));
+  const activeAnalysis = analyses.find((analysis) => analysis.id === currentAnalysisId) || analyses[0];
+
+  return applyAnalysisToClient(
+    {
+      ...emptyClient,
+      ...client,
+      analyses,
+      currentAnalysisId,
+    },
+    activeAnalysis
+  );
+}
+
 function formatCurrency(value) {
   const amount = Number(String(value || "0").replace(",", "."));
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number.isFinite(amount) ? amount : 0);
@@ -354,15 +539,14 @@ function formatFullDate(value) {
 }
 
 function buildAttendanceDateOptions(client) {
-  const history = Array.isArray(client?.atendimentosHistorico) ? client.atendimentosHistorico : [];
-  const dates = [client?.dataInicio, ...history.map((item) => (typeof item === "string" ? item : item?.dataInicio || item?.data || ""))]
-    .filter(Boolean)
-    .filter((value, index, list) => list.indexOf(value) === index);
-
-  return dates.map((value, index) => ({
-    value,
-    label: index === 0 ? `${formatFullDate(value)} · Analise atual` : formatFullDate(value),
-  }));
+  const analyses = Array.isArray(client?.analyses) ? client.analyses : [];
+  return analyses
+    .filter((analysis) => analysis?.id)
+    .sort((a, b) => String(b.dataInicio || "").localeCompare(String(a.dataInicio || "")))
+    .map((analysis) => ({
+      value: analysis.id,
+      label: `${formatFullDate(analysis.dataInicio)}${analysis.id === client.currentAnalysisId ? " · Analise atual" : ""}${analysis.status ? ` · ${analysis.status}` : ""}`,
+    }));
 }
 
 function getDaysSinceStart(startDate) {
@@ -630,7 +814,8 @@ function App() {
 
   const clientsWithProgress = useMemo(
     () =>
-      clients.map((client) => {
+      clients.map((item) => {
+        const client = normalizeClientRecord(item);
         const computedDay = client.dataInicio ? getDaysSinceStart(client.dataInicio) : 1;
         return {
           ...client,
@@ -694,9 +879,7 @@ function App() {
   async function saveClient(payload) {
     setSaving(true);
     setUiMessage("");
-    const record = {
-      ...payload,
-    };
+    const record = normalizeClientRecord(payload);
 
     try {
       const response = await upsertClient(record, clients);
@@ -735,12 +918,52 @@ function App() {
   async function finalizeClient(id) {
     const currentClient = clients.find((item) => item.id === id);
     if (!currentClient) return;
+    const normalized = normalizeClientRecord(currentClient);
+    const finalizedAnalysis = buildAnalysisDraft(
+      normalized.analyses.find((analysis) => analysis.id === normalized.currentAnalysisId),
+      { status: "Concluido" }
+    );
 
     await saveClient({
-      ...currentClient,
+      ...normalized,
+      analyses: normalized.analyses.map((analysis) => (analysis.id === finalizedAnalysis.id ? finalizedAnalysis : analysis)),
+      currentAnalysisId: finalizedAnalysis.id,
       status: "Concluido",
     });
     setUiMessage("Analise finalizada.");
+  }
+
+  async function switchClientAnalysis(clientId, analysisId) {
+    const currentClient = clients.find((item) => item.id === clientId);
+    if (!currentClient) return;
+    const normalized = normalizeClientRecord(currentClient);
+    const selectedAnalysis = normalized.analyses.find((analysis) => analysis.id === analysisId);
+    if (!selectedAnalysis) return;
+
+    await saveClient({
+      ...applyAnalysisToClient(normalized, selectedAnalysis),
+      analyses: normalized.analyses,
+      currentAnalysisId: selectedAnalysis.id,
+    });
+  }
+
+  async function createNewAnalysis(clientId) {
+    const currentClient = clients.find((item) => item.id === clientId);
+    if (!currentClient) return;
+    const normalized = normalizeClientRecord(currentClient);
+    const newAnalysis = buildAnalysisDraft({
+      title: "",
+      dataInicio: getTodayDate(),
+      status: "Em atendimento",
+      statusPagamento: "Pendente",
+    });
+
+    await saveClient({
+      ...applyAnalysisToClient(normalized, newAnalysis),
+      analyses: [newAnalysis, ...normalized.analyses],
+      currentAnalysisId: newAnalysis.id,
+    });
+    setUiMessage("Nova analise iniciada.");
   }
 
   function handleTabChange(nextTab) {
@@ -856,6 +1079,9 @@ function App() {
           setSelectedId={setSelectedId}
           saveClient={saveClient}
           removeClient={removeClient}
+          finalizeClient={finalizeClient}
+          switchClientAnalysis={switchClientAnalysis}
+          createNewAnalysis={createNewAnalysis}
           saving={saving}
           activeMethod={activeMethod}
           setActiveMethod={setActiveMethod}
@@ -893,6 +1119,8 @@ function MainContent(props) {
     saveClient,
     removeClient,
     finalizeClient,
+    switchClientAnalysis,
+    createNewAnalysis,
     saving,
     activeMethod,
     setActiveMethod,
@@ -943,6 +1171,8 @@ function MainContent(props) {
           saveClient={saveClient}
           removeClient={removeClient}
           finalizeClient={finalizeClient}
+          switchClientAnalysis={switchClientAnalysis}
+          createNewAnalysis={createNewAnalysis}
           saving={saving}
           mobile={mobile}
           openProtocolForClient={openProtocolForClient}
@@ -1066,7 +1296,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, saving, mobile, openProtocolForClient }) {
+function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, openProtocolForClient }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "340px minmax(0, 1fr)", gap: 18 }}>
       <aside style={{ display: "grid", gap: 14, alignSelf: "start" }}>
@@ -1094,7 +1324,14 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
       <section style={{ display: "grid", gap: 18 }}>
         {selectedClient ? (
           <>
-            <ClientHeader client={selectedClient} onDelete={removeClient} onFinalize={finalizeClient} onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)} />
+            <ClientHeader
+              client={selectedClient}
+              onDelete={removeClient}
+              onFinalize={finalizeClient}
+              onSelectAnalysis={switchClientAnalysis}
+              onNewAnalysis={createNewAnalysis}
+              onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
+            />
             <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
             <ClientJourney client={selectedClient} mobile={mobile} />
             <FinalFeedback client={selectedClient} />
@@ -1636,7 +1873,7 @@ function FinancialView({ clients, mobile }) {
   );
 }
 
-function ClientHeader({ client, onDelete, onFinalize, onOpenProtocol }) {
+function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol }) {
   const validProtocols = getValidProtocols(client.protocolosUsados);
   const attendanceDateOptions = buildAttendanceDateOptions(client);
 
@@ -1656,6 +1893,7 @@ function ClientHeader({ client, onDelete, onFinalize, onOpenProtocol }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" onClick={() => onNewAnalysis(client.id)} style={secondaryButtonStyle}>Nova analise</button>
             <button type="button" onClick={() => onFinalize(client.id)} disabled={client.status === "Concluido"} style={{ ...secondaryButtonStyle, opacity: client.status === "Concluido" ? 0.65 : 1, cursor: client.status === "Concluido" ? "default" : "pointer" }}>
               Finalizar analise
             </button>
@@ -1666,7 +1904,7 @@ function ClientHeader({ client, onDelete, onFinalize, onOpenProtocol }) {
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 280px) 1fr", gap: 12, alignItems: "end" }}>
             <Field label="Atendimentos por data">
-              <select value={client.dataInicio || attendanceDateOptions[0]?.value || ""} style={{ ...inputStyle, background: "#f4efe8" }} disabled>
+              <select value={client.currentAnalysisId || attendanceDateOptions[0]?.value || ""} onChange={(event) => onSelectAnalysis(client.id, event.target.value)} style={inputStyle}>
                 {attendanceDateOptions.map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
                 ))}

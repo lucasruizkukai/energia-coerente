@@ -2,6 +2,33 @@ import { readLocalClients, writeLocalClients } from "../lib/local-db";
 import { hasSupabaseEnv, supabase } from "../lib/supabase";
 
 const TABLE_NAME = "clients";
+const ANALYSES_MARKER = "\n\n[EC_ANALYSES]";
+const ANALYSIS_DEFAULTS = {
+  id: "",
+  title: "",
+  dataInicio: "",
+  protocolosUsados: [],
+  queixaPrincipal: "",
+  objetivo: "",
+  diagnosticoEnergetico: "",
+  causasIdentificadas: "",
+  areasAfetadas: "",
+  intervencoesRealizadas: "",
+  observacoes: "",
+  status: "Em atendimento",
+  bovis: "",
+  hawkins: "",
+  corposSutis: {},
+  chakras: {},
+  funcoes: {},
+  campos: {},
+  aura: {},
+  evolucao: "",
+  valor: "",
+  statusPagamento: "Pendente",
+  devolutivaFinal: "",
+  proximosPassos: "",
+};
 
 export async function listClients(fallback = []) {
   if (!hasSupabaseEnv || !supabase) {
@@ -45,12 +72,13 @@ export async function deleteClient(id, currentClients = []) {
 }
 
 function mapRowToClient(row) {
+  const parsedObservacoes = splitObservacoesPayload(row.observacoes || "");
   const protocolosUsados = String(row.tipo_sessao || "")
     .split("|")
     .map((item) => item.trim())
     .filter(Boolean);
 
-  return {
+  const baseClient = {
     id: row.id,
     nome: row.nome || "",
     whatsapp: row.whatsapp || "",
@@ -63,7 +91,7 @@ function mapRowToClient(row) {
     causasIdentificadas: row.causas_identificadas || "",
     areasAfetadas: row.areas_afetadas || "",
     intervencoesRealizadas: row.intervencoes_realizadas || "",
-    observacoes: row.observacoes || "",
+    observacoes: parsedObservacoes.visibleText,
     status: row.status || "",
     evolucao: row.evolucao || "",
     valor: row.valor?.toString() || "",
@@ -71,33 +99,159 @@ function mapRowToClient(row) {
     devolutivaFinal: row.devolutiva_final || "",
     proximosPassos: row.proximos_passos || "",
   };
+
+  return normalizeClientAnalyses({
+    ...baseClient,
+    analyses: parsedObservacoes.metadata?.analyses || [],
+    currentAnalysisId: parsedObservacoes.metadata?.currentAnalysisId || "",
+  });
 }
 
 function mapClientToRow(client) {
-  const protocolosUsados = Array.isArray(client.protocolosUsados) ? client.protocolosUsados : [];
-  const diaProcesso = client.dataInicio
-    ? Math.max(1, Math.floor((new Date().setHours(12, 0, 0, 0) - new Date(`${client.dataInicio}T12:00:00`).getTime()) / 86400000) + 1)
+  const normalizedClient = normalizeClientAnalyses(client);
+  const activeAnalysis = getActiveAnalysis(normalizedClient);
+  const protocolosUsados = Array.isArray(activeAnalysis.protocolosUsados) ? activeAnalysis.protocolosUsados : [];
+  const diaProcesso = activeAnalysis.dataInicio
+    ? Math.max(1, Math.floor((new Date().setHours(12, 0, 0, 0) - new Date(`${activeAnalysis.dataInicio}T12:00:00`).getTime()) / 86400000) + 1)
     : 1;
+
   return {
-    id: client.id,
-    nome: client.nome,
-    whatsapp: client.whatsapp,
-    email: client.email || null,
-    data_inicio: client.dataInicio || null,
+    id: normalizedClient.id,
+    nome: normalizedClient.nome,
+    whatsapp: normalizedClient.whatsapp,
+    email: normalizedClient.email || null,
+    data_inicio: activeAnalysis.dataInicio || null,
     tipo_sessao: protocolosUsados.join(" | "),
-    queixa_principal: client.queixaPrincipal,
-    objetivo: client.objetivo,
-    diagnostico_energetico: client.diagnosticoEnergetico,
-    causas_identificadas: client.causasIdentificadas,
-    areas_afetadas: client.areasAfetadas,
-    intervencoes_realizadas: client.intervencoesRealizadas,
-    observacoes: client.observacoes,
-    status: client.status,
+    queixa_principal: activeAnalysis.queixaPrincipal,
+    objetivo: activeAnalysis.objetivo,
+    diagnostico_energetico: activeAnalysis.diagnosticoEnergetico,
+    causas_identificadas: activeAnalysis.causasIdentificadas,
+    areas_afetadas: activeAnalysis.areasAfetadas,
+    intervencoes_realizadas: activeAnalysis.intervencoesRealizadas,
+    observacoes: joinObservacoesPayload(activeAnalysis.observacoes, {
+      currentAnalysisId: normalizedClient.currentAnalysisId,
+      analyses: normalizedClient.analyses,
+    }),
+    status: activeAnalysis.status,
     dia_processo: diaProcesso,
-    evolucao: client.evolucao,
-    valor: client.valor ? Number(String(client.valor).replace(",", ".")) : null,
-    status_pagamento: client.statusPagamento,
-    devolutiva_final: client.devolutivaFinal,
-    proximos_passos: client.proximosPassos,
+    evolucao: activeAnalysis.evolucao,
+    valor: activeAnalysis.valor ? Number(String(activeAnalysis.valor).replace(",", ".")) : null,
+    status_pagamento: activeAnalysis.statusPagamento,
+    devolutiva_final: activeAnalysis.devolutivaFinal,
+    proximos_passos: activeAnalysis.proximosPassos,
+  };
+}
+
+function splitObservacoesPayload(value) {
+  const raw = String(value || "");
+  const markerIndex = raw.indexOf(ANALYSES_MARKER);
+  if (markerIndex === -1) return { visibleText: raw, metadata: null };
+
+  const visibleText = raw.slice(0, markerIndex).trimEnd();
+  const metadataText = raw.slice(markerIndex + ANALYSES_MARKER.length);
+  try {
+    return { visibleText, metadata: JSON.parse(metadataText) };
+  } catch {
+    return { visibleText: raw, metadata: null };
+  }
+}
+
+function joinObservacoesPayload(visibleText, metadata) {
+  return `${String(visibleText || "").trimEnd()}${ANALYSES_MARKER}${JSON.stringify(metadata)}`;
+}
+
+function buildAnalysisFromSource(source = {}, overrides = {}) {
+  return {
+    ...ANALYSIS_DEFAULTS,
+    ...source,
+    ...overrides,
+    protocolosUsados: [...(overrides.protocolosUsados || source.protocolosUsados || [])],
+    corposSutis: { ...(source.corposSutis || {}), ...(overrides.corposSutis || {}) },
+    chakras: { ...(source.chakras || {}), ...(overrides.chakras || {}) },
+    funcoes: { ...(source.funcoes || {}), ...(overrides.funcoes || {}) },
+    campos: { ...(source.campos || {}), ...(overrides.campos || {}) },
+    aura: { ...(source.aura || {}), ...(overrides.aura || {}) },
+  };
+}
+
+function extractAnalysisFromClient(client = {}, overrides = {}) {
+  return buildAnalysisFromSource(
+    {
+      id: overrides.id || client.currentAnalysisId || client.id,
+      title: overrides.title || client.title || "",
+      dataInicio: client.dataInicio,
+      protocolosUsados: client.protocolosUsados,
+      queixaPrincipal: client.queixaPrincipal,
+      objetivo: client.objetivo,
+      diagnosticoEnergetico: client.diagnosticoEnergetico,
+      causasIdentificadas: client.causasIdentificadas,
+      areasAfetadas: client.areasAfetadas,
+      intervencoesRealizadas: client.intervencoesRealizadas,
+      observacoes: client.observacoes,
+      status: client.status,
+      bovis: client.bovis,
+      hawkins: client.hawkins,
+      corposSutis: client.corposSutis,
+      chakras: client.chakras,
+      funcoes: client.funcoes,
+      campos: client.campos,
+      aura: client.aura,
+      evolucao: client.evolucao,
+      valor: client.valor,
+      statusPagamento: client.statusPagamento,
+      devolutivaFinal: client.devolutivaFinal,
+      proximosPassos: client.proximosPassos,
+    },
+    overrides
+  );
+}
+
+function getActiveAnalysis(client) {
+  return client.analyses?.find((analysis) => analysis.id === client.currentAnalysisId) || client.analyses?.[0] || extractAnalysisFromClient(client);
+}
+
+function normalizeClientAnalyses(client = {}) {
+  const analyses = Array.isArray(client.analyses) && client.analyses.length
+    ? client.analyses.map((analysis) => buildAnalysisFromSource(analysis))
+    : [extractAnalysisFromClient(client, { id: client.currentAnalysisId || client.id })];
+
+  const currentAnalysisId = analyses.some((analysis) => analysis.id === client.currentAnalysisId)
+    ? client.currentAnalysisId
+    : analyses[0]?.id;
+
+  const currentSnapshot = extractAnalysisFromClient(client, { id: currentAnalysisId });
+  const syncedAnalyses = analyses.map((analysis) => (
+    analysis.id === currentAnalysisId
+      ? buildAnalysisFromSource(analysis, currentSnapshot)
+      : analysis
+  ));
+  const activeAnalysis = syncedAnalyses.find((analysis) => analysis.id === currentAnalysisId) || syncedAnalyses[0];
+
+  return {
+    ...client,
+    analyses: syncedAnalyses,
+    currentAnalysisId,
+    dataInicio: activeAnalysis.dataInicio,
+    protocolosUsados: activeAnalysis.protocolosUsados,
+    queixaPrincipal: activeAnalysis.queixaPrincipal,
+    objetivo: activeAnalysis.objetivo,
+    diagnosticoEnergetico: activeAnalysis.diagnosticoEnergetico,
+    causasIdentificadas: activeAnalysis.causasIdentificadas,
+    areasAfetadas: activeAnalysis.areasAfetadas,
+    intervencoesRealizadas: activeAnalysis.intervencoesRealizadas,
+    observacoes: activeAnalysis.observacoes,
+    status: activeAnalysis.status,
+    bovis: activeAnalysis.bovis,
+    hawkins: activeAnalysis.hawkins,
+    corposSutis: activeAnalysis.corposSutis,
+    chakras: activeAnalysis.chakras,
+    funcoes: activeAnalysis.funcoes,
+    campos: activeAnalysis.campos,
+    aura: activeAnalysis.aura,
+    evolucao: activeAnalysis.evolucao,
+    valor: activeAnalysis.valor,
+    statusPagamento: activeAnalysis.statusPagamento,
+    devolutivaFinal: activeAnalysis.devolutivaFinal,
+    proximosPassos: activeAnalysis.proximosPassos,
   };
 }
