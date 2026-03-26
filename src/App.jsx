@@ -928,13 +928,8 @@ function App() {
   const selectedClient =
     filteredClients.find((client) => client.id === selectedId) ||
     clientsWithProgress.find((client) => client.id === selectedId) ||
-    filteredClients[0] ||
-    clientsWithProgress[0] ||
     null;
-
-  useEffect(() => {
-    if (!selectedId && clientsWithProgress[0]?.id) setSelectedId(clientsWithProgress[0].id);
-  }, [selectedId, clientsWithProgress]);
+  const clientWorkspaceOpen = Boolean(selectedClient) && (mainTab === "clientes" || mainTab === "metodos");
 
   const metrics = useMemo(() => {
     const active = clientsWithProgress.filter((client) => client.status === "Em atendimento").length;
@@ -1122,6 +1117,9 @@ function App() {
       setActiveSubmethod("tgr");
       setActiveMethodTab("protocolos");
     }
+    if (nextTab === "clientes") {
+      setSelectedId("");
+    }
     setMainTab(nextTab);
   }
 
@@ -1215,12 +1213,29 @@ function App() {
     <Shell>
       <Header user={user} onLogout={handleLogout} mobile={mobile} />
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "18px 14px 40px" : "24px 24px 48px" }}>
-        <TopMetrics metrics={metrics} mobile={mobile} />
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
-          {MAIN_TABS.map((tab) => (
-            <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
-          ))}
-        </div>
+        {!clientWorkspaceOpen ? <TopMetrics metrics={metrics} mobile={mobile} /> : null}
+        {!clientWorkspaceOpen ? (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
+            {MAIN_TABS.map((tab) => (
+              <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ marginTop: 10, marginBottom: 18 }}>
+            <Panel style={{ padding: "14px 16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 800 }}>{mainTab === "metodos" ? "TGR da cliente" : "Prontuário da cliente"}</div>
+                  <div style={{ color: THEME.muted, fontSize: 13 }}>Navegação focada para evitar sair da análise por engano.</div>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {mainTab === "metodos" ? <button type="button" onClick={() => setMainTab("clientes")} style={secondaryButtonStyle}>Voltar ao prontuário</button> : null}
+                  <button type="button" onClick={() => setSelectedId("")} style={secondaryButtonStyle}>Voltar para clientes</button>
+                </div>
+              </div>
+            </Panel>
+          </div>
+        )}
         {uiMessage ? (
           <div style={{ marginBottom: 16 }}>
             <Panel style={{ padding: "12px 16px", background: "#fff8ef" }}>
@@ -1261,6 +1276,7 @@ function App() {
           setProtocolSupportForms={setProtocolSupportForms}
           relacoesContext={relacoesContext}
           selectedClient={selectedClient}
+          clientDetailOpen={mainTab === "clientes" && Boolean(selectedClient)}
           toggleClientProtocol={toggleClientProtocol}
           saveProtocolToClient={saveProtocolToClient}
           setMainTab={setMainTab}
@@ -1304,9 +1320,9 @@ function MainContent(props) {
     protocolSupportForms,
     setProtocolSupportForms,
     relacoesContext,
-    selectedClient,
     toggleClientProtocol,
     saveProtocolToClient,
+    clientDetailOpen,
     setMainTab,
     openProtocolForClient,
   } = props;
@@ -1349,7 +1365,9 @@ function MainContent(props) {
           createNewAnalysis={createNewAnalysis}
           saving={saving}
           mobile={mobile}
+          clientDetailOpen={clientDetailOpen}
           openProtocolForClient={openProtocolForClient}
+          onBackToList={() => setSelectedId("")}
         />
     );
   }
@@ -1475,10 +1493,37 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, openProtocolForClient }) {
+function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, openProtocolForClient, onBackToList }) {
+  if (clientDetailOpen && selectedClient) {
+    return (
+      <section style={{ display: "grid", gap: 18 }}>
+        <ClientHeader
+          client={selectedClient}
+          onDelete={removeClient}
+          onFinalize={finalizeClient}
+          onSelectAnalysis={switchClientAnalysis}
+          onNewAnalysis={createNewAnalysis}
+          onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
+          onBack={onBackToList}
+        />
+        <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
+        <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
+        <FinalFeedback client={selectedClient} />
+      </section>
+    );
+  }
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "340px minmax(0, 1fr)", gap: 18 }}>
-      <aside style={{ display: "grid", gap: 14, alignSelf: "start" }}>
+    <div style={{ display: "grid", gap: 18 }}>
+      <Panel>
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ fontSize: 22, fontWeight: 800 }}>Clientes</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha uma cliente para abrir o prontuário em modo focado.</div>
+        </div>
+      </Panel>
+
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "340px minmax(0, 1fr)", gap: 18 }}>
+        <aside style={{ display: "grid", gap: 14, alignSelf: "start" }}>
         <Panel>
           <div style={{ display: "grid", gap: 10 }}>
             <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar cliente, queixa ou objetivo" style={inputStyle} />
@@ -1498,25 +1543,19 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
             )) : <div style={{ color: THEME.muted, textAlign: "center", padding: "12px 0" }}>Nenhum cliente encontrado.</div>}
           </div>
         </Panel>
-      </aside>
+        </aside>
 
-      <section style={{ display: "grid", gap: 18 }}>
-        {selectedClient ? (
-          <>
-            <ClientHeader
-              client={selectedClient}
-              onDelete={removeClient}
-              onFinalize={finalizeClient}
-              onSelectAnalysis={switchClientAnalysis}
-              onNewAnalysis={createNewAnalysis}
-              onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
-            />
-            <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
-            <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
-            <FinalFeedback client={selectedClient} />
-          </>
-        ) : <ClientRecord client={{ ...emptyClient, id: generateId() }} onSave={saveClient} mobile={mobile} saving={saving} />}
-      </section>
+        <section style={{ display: "grid", gap: 18 }}>
+          <Panel>
+            <div style={{ display: "grid", placeItems: "center", minHeight: 320, textAlign: "center", gap: 10 }}>
+              <div style={{ fontSize: 22, fontWeight: 800 }}>Nenhum prontuário aberto</div>
+              <div style={{ color: THEME.muted, maxWidth: 420, lineHeight: 1.7 }}>
+                Selecione uma cliente na lista para abrir a análise em uma tela focada, sem menus paralelos competindo pela navegação.
+              </div>
+            </div>
+          </Panel>
+        </section>
+      </div>
     </div>
   );
 }
@@ -2198,7 +2237,7 @@ function FinancialView({ clients, mobile }) {
   );
 }
 
-function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol }) {
+function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol, onBack }) {
   const validProtocols = getValidProtocols(client.protocolosUsados);
   const attendanceDateOptions = buildAttendanceDateOptions(client);
   const activeGraphics = getActiveGraphicsByProtocol(client);
@@ -2208,6 +2247,7 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
       <div style={{ display: "grid", gap: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
           <div>
+            {onBack ? <button type="button" onClick={onBack} style={{ ...secondaryButtonStyle, marginBottom: 12 }}>Voltar para clientes</button> : null}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 10 }}>
               <div style={{ fontSize: 24, fontWeight: 800 }}>{client.nome}</div>
               <StatusBadge status={client.status} />
