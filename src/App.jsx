@@ -929,7 +929,6 @@ function App() {
     filteredClients.find((client) => client.id === selectedId) ||
     clientsWithProgress.find((client) => client.id === selectedId) ||
     null;
-  const clientWorkspaceOpen = Boolean(selectedClient) && (mainTab === "clientes" || mainTab === "metodos");
 
   const metrics = useMemo(() => {
     const active = clientsWithProgress.filter((client) => client.status === "Em atendimento").length;
@@ -1117,9 +1116,6 @@ function App() {
       setActiveSubmethod("tgr");
       setActiveMethodTab("protocolos");
     }
-    if (nextTab === "clientes") {
-      setSelectedId("");
-    }
     setMainTab(nextTab);
   }
 
@@ -1213,29 +1209,12 @@ function App() {
     <Shell>
       <Header user={user} onLogout={handleLogout} mobile={mobile} />
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "18px 14px 40px" : "24px 24px 48px" }}>
-        {!clientWorkspaceOpen ? <TopMetrics metrics={metrics} mobile={mobile} /> : null}
-        {!clientWorkspaceOpen ? (
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
-            {MAIN_TABS.map((tab) => (
-              <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
-            ))}
-          </div>
-        ) : (
-          <div style={{ marginTop: 10, marginBottom: 18 }}>
-            <Panel style={{ padding: "14px 16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 800 }}>{mainTab === "metodos" ? "TGR da cliente" : "Prontuário da cliente"}</div>
-                  <div style={{ color: THEME.muted, fontSize: 13 }}>Navegação focada para evitar sair da análise por engano.</div>
-                </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {mainTab === "metodos" ? <button type="button" onClick={() => setMainTab("clientes")} style={secondaryButtonStyle}>Voltar ao prontuário</button> : null}
-                  <button type="button" onClick={() => setSelectedId("")} style={secondaryButtonStyle}>Voltar para clientes</button>
-                </div>
-              </div>
-            </Panel>
-          </div>
-        )}
+        <TopMetrics metrics={metrics} mobile={mobile} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
+          {MAIN_TABS.map((tab) => (
+            <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
+          ))}
+        </div>
         {uiMessage ? (
           <div style={{ marginBottom: 16 }}>
             <Panel style={{ padding: "12px 16px", background: "#fff8ef" }}>
