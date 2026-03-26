@@ -1275,7 +1275,6 @@ function App() {
           protocolSupportForms={protocolSupportForms}
           setProtocolSupportForms={setProtocolSupportForms}
           relacoesContext={relacoesContext}
-          selectedClient={selectedClient}
           clientDetailOpen={mainTab === "clientes" && Boolean(selectedClient)}
           toggleClientProtocol={toggleClientProtocol}
           saveProtocolToClient={saveProtocolToClient}
