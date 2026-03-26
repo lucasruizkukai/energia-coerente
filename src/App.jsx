@@ -51,7 +51,6 @@ const TGR_PROTOCOLS = [
   { slug: "limpeza-protecao", nome: "Limpeza e Protecao", resumo: "Identificacao de sobrecargas, interferencias e camadas de protecao." },
   { slug: "prosperidade", nome: "Prosperidade", resumo: "Mapeamento de bloqueios e organizacao de campos ligados a fluxo e realizacao." },
   { slug: "psicoemocionais", nome: "Psicoemocionais", resumo: "Leitura dos eixos emocionais e mentais envolvidos no processo." },
-  { slug: "chakras", nome: "Chakras", resumo: "Observacao da distribuicao energetica e dos centros principais." },
 ];
 
 const PROTOCOL_OPTIONS = TGR_PROTOCOLS.map((item) => item.nome);
@@ -159,7 +158,6 @@ const PROTOCOL_GRAPHIC_DEFAULTS = {
   "limpeza-protecao": { group: "limpeza", context: "Limpeza e Protecao Energetica" },
   prosperidade: { group: "despertar", context: "Prosperidade e Dinheiro" },
   psicoemocionais: { group: "psicoemocionais", context: "Relacoes" },
-  chakras: { group: "vitalidade", context: "Limpeza e Protecao Energetica" },
 };
 
 const emptyRelacoesForm = {
@@ -725,7 +723,7 @@ function inferProtocolSlug(client) {
   if (text.includes("protec") || text.includes("limpeza")) return "limpeza-protecao";
   if (text.includes("vital")) return "vitalidade";
   if (text.includes("harmon")) return "harmonia";
-  if (text.includes("chakra")) return "chakras";
+  if (text.includes("chakra")) return "vitalidade";
   return "despertar";
 }
 
