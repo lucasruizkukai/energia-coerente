@@ -179,6 +179,23 @@ const emptyRelacoesForm = {
   conclusaoAnalitica: "",
 };
 
+const emptyProtocolSupportForm = {
+  objetivoLeitura: "",
+  observacaoInicial: "",
+  leituraPrincipal: "",
+  pontosObservados: "",
+  graficosSelecionados: [],
+  contextoGraficos: {},
+  tempoAtivacaoGraficos: {},
+  leituraGraficos: "",
+  sinteseGraficos: "",
+  intervencaoIndicada: "",
+  orientacaoTerapeutica: "",
+  focoProximosDias: "",
+  observacoesFinais: "",
+  conclusaoAnalitica: "",
+};
+
 
 const THEME = {
   bg: "#f6f1e8",
@@ -773,6 +790,7 @@ function App() {
   const [activeMethodTab, setActiveMethodTab] = useState("overview");
   const [activeTgrProtocol, setActiveTgrProtocol] = useState("relacoes");
   const [relacoesForm, setRelacoesForm] = useState(emptyRelacoesForm);
+  const [protocolSupportForms, setProtocolSupportForms] = useState({});
   const [relacoesContext, setRelacoesContext] = useState(null);
 
   useEffect(() => {
@@ -977,10 +995,11 @@ function App() {
 
   function openProtocolForClient(client, protocolName = "Relacoes") {
     if (!client) return;
+    const protocolSlug = findProtocolSlugByName(protocolName);
     setActiveMethod("radiestesia");
     setActiveSubmethod("tgr");
     setActiveMethodTab("protocolos");
-    setActiveTgrProtocol(findProtocolSlugByName(protocolName));
+    setActiveTgrProtocol(protocolSlug);
     setRelacoesContext({
       clientId: client.id,
       clientName: client.nome,
@@ -991,6 +1010,16 @@ function App() {
       objetivoLeitura: current.objetivoLeitura || client.objetivo || "",
       observacaoInicial: current.observacaoInicial || client.queixaPrincipal || "",
       conclusaoAnalitica: current.conclusaoAnalitica || client.diagnosticoEnergetico || "",
+    }));
+    setProtocolSupportForms((current) => ({
+      ...current,
+      [protocolSlug]: {
+        ...emptyProtocolSupportForm,
+        ...(current[protocolSlug] || {}),
+        objetivoLeitura: current[protocolSlug]?.objetivoLeitura || client.objetivo || "",
+        observacaoInicial: current[protocolSlug]?.observacaoInicial || client.queixaPrincipal || "",
+        conclusaoAnalitica: current[protocolSlug]?.conclusaoAnalitica || client.diagnosticoEnergetico || "",
+      },
     }));
     setMainTab("metodos");
   }
@@ -1093,6 +1122,8 @@ function App() {
           setActiveTgrProtocol={setActiveTgrProtocol}
           relacoesForm={relacoesForm}
           setRelacoesForm={setRelacoesForm}
+          protocolSupportForms={protocolSupportForms}
+          setProtocolSupportForms={setProtocolSupportForms}
           relacoesContext={relacoesContext}
           setMainTab={setMainTab}
           openProtocolForClient={openProtocolForClient}
@@ -1132,6 +1163,8 @@ function MainContent(props) {
     setActiveTgrProtocol,
     relacoesForm,
     setRelacoesForm,
+    protocolSupportForms,
+    setProtocolSupportForms,
     relacoesContext,
     setMainTab,
     openProtocolForClient,
@@ -1207,6 +1240,8 @@ function MainContent(props) {
         setActiveTgrProtocol={setActiveTgrProtocol}
         relacoesForm={relacoesForm}
         setRelacoesForm={setRelacoesForm}
+        protocolSupportForms={protocolSupportForms}
+        setProtocolSupportForms={setProtocolSupportForms}
         relacoesContext={relacoesContext}
         appointments={appointments}
         mobile={mobile}
@@ -1373,7 +1408,7 @@ function AppointmentsView({ appointments, clients, mobile, onOpenClient }) {
   );
 }
 
-function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActiveSubmethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, relacoesContext, appointments, mobile }) {
+function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActiveSubmethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext, appointments, mobile }) {
   const tgrAppointmentCount = appointments.filter((appointment) => appointment.methodSlug === "tgr").length;
   const selectedMethod = METHOD_CATALOG.find((item) => item.slug === activeMethod) || METHOD_CATALOG[0];
   const selectedSubmethod = RADIOESTHESIA_METHODS.find((item) => item.slug === activeSubmethod) || RADIOESTHESIA_METHODS[0];
@@ -1479,6 +1514,8 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
                 setActiveProtocol={setActiveTgrProtocol}
                 relacoesForm={relacoesForm}
                 setRelacoesForm={setRelacoesForm}
+                protocolSupportForms={protocolSupportForms}
+                setProtocolSupportForms={setProtocolSupportForms}
                 relacoesContext={relacoesContext}
               />
             )}
@@ -1511,8 +1548,9 @@ function MethodOverview({ appointments, mobile }) {
   );
 }
 
-function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, relacoesContext }) {
+function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext }) {
   const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol) || TGR_PROTOCOLS[0];
+  const supportForm = protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm;
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
@@ -1520,14 +1558,20 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
       {selectedProtocol.slug === "relacoes" ? (
         <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} />
       ) : (
-        <Panel>
-          <div style={{ display: "grid", gap: 8 }}>
-            <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedProtocol.nome}</div>
-            <div style={{ color: THEME.muted, lineHeight: 1.7 }}>
-              Este protocolo vai entrar na mesma estrutura operacional de Relacoes: leitura principal, chakras, graficos usados, tempo de ativacao e conduta.
-            </div>
-          </div>
-        </Panel>
+        <GenericProtocolView
+          mobile={mobile}
+          protocol={selectedProtocol}
+          form={supportForm}
+          setForm={(updater) =>
+            setProtocolSupportForms((current) => ({
+              ...current,
+              [selectedProtocol.slug]: typeof updater === "function"
+                ? updater(current[selectedProtocol.slug] || emptyProtocolSupportForm)
+                : updater,
+            }))
+          }
+          context={relacoesContext}
+        />
       )}
     </div>
   );
@@ -1762,6 +1806,175 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
               ))}
             </div>
           ) : null}
+          <Field label="Leitura dos graficos">
+            <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Sintese dos graficos">
+            <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Intervencao indicada">
+            <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Orientacao terapeutica">
+            <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Foco dos proximos dias">
+            <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Conclusao analitica">
+            <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Observacoes finais">
+            <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
+          </Field>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function GenericProtocolView({ mobile, protocol, form, setForm, context }) {
+  const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
+  const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
+  const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+
+  function setField(key, value) {
+    setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function toggleGraphic(graphic) {
+    setForm((current) => {
+      const values = current.graficosSelecionados || [];
+      const exists = values.includes(graphic);
+      return {
+        ...current,
+        graficosSelecionados: exists ? values.filter((item) => item !== graphic) : [...values, graphic],
+      };
+    });
+  }
+
+  function setGraphicDuration(graphic, value) {
+    setForm((current) => ({
+      ...current,
+      tempoAtivacaoGraficos: {
+        ...(current.tempoAtivacaoGraficos || {}),
+        [graphic]: value,
+      },
+    }));
+  }
+
+  function setGraphicContext(graphic, value) {
+    setForm((current) => ({
+      ...current,
+      contextoGraficos: {
+        ...(current.contextoGraficos || {}),
+        [graphic]: value,
+      },
+    }));
+  }
+
+  function toggleGraphicConfig(graphic) {
+    setExpandedGraphicConfigs((current) => ({
+      ...current,
+      [graphic]: !current[graphic],
+    }));
+  }
+
+  return (
+    <Panel>
+      <div style={{ display: "grid", gap: 18 }}>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{protocol.nome}</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.7 }}>{protocol.resumo}</div>
+        </div>
+
+        {context ? (
+          <div style={{ border: `1px solid ${THEME.green}`, background: "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "grid", gap: 4 }}>
+            <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
+            <div style={{ color: THEME.muted }}>{context.clientName}</div>
+            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
+          </div>
+        ) : null}
+
+        <SectionTitle title="Cabecalho da leitura" />
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+          <Field label="Objetivo da leitura">
+            <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Observacao inicial">
+            <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
+          </Field>
+        </div>
+
+        <SectionTitle title="Leitura principal" />
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+          <Field label="Leitura principal">
+            <textarea value={form.leituraPrincipal} onChange={(event) => setField("leituraPrincipal", event.target.value)} style={inputStyle} />
+          </Field>
+          <Field label="Pontos observados">
+            <textarea value={form.pontosObservados} onChange={(event) => setField("pontosObservados", event.target.value)} style={inputStyle} />
+          </Field>
+        </div>
+
+        <SectionTitle title="Graficos usados" />
+        <div style={{ display: "grid", gap: 14 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {TGR_GRAPHIC_GROUPS.map((group) => (
+              <PillButton key={group.slug} active={currentGraphicGroup.slug === group.slug} onClick={() => setActiveGraphicGroup(group.slug)} label={group.nome} />
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
+            {currentGraphicGroup.graficos.map((graphic) => (
+              <button
+                key={graphic}
+                type="button"
+                onClick={() => toggleGraphic(graphic)}
+                style={{
+                  border: `1px solid ${(form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.line}`,
+                  background: (form.graficosSelecionados || []).includes(graphic) ? "#f7fbf4" : "#fffdfa",
+                  borderRadius: 16,
+                  padding: "12px 14px",
+                  textAlign: "left",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  color: (form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.text,
+                }}
+              >
+                {graphic}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {(form.graficosSelecionados || []).length ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Configuracao dos graficos selecionados</div>
+            {(form.graficosSelecionados || []).map((graphic) => (
+              <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
+                <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
+                  <span>{graphic}</span>
+                  <span style={{ color: THEME.muted, fontSize: 13 }}>{expandedGraphicConfigs[graphic] ? "Ocultar" : "Configurar"}</span>
+                </button>
+                {expandedGraphicConfigs[graphic] ? (
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                    <select value={form.contextoGraficos?.[graphic] || protocol.nome} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                      {[protocol.nome, ...GRAPHIC_CONTEXT_OPTIONS.filter((option) => option !== protocol.nome)].map((option) => <option key={option}>{option}</option>)}
+                    </select>
+                    <input
+                      value={form.tempoAtivacaoGraficos?.[graphic] || ""}
+                      onChange={(event) => setGraphicDuration(graphic, event.target.value)}
+                      style={inputStyle}
+                      placeholder="Ex.: 7 dias, continuo"
+                    />
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        <SectionTitle title="Sintese e conduta" />
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           <Field label="Leitura dos graficos">
             <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
           </Field>
