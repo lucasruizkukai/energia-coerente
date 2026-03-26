@@ -42,7 +42,16 @@ export async function listClients(fallback = []) {
 
   if (error) throw error;
 
-  return { mode: "supabase", data: (data || []).map(mapRowToClient) };
+  return {
+    mode: "supabase",
+    data: (data || []).map((row) => {
+      try {
+        return mapRowToClient(row);
+      } catch {
+        return mapRowToClientFallback(row);
+      }
+    }),
+  };
 }
 
 export async function upsertClient(client, currentClients = []) {
@@ -140,6 +149,35 @@ function mapClientToRow(client) {
     devolutiva_final: activeAnalysis.devolutivaFinal,
     proximos_passos: activeAnalysis.proximosPassos,
   };
+}
+
+function mapRowToClientFallback(row) {
+  const protocolosUsados = String(row?.tipo_sessao || "")
+    .split("|")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return normalizeClientAnalyses({
+    id: row?.id || "",
+    nome: row?.nome || "",
+    whatsapp: row?.whatsapp || "",
+    email: row?.email || "",
+    dataInicio: row?.data_inicio || "",
+    protocolosUsados,
+    queixaPrincipal: row?.queixa_principal || "",
+    objetivo: row?.objetivo || "",
+    diagnosticoEnergetico: row?.diagnostico_energetico || "",
+    causasIdentificadas: row?.causas_identificadas || "",
+    areasAfetadas: row?.areas_afetadas || "",
+    intervencoesRealizadas: row?.intervencoes_realizadas || "",
+    observacoes: row?.observacoes || "",
+    status: row?.status || "Em atendimento",
+    evolucao: row?.evolucao || "",
+    valor: row?.valor?.toString() || "",
+    statusPagamento: row?.status_pagamento || "Pendente",
+    devolutivaFinal: row?.devolutiva_final || "",
+    proximosPassos: row?.proximos_passos || "",
+  });
 }
 
 function splitObservacoesPayload(value) {

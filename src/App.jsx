@@ -809,8 +809,9 @@ function App() {
         setClients(clientsState.data);
       } catch {
         if (!mounted) return;
-        setAppMode("local");
-        setClients(sampleClients);
+        setAppMode(hasSupabaseEnv ? "supabase" : "local");
+        setClients(hasSupabaseEnv ? [] : sampleClients);
+        setUiMessage(hasSupabaseEnv ? "Nao foi possivel carregar os clientes salvos. Revise a conexao com o banco." : "Nao foi possivel carregar os clientes locais.");
       } finally {
         if (!mounted) return;
         setAuthReady(true);
