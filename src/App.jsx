@@ -369,6 +369,7 @@ function buildGraphicLibrary() {
       nome: graphic,
       origem: group.nome,
       contextos: GRAPHIC_CONTEXT_OPTIONS,
+      resumo: `Grafico da apostila ${group.nome}, aplicavel em diferentes analises do TGR conforme o contexto escolhido.`,
     }))
   );
 }
@@ -1037,12 +1038,14 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
 function TgrGraphicsLibrary({ mobile }) {
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
   const [activeGraphic, setActiveGraphic] = useState(TGR_GRAPHIC_GROUPS[0].graficos[0]);
+  const [showGraphicDetails, setShowGraphicDetails] = useState(false);
   const currentGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
   const graphicLibrary = buildGraphicLibrary();
   const currentGraphic = graphicLibrary.find((item) => item.nome === activeGraphic && item.origem === currentGroup.nome) || graphicLibrary.find((item) => item.origem === currentGroup.nome) || null;
 
   useEffect(() => {
     setActiveGraphic(currentGroup.graficos[0]);
+    setShowGraphicDetails(false);
   }, [currentGroup]);
 
   return (
@@ -1076,12 +1079,22 @@ function TgrGraphicsLibrary({ mobile }) {
         <Panel>
           {currentGraphic ? (
             <div style={{ display: "grid", gap: 14 }}>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{currentGraphic.nome}</div>
-                <div style={{ color: THEME.muted }}>Origem: {currentGraphic.origem}</div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{currentGraphic.nome}</div>
+                  <div style={{ color: THEME.muted }}>Origem: {currentGraphic.origem}</div>
+                </div>
+                <button type="button" onClick={() => setShowGraphicDetails((current) => !current)} style={secondaryButtonStyle}>
+                  {showGraphicDetails ? "Ocultar detalhes" : "Ver detalhes"}
+                </button>
               </div>
-              <InfoCard label="Contextos de uso" value={currentGraphic.contextos.join(", ")} />
-              <InfoCard label="Aplicacao" value="Este grafico pode ser usado em diferentes analises do TGR, conforme o contexto escolhido no atendimento." />
+              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>{currentGraphic.resumo}</div>
+              {showGraphicDetails ? (
+                <div style={{ display: "grid", gap: 12 }}>
+                  <InfoCard label="Contextos de uso" value={currentGraphic.contextos.join(", ")} />
+                  <InfoCard label="Aplicacao" value="Use este grafico no atendimento escolhendo o contexto e o tempo ativo conforme a leitura realizada." />
+                </div>
+              ) : null}
             </div>
           ) : null}
         </Panel>
@@ -1092,6 +1105,7 @@ function TgrGraphicsLibrary({ mobile }) {
 
 function RelacoesProtocolView({ mobile, form, setForm, context }) {
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
+  const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
 
   function setField(key, value) {
@@ -1147,6 +1161,13 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
         ...(current.contextoGraficos || {}),
         [graphic]: value,
       },
+    }));
+  }
+
+  function toggleGraphicConfig(graphic) {
+    setExpandedGraphicConfigs((current) => ({
+      ...current,
+      [graphic]: !current[graphic],
     }));
   }
 
@@ -1285,18 +1306,23 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
               <div style={{ ...labelStyle, marginBottom: 0 }}>Configuracao dos graficos selecionados</div>
               {(form.graficosSelecionados || []).map((graphic) => (
                 <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
-                  <div style={{ fontWeight: 700 }}>{graphic}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
-                    <select value={form.contextoGraficos?.[graphic] || "Relacoes"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
-                      {GRAPHIC_CONTEXT_OPTIONS.map((option) => <option key={option}>{option}</option>)}
-                    </select>
-                    <input
-                      value={form.tempoAtivacaoGraficos?.[graphic] || ""}
-                      onChange={(event) => setGraphicDuration(graphic, event.target.value)}
-                      style={inputStyle}
-                      placeholder="Ex.: 7 dias, continuo"
-                    />
-                  </div>
+                  <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
+                    <span>{graphic}</span>
+                    <span style={{ color: THEME.muted, fontSize: 13 }}>{expandedGraphicConfigs[graphic] ? "Ocultar" : "Configurar"}</span>
+                  </button>
+                  {expandedGraphicConfigs[graphic] ? (
+                    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                      <select value={form.contextoGraficos?.[graphic] || "Relacoes"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                        {GRAPHIC_CONTEXT_OPTIONS.map((option) => <option key={option}>{option}</option>)}
+                      </select>
+                      <input
+                        value={form.tempoAtivacaoGraficos?.[graphic] || ""}
+                        onChange={(event) => setGraphicDuration(graphic, event.target.value)}
+                        style={inputStyle}
+                        placeholder="Ex.: 7 dias, continuo"
+                      />
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
