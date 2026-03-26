@@ -28,6 +28,11 @@ const ANALYSIS_DEFAULTS = {
   statusPagamento: "Pendente",
   devolutivaFinal: "",
   proximosPassos: "",
+  protocolForms: {
+    relacoes: {},
+    "limpeza-protecao": {},
+    prosperidade: {},
+  },
 };
 
 export async function listClients(fallback = []) {
@@ -221,6 +226,11 @@ function buildAnalysisFromSource(source = {}, overrides = {}) {
     funcoes: { ...(source.funcoes || {}), ...(overrides.funcoes || {}) },
     campos: { ...(source.campos || {}), ...(overrides.campos || {}) },
     aura: { ...(source.aura || {}), ...(overrides.aura || {}) },
+    protocolForms: {
+      relacoes: { ...(source.protocolForms?.relacoes || {}), ...(overrides.protocolForms?.relacoes || {}) },
+      "limpeza-protecao": { ...(source.protocolForms?.["limpeza-protecao"] || {}), ...(overrides.protocolForms?.["limpeza-protecao"] || {}) },
+      prosperidade: { ...(source.protocolForms?.prosperidade || {}), ...(overrides.protocolForms?.prosperidade || {}) },
+    },
   };
 }
 
@@ -251,6 +261,7 @@ function extractAnalysisFromClient(client = {}, overrides = {}) {
       statusPagamento: client.statusPagamento,
       devolutivaFinal: client.devolutivaFinal,
       proximosPassos: client.proximosPassos,
+      protocolForms: client.protocolForms,
     },
     overrides
   );

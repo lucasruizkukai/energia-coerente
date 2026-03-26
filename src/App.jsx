@@ -196,6 +196,35 @@ const emptyProtocolSupportForm = {
   conclusaoAnalitica: "",
 };
 
+function cloneProtocolForms(source = {}) {
+  return {
+    relacoes: {
+      ...emptyRelacoesForm,
+      ...(source.relacoes || {}),
+      graficosSelecionados: [...(source.relacoes?.graficosSelecionados || [])],
+      contextoGraficos: { ...(source.relacoes?.contextoGraficos || {}) },
+      tempoAtivacaoGraficos: { ...(source.relacoes?.tempoAtivacaoGraficos || {}) },
+      leituraChakrasPercentuais: { ...(source.relacoes?.leituraChakrasPercentuais || {}) },
+      chakrasEmHarmonia: [...(source.relacoes?.chakrasEmHarmonia || [])],
+      chakrasEmDesequilibrio: [...(source.relacoes?.chakrasEmDesequilibrio || [])],
+    },
+    "limpeza-protecao": {
+      ...emptyProtocolSupportForm,
+      ...(source["limpeza-protecao"] || {}),
+      graficosSelecionados: [...(source["limpeza-protecao"]?.graficosSelecionados || [])],
+      contextoGraficos: { ...(source["limpeza-protecao"]?.contextoGraficos || {}) },
+      tempoAtivacaoGraficos: { ...(source["limpeza-protecao"]?.tempoAtivacaoGraficos || {}) },
+    },
+    prosperidade: {
+      ...emptyProtocolSupportForm,
+      ...(source.prosperidade || {}),
+      graficosSelecionados: [...(source.prosperidade?.graficosSelecionados || [])],
+      contextoGraficos: { ...(source.prosperidade?.contextoGraficos || {}) },
+      tempoAtivacaoGraficos: { ...(source.prosperidade?.tempoAtivacaoGraficos || {}) },
+    },
+  };
+}
+
 
 const THEME = {
   bg: "#f6f1e8",
@@ -344,6 +373,7 @@ const emptyAnalysis = {
   statusPagamento: "Pendente",
   devolutivaFinal: "",
   proximosPassos: "",
+  protocolForms: cloneProtocolForms(),
 };
 
 const sampleClients = [
@@ -443,6 +473,7 @@ function buildAnalysisDraft(source = {}, overrides = {}) {
     funcoes: cloneStructuredSection(overrides.funcoes || source.funcoes, emptyAnalysis.funcoes),
     campos: cloneStructuredSection(overrides.campos || source.campos, emptyAnalysis.campos),
     aura: cloneStructuredSection(overrides.aura || source.aura, emptyAnalysis.aura),
+    protocolForms: cloneProtocolForms(overrides.protocolForms || source.protocolForms),
   };
 }
 
@@ -473,6 +504,7 @@ function extractAnalysisFromClient(client = {}, overrides = {}) {
       statusPagamento: client.statusPagamento,
       devolutivaFinal: client.devolutivaFinal,
       proximosPassos: client.proximosPassos,
+      protocolForms: client.protocolForms,
     },
     overrides
   );
@@ -505,6 +537,7 @@ function applyAnalysisToClient(client, analysis) {
     statusPagamento: mergedAnalysis.statusPagamento,
     devolutivaFinal: mergedAnalysis.devolutivaFinal,
     proximosPassos: mergedAnalysis.proximosPassos,
+    protocolForms: cloneProtocolForms(mergedAnalysis.protocolForms),
   };
 }
 
@@ -731,6 +764,20 @@ function formatProtocols(client) {
   return validProtocols.length ? validProtocols.join(", ") : findProtocolName(client.protocolSlug);
 }
 
+function getActiveGraphicsByProtocol(client) {
+  const analysis = client?.analyses?.find((item) => item.id === client.currentAnalysisId) || extractAnalysisFromClient(client || {});
+  const protocolForms = cloneProtocolForms(analysis.protocolForms);
+  return TGR_PROTOCOLS.flatMap((protocol) => {
+    const form = protocol.slug === "relacoes" ? protocolForms.relacoes : protocolForms[protocol.slug];
+    return (form?.graficosSelecionados || []).map((graphic) => ({
+      protocol: protocol.nome,
+      nome: graphic,
+      contexto: form?.contextoGraficos?.[graphic] || "",
+      tempo: form?.tempoAtivacaoGraficos?.[graphic] || "",
+    }));
+  });
+}
+
 function findProtocolSlugByName(name) {
   const match = TGR_PROTOCOLS.find((item) => item.nome.toLowerCase() === String(name || "").toLowerCase());
   return match?.slug || "relacoes";
@@ -778,6 +825,22 @@ function App() {
   const [relacoesForm, setRelacoesForm] = useState(emptyRelacoesForm);
   const [protocolSupportForms, setProtocolSupportForms] = useState({});
   const [relacoesContext, setRelacoesContext] = useState(null);
+
+  useEffect(() => {
+    if (!selectedClient) {
+      setRelacoesForm(emptyRelacoesForm);
+      setProtocolSupportForms({});
+      return;
+    }
+
+    const activeAnalysis = selectedClient.analyses?.find((analysis) => analysis.id === selectedClient.currentAnalysisId) || extractAnalysisFromClient(selectedClient);
+    const protocolForms = cloneProtocolForms(activeAnalysis.protocolForms);
+    setRelacoesForm(protocolForms.relacoes);
+    setProtocolSupportForms({
+      "limpeza-protecao": protocolForms["limpeza-protecao"],
+      prosperidade: protocolForms.prosperidade,
+    });
+  }, [selectedClient?.id, selectedClient?.currentAnalysisId]);
 
   useEffect(() => {
     let mounted = true;
@@ -881,9 +944,9 @@ function App() {
     return { active, pendingFeedback, pendingPayment, monthlyRevenue };
   }, [clientsWithProgress]);
 
-  async function saveClient(payload) {
+  async function persistClientRecord(payload, options = {}) {
     setSaving(true);
-    setUiMessage("");
+    if (!options.keepMessage) setUiMessage("");
     const record = normalizeClientRecord(payload);
 
     try {
@@ -897,14 +960,24 @@ function App() {
         });
       }
       setSelectedId(record.id);
-      setDraftClient({ ...emptyClient, id: generateId() });
-      setMainTab("clientes");
-      setUiMessage("Atendimento salvo com sucesso.");
+      if (options.resetDraft) setDraftClient({ ...emptyClient, id: generateId() });
+      if (options.goToClients) setMainTab("clientes");
+      if (options.successMessage) setUiMessage(options.successMessage);
+      return record;
     } catch (error) {
-      setUiMessage(error?.message || "Nao foi possivel salvar o atendimento.");
+      setUiMessage(error?.message || options.errorMessage || "Nao foi possivel salvar o atendimento.");
+      return null;
     } finally {
       setSaving(false);
     }
+  }
+
+  async function saveClient(payload) {
+    await persistClientRecord(payload, {
+      resetDraft: true,
+      goToClients: true,
+      successMessage: "Atendimento salvo com sucesso.",
+    });
   }
 
   async function removeClient(id) {
@@ -929,12 +1002,12 @@ function App() {
       { status: "Concluido" }
     );
 
-    await saveClient({
+    await persistClientRecord({
       ...normalized,
       analyses: normalized.analyses.map((analysis) => (analysis.id === finalizedAnalysis.id ? finalizedAnalysis : analysis)),
       currentAnalysisId: finalizedAnalysis.id,
       status: "Concluido",
-    });
+    }, { successMessage: "Analise finalizada." });
     setUiMessage("Analise finalizada.");
   }
 
@@ -945,11 +1018,11 @@ function App() {
     const selectedAnalysis = normalized.analyses.find((analysis) => analysis.id === analysisId);
     if (!selectedAnalysis) return;
 
-    await saveClient({
+    await persistClientRecord({
       ...applyAnalysisToClient(normalized, selectedAnalysis),
       analyses: normalized.analyses,
       currentAnalysisId: selectedAnalysis.id,
-    });
+    }, { keepMessage: true });
   }
 
   async function createNewAnalysis(clientId) {
@@ -963,12 +1036,84 @@ function App() {
       statusPagamento: "Pendente",
     });
 
-    await saveClient({
+    await persistClientRecord({
       ...applyAnalysisToClient(normalized, newAnalysis),
       analyses: [newAnalysis, ...normalized.analyses],
       currentAnalysisId: newAnalysis.id,
-    });
+    }, { successMessage: "Nova analise iniciada." });
     setUiMessage("Nova analise iniciada.");
+  }
+
+  async function toggleClientProtocol(clientId, protocolName) {
+    const currentClient = clients.find((item) => item.id === clientId);
+    if (!currentClient) return;
+    const normalized = normalizeClientRecord(currentClient);
+    const currentAnalysis = normalized.analyses.find((analysis) => analysis.id === normalized.currentAnalysisId);
+    if (!currentAnalysis) return;
+
+    const currentProtocols = getValidProtocols(currentAnalysis.protocolosUsados);
+    const nextProtocols = currentProtocols.includes(protocolName)
+      ? currentProtocols.filter((protocol) => protocol !== protocolName)
+      : [...currentProtocols, protocolName];
+
+    const updatedAnalysis = buildAnalysisDraft(currentAnalysis, {
+      protocolosUsados: nextProtocols,
+    });
+
+    await persistClientRecord({
+      ...applyAnalysisToClient(normalized, updatedAnalysis),
+      analyses: normalized.analyses.map((analysis) => (analysis.id === updatedAnalysis.id ? updatedAnalysis : analysis)),
+      currentAnalysisId: updatedAnalysis.id,
+    }, { keepMessage: true });
+
+    if (!nextProtocols.length) {
+      setActiveTgrProtocol("relacoes");
+    } else if (!nextProtocols.includes(findProtocolName(activeTgrProtocol))) {
+      setActiveTgrProtocol(findProtocolSlugByName(nextProtocols[0]));
+    }
+  }
+
+  async function saveProtocolToClient(protocolSlug, formData) {
+    if (!relacoesContext?.clientId) return;
+    const currentClient = clients.find((item) => item.id === relacoesContext.clientId);
+    if (!currentClient) return;
+    const normalized = normalizeClientRecord(currentClient);
+    const currentAnalysis = normalized.analyses.find((analysis) => analysis.id === normalized.currentAnalysisId);
+    if (!currentAnalysis) return;
+
+    const protocolName = findProtocolName(protocolSlug);
+    const updatedAnalysis = buildAnalysisDraft(currentAnalysis, {
+      protocolosUsados: Array.from(new Set([...(currentAnalysis.protocolosUsados || []), protocolName])),
+      protocolForms: {
+        ...cloneProtocolForms(currentAnalysis.protocolForms),
+        [protocolSlug]: protocolSlug === "relacoes"
+          ? {
+            ...emptyRelacoesForm,
+            ...formData,
+            graficosSelecionados: [...(formData.graficosSelecionados || [])],
+            contextoGraficos: { ...(formData.contextoGraficos || {}) },
+            tempoAtivacaoGraficos: { ...(formData.tempoAtivacaoGraficos || {}) },
+            leituraChakrasPercentuais: { ...(formData.leituraChakrasPercentuais || {}) },
+            chakrasEmHarmonia: [...(formData.chakrasEmHarmonia || [])],
+            chakrasEmDesequilibrio: [...(formData.chakrasEmDesequilibrio || [])],
+          }
+          : {
+            ...emptyProtocolSupportForm,
+            ...formData,
+            graficosSelecionados: [...(formData.graficosSelecionados || [])],
+            contextoGraficos: { ...(formData.contextoGraficos || {}) },
+            tempoAtivacaoGraficos: { ...(formData.tempoAtivacaoGraficos || {}) },
+          },
+      },
+    });
+
+    await persistClientRecord({
+      ...applyAnalysisToClient(normalized, updatedAnalysis),
+      analyses: normalized.analyses.map((analysis) => (analysis.id === updatedAnalysis.id ? updatedAnalysis : analysis)),
+      currentAnalysisId: updatedAnalysis.id,
+    }, { successMessage: `Protocolo ${protocolName} salvo na analise.` });
+
+    setUiMessage(`Protocolo ${protocolName} salvo na analise.`);
   }
 
   function handleTabChange(nextTab) {
@@ -983,6 +1128,9 @@ function App() {
   function openProtocolForClient(client, protocolName = "Relacoes") {
     if (!client) return;
     const protocolSlug = findProtocolSlugByName(protocolName);
+    const normalizedClient = normalizeClientRecord(client);
+    const currentAnalysis = normalizedClient.analyses.find((analysis) => analysis.id === normalizedClient.currentAnalysisId) || extractAnalysisFromClient(normalizedClient);
+    const protocolForms = cloneProtocolForms(currentAnalysis.protocolForms);
     setActiveMethod("radiestesia");
     setActiveSubmethod("tgr");
     setActiveMethodTab("protocolos");
@@ -992,20 +1140,20 @@ function App() {
       clientName: client.nome,
       protocolName,
     });
-    setRelacoesForm((current) => ({
-      ...current,
-      objetivoLeitura: current.objetivoLeitura || client.objetivo || "",
-      observacaoInicial: current.observacaoInicial || client.queixaPrincipal || "",
-      conclusaoAnalitica: current.conclusaoAnalitica || client.diagnosticoEnergetico || "",
-    }));
+    setRelacoesForm({
+      ...protocolForms.relacoes,
+      objetivoLeitura: protocolForms.relacoes.objetivoLeitura || client.objetivo || "",
+      observacaoInicial: protocolForms.relacoes.observacaoInicial || client.queixaPrincipal || "",
+      conclusaoAnalitica: protocolForms.relacoes.conclusaoAnalitica || client.diagnosticoEnergetico || "",
+    });
     setProtocolSupportForms((current) => ({
       ...current,
       [protocolSlug]: {
         ...emptyProtocolSupportForm,
-        ...(current[protocolSlug] || {}),
-        objetivoLeitura: current[protocolSlug]?.objetivoLeitura || client.objetivo || "",
-        observacaoInicial: current[protocolSlug]?.observacaoInicial || client.queixaPrincipal || "",
-        conclusaoAnalitica: current[protocolSlug]?.conclusaoAnalitica || client.diagnosticoEnergetico || "",
+        ...(protocolForms[protocolSlug] || current[protocolSlug] || {}),
+        objetivoLeitura: protocolForms[protocolSlug]?.objetivoLeitura || current[protocolSlug]?.objetivoLeitura || client.objetivo || "",
+        observacaoInicial: protocolForms[protocolSlug]?.observacaoInicial || current[protocolSlug]?.observacaoInicial || client.queixaPrincipal || "",
+        conclusaoAnalitica: protocolForms[protocolSlug]?.conclusaoAnalitica || current[protocolSlug]?.conclusaoAnalitica || client.diagnosticoEnergetico || "",
       },
     }));
     setMainTab("metodos");
@@ -1112,6 +1260,9 @@ function App() {
           protocolSupportForms={protocolSupportForms}
           setProtocolSupportForms={setProtocolSupportForms}
           relacoesContext={relacoesContext}
+          selectedClient={selectedClient}
+          toggleClientProtocol={toggleClientProtocol}
+          saveProtocolToClient={saveProtocolToClient}
           setMainTab={setMainTab}
           openProtocolForClient={openProtocolForClient}
         />
@@ -1153,6 +1304,9 @@ function MainContent(props) {
     protocolSupportForms,
     setProtocolSupportForms,
     relacoesContext,
+    selectedClient,
+    toggleClientProtocol,
+    saveProtocolToClient,
     setMainTab,
     openProtocolForClient,
   } = props;
@@ -1230,6 +1384,9 @@ function MainContent(props) {
         protocolSupportForms={protocolSupportForms}
         setProtocolSupportForms={setProtocolSupportForms}
         relacoesContext={relacoesContext}
+        selectedClient={selectedClient}
+        toggleClientProtocol={toggleClientProtocol}
+        saveProtocolToClient={saveProtocolToClient}
         appointments={appointments}
         mobile={mobile}
       />
@@ -1355,7 +1512,7 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
               onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
             />
             <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
-            <ClientJourney client={selectedClient} mobile={mobile} />
+            <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
             <FinalFeedback client={selectedClient} />
           </>
         ) : <ClientRecord client={{ ...emptyClient, id: generateId() }} onSave={saveClient} mobile={mobile} saving={saving} />}
@@ -1395,7 +1552,7 @@ function AppointmentsView({ appointments, clients, mobile, onOpenClient }) {
   );
 }
 
-function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActiveSubmethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext, appointments, mobile }) {
+function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActiveSubmethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext, selectedClient, toggleClientProtocol, saveProtocolToClient, appointments, mobile }) {
   const tgrAppointmentCount = appointments.filter((appointment) => appointment.methodSlug === "tgr").length;
   const selectedMethod = METHOD_CATALOG.find((item) => item.slug === activeMethod) || METHOD_CATALOG[0];
   const selectedSubmethod = RADIOESTHESIA_METHODS.find((item) => item.slug === activeSubmethod) || RADIOESTHESIA_METHODS[0];
@@ -1504,6 +1661,9 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
                 protocolSupportForms={protocolSupportForms}
                 setProtocolSupportForms={setProtocolSupportForms}
                 relacoesContext={relacoesContext}
+                selectedClient={selectedClient}
+                toggleClientProtocol={toggleClientProtocol}
+                saveProtocolToClient={saveProtocolToClient}
               />
             )}
               </>
@@ -1534,15 +1694,36 @@ function MethodOverview({ appointments, mobile }) {
   );
 }
 
-function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext }) {
+function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext, selectedClient, toggleClientProtocol, saveProtocolToClient }) {
   const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol) || TGR_PROTOCOLS[0];
   const supportForm = protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm;
+  const validProtocols = getValidProtocols(selectedClient?.protocolosUsados);
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
+      {selectedClient ? (
+        <Panel>
+          <div style={{ display: "grid", gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta analise</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque um ou mais protocolos para trabalhar na mesma analise e abra cada um pelo proprio chip.</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {PROTOCOL_OPTIONS.map((protocol) => (
+                <PillButton
+                  key={protocol}
+                  active={validProtocols.includes(protocol)}
+                  onClick={() => toggleClientProtocol(selectedClient.id, protocol)}
+                  label={protocol}
+                />
+              ))}
+            </div>
+          </div>
+        </Panel>
+      ) : null}
       <MethodCatalog title="Protocolos TGR" items={TGR_PROTOCOLS} mobile={mobile} activeSlug={selectedProtocol.slug} onSelect={setActiveProtocol} />
       {selectedProtocol.slug === "relacoes" ? (
-        <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} />
+        <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} onSave={() => saveProtocolToClient("relacoes", relacoesForm)} />
       ) : (
         <GenericProtocolView
           mobile={mobile}
@@ -1557,13 +1738,14 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
             }))
           }
           context={relacoesContext}
+          onSave={() => saveProtocolToClient(selectedProtocol.slug, supportForm)}
         />
       )}
     </div>
   );
 }
 
-function RelacoesProtocolView({ mobile, form, setForm, context }) {
+function RelacoesProtocolView({ mobile, form, setForm, context, onSave }) {
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
@@ -1622,6 +1804,9 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
             <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
             <div style={{ color: THEME.muted }}>{context.clientName}</div>
             <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
+            <div style={{ marginTop: 8 }}>
+              <button type="button" onClick={onSave} style={secondaryButtonStyle}>Salvar no prontuario</button>
+            </div>
           </div>
         ) : null}
 
@@ -1751,7 +1936,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
   );
 }
 
-function GenericProtocolView({ mobile, protocol, form, setForm, context }) {
+function GenericProtocolView({ mobile, protocol, form, setForm, context, onSave }) {
   const defaultGraphicConfig = PROTOCOL_GRAPHIC_DEFAULTS[protocol.slug] || { group: TGR_GRAPHIC_GROUPS[0].slug, context: protocol.nome };
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(defaultGraphicConfig.group);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
@@ -1817,6 +2002,9 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context }) {
             <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
             <div style={{ color: THEME.muted }}>{context.clientName}</div>
             <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
+            <div style={{ marginTop: 8 }}>
+              <button type="button" onClick={onSave} style={secondaryButtonStyle}>Salvar no prontuario</button>
+            </div>
           </div>
         ) : null}
 
@@ -2013,6 +2201,7 @@ function FinancialView({ clients, mobile }) {
 function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol }) {
   const validProtocols = getValidProtocols(client.protocolosUsados);
   const attendanceDateOptions = buildAttendanceDateOptions(client);
+  const activeGraphics = getActiveGraphicsByProtocol(client);
 
   return (
     <Panel>
@@ -2057,32 +2246,77 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           <div style={{ ...labelStyle, marginBottom: 0 }}>Protocolos da analise</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {validProtocols.length ? validProtocols.map((protocol) => (
-              <PillButton key={protocol} active={false} onClick={() => onOpenProtocol(protocol)} label={protocol} />
+              <PillButton key={protocol} active onClick={() => onOpenProtocol(protocol)} label={protocol} />
             )) : <span style={{ color: THEME.muted, fontSize: 14 }}>Nenhum protocolo selecionado ainda.</span>}
           </div>
+          {activeGraphics.length ? (
+            <>
+              <div style={{ ...labelStyle, marginBottom: 0 }}>Graficos ativos nesta analise</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {activeGraphics.map((item) => (
+                  <span key={`${item.protocol}-${item.nome}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 999, padding: "8px 12px", background: "#fffdfa", fontSize: 12, fontWeight: 700, color: THEME.text }}>
+                    {item.nome} · {item.protocol}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
     </Panel>
   );
 }
 
-function ClientJourney({ client, mobile }) {
+function ClientJourney({ client, mobile, onSelectAnalysis }) {
   const validProtocols = getValidProtocols(client.protocolosUsados);
+  const activeGraphics = getActiveGraphicsByProtocol(client);
+  const attendanceHistory = buildAttendanceDateOptions(client);
 
   return (
-    <Panel>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
-        <div style={{ fontSize: 18, fontWeight: 800 }}>Timeline do atendimento</div>
-        <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o inicio</div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 16 }}>
-        <InfoCard label="Metodo" value="TGR" />
-        <InfoCard label="Protocolos" value={formatProtocols(client)} />
-        <InfoCard label="Inicio" value={formatDate(client.dataInicio)} />
-        <InfoCard label="Pagamento" value={client.statusPagamento} />
-        <InfoCard label="Protocolos ativos" value={validProtocols.join(", ") || "Nao definidos"} />
-      </div>
-    </Panel>
+    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18 }}>
+      <Panel>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
+          <div style={{ fontSize: 18, fontWeight: 800 }}>Resumo da analise</div>
+          <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o inicio</div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 16 }}>
+          <InfoCard label="Metodo" value="TGR" />
+          <InfoCard label="Protocolos" value={formatProtocols(client)} />
+          <InfoCard label="Inicio" value={formatDate(client.dataInicio)} />
+          <InfoCard label="Pagamento" value={client.statusPagamento} />
+          <InfoCard label="Status" value={client.status} />
+          <InfoCard label="Graficos ativos" value={activeGraphics.length ? String(activeGraphics.length) : "0"} />
+          <InfoCard label="Queixa" value={client.queixaPrincipal || "Nao registrada"} />
+          <InfoCard label="Objetivo" value={client.objetivo || "Nao registrado"} />
+        </div>
+        {activeGraphics.length ? (
+          <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Graficos ativos por protocolo</div>
+            {activeGraphics.map((item) => (
+              <div key={`${item.protocol}-${item.nome}-${item.contexto}-${item.tempo}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr .9fr .8fr", gap: 10 }}>
+                <div><strong>{item.nome}</strong> <span style={{ color: THEME.muted }}>· {item.protocol}</span></div>
+                <div style={{ color: THEME.muted }}>{item.contexto || "Sem contexto"}</div>
+                <div style={{ color: THEME.muted }}>{item.tempo || "Sem tempo"}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </Panel>
+
+      <Panel>
+        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Historico por data</div>
+        <div style={{ display: "grid", gap: 10 }}>
+          {attendanceHistory.map((item) => (
+            <button key={item.value} type="button" onClick={() => onSelectAnalysis(client.id, item.value)} style={{ border: `1px solid ${item.value === client.currentAnalysisId ? THEME.green : THEME.line}`, background: item.value === client.currentAnalysisId ? "#f7fbf4" : "#fffdfa", borderRadius: 16, padding: "12px 14px", textAlign: "left", cursor: "pointer" }}>
+              <div style={{ fontWeight: 800 }}>{item.label}</div>
+            </button>
+          ))}
+        </div>
+        <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.6, marginTop: 14 }}>
+          Cada data representa uma analise diferente dentro do prontuario desta cliente.
+        </div>
+      </Panel>
+    </div>
   );
 }
 
