@@ -87,14 +87,6 @@ const CHAKRA_OPTIONS = [
 
 const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convivio", "Outro"];
 
-const RELACOES_BIOMETERS = [
-  "Relacionamento - Campo Mental",
-  "Relacionamento - Campo Emocional",
-  "Tipo de Vinculo",
-  "Biometro Numerico",
-  "Biometro de Tempo",
-];
-
 const RELACOES_GRAPHICS = [
   "Graficos de Relacoes",
   "Graficos de Apoio Relacional",
@@ -978,15 +970,12 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
     });
   }
 
-  function setChakraPercent(chakra, key, value) {
+  function setChakraPercent(chakra, value) {
     setForm((current) => ({
       ...current,
       leituraChakrasPercentuais: {
         ...(current.leituraChakrasPercentuais || {}),
-        [chakra]: {
-          ...((current.leituraChakrasPercentuais || {})[chakra] || {}),
-          [key]: value,
-        },
+        [chakra]: value,
       },
     }));
   }
@@ -1097,30 +1086,16 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
               {CHAKRA_OPTIONS.map((chakra) => (
                 <div key={chakra} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa" }}>
                   <div style={{ fontWeight: 700, marginBottom: 8 }}>{chakra}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 8 }}>
-                    <input
-                      value={form.leituraChakrasPercentuais?.[chakra]?.equilibrio || ""}
-                      onChange={(event) => setChakraPercent(chakra, "equilibrio", event.target.value.replace(/[^\d]/g, "").slice(0, 3))}
-                      placeholder="% equilibrio"
-                      style={inputStyle}
-                    />
-                    <input
-                      value={form.leituraChakrasPercentuais?.[chakra]?.desequilibrio || ""}
-                      onChange={(event) => setChakraPercent(chakra, "desequilibrio", event.target.value.replace(/[^\d]/g, "").slice(0, 3))}
-                      placeholder="% desequilibrio"
-                      style={inputStyle}
-                    />
-                  </div>
+                  <input
+                    value={form.leituraChakrasPercentuais?.[chakra] || ""}
+                    onChange={(event) => setChakraPercent(chakra, event.target.value.replace(/[^\d]/g, "").slice(0, 3))}
+                    placeholder="% desequilibrio"
+                    style={inputStyle}
+                  />
                 </div>
               ))}
             </div>
           </div>
-        </div>
-
-        <SectionTitle title="Ferramentas relacionadas" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 18 }}>
-          <ToolListCard title="Biometros relacionados" items={RELACOES_BIOMETERS} />
-          <ToolListCard title="Graficos relacionados" items={RELACOES_GRAPHICS} />
         </div>
 
         <SectionTitle title="Sintese e conduta" />
@@ -1173,19 +1148,6 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
         </div>
       </div>
     </Panel>
-  );
-}
-
-function ToolListCard({ title, items }) {
-  return (
-    <div style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px" }}>
-      <div style={{ fontWeight: 800, marginBottom: 10 }}>{title}</div>
-      <div style={{ display: "grid", gap: 8 }}>
-        {items.map((item) => (
-          <div key={item} style={{ color: THEME.muted }}>{item}</div>
-        ))}
-      </div>
-    </div>
   );
 }
 
