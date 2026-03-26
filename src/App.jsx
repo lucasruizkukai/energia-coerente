@@ -902,7 +902,7 @@ function App() {
 
     try {
       const response = await upsertClient(record, clients);
-      if (response.mode === "local" && response.all) setClients(response.all);
+      if (response.all) setClients(response.all);
       else {
         setClients((current) => {
           const exists = current.some((item) => item.id === record.id);
@@ -925,7 +925,7 @@ function App() {
     setUiMessage("");
     try {
       const response = await deleteClient(id, clients);
-      if (response.mode === "local" && response.all) setClients(response.all);
+      if (response.all) setClients(response.all);
       else setClients((current) => current.filter((item) => item.id !== id));
       if (selectedId === id) setSelectedId("");
       setUiMessage("Atendimento removido.");

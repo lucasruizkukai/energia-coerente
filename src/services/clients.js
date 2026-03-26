@@ -35,6 +35,8 @@ export async function listClients(fallback = []) {
     return { mode: "local", data: readLocalClients(fallback) };
   }
 
+  const localBackup = readLocalClients([]);
+
   const { data, error } = await supabase
     .from(TABLE_NAME)
     .select("*")
@@ -42,15 +44,19 @@ export async function listClients(fallback = []) {
 
   if (error) throw error;
 
+  const remoteClients = (data || []).map((row) => {
+    try {
+      return mapRowToClient(row);
+    } catch {
+      return mapRowToClientFallback(row);
+    }
+  });
+  const mergedClients = mergeClientsById(remoteClients, localBackup);
+  writeLocalClients(mergedClients);
+
   return {
     mode: "supabase",
-    data: (data || []).map((row) => {
-      try {
-        return mapRowToClient(row);
-      } catch {
-        return mapRowToClientFallback(row);
-      }
-    }),
+    data: mergedClients,
   };
 }
 
@@ -65,7 +71,11 @@ export async function upsertClient(client, currentClients = []) {
   const payload = mapClientToRow(client);
   const { data, error } = await supabase.from(TABLE_NAME).upsert(payload).select().single();
   if (error) throw error;
-  return { mode: "supabase", data: mapRowToClient(data) };
+  const savedClient = mapRowToClient(data);
+  const exists = currentClients.some((item) => item.id === savedClient.id);
+  const nextClients = exists ? currentClients.map((item) => (item.id === savedClient.id ? savedClient : item)) : [savedClient, ...currentClients];
+  writeLocalClients(nextClients);
+  return { mode: "supabase", data: savedClient, all: nextClients };
 }
 
 export async function deleteClient(id, currentClients = []) {
@@ -77,7 +87,9 @@ export async function deleteClient(id, currentClients = []) {
 
   const { error } = await supabase.from(TABLE_NAME).delete().eq("id", id);
   if (error) throw error;
-  return { mode: "supabase" };
+  const nextClients = currentClients.filter((item) => item.id !== id);
+  writeLocalClients(nextClients);
+  return { mode: "supabase", all: nextClients };
 }
 
 function mapRowToClient(row) {
@@ -292,4 +304,13 @@ function normalizeClientAnalyses(client = {}) {
     devolutivaFinal: activeAnalysis.devolutivaFinal,
     proximosPassos: activeAnalysis.proximosPassos,
   };
+}
+
+function mergeClientsById(primary = [], secondary = []) {
+  const map = new Map();
+  [...secondary, ...primary].forEach((client) => {
+    if (!client?.id) return;
+    map.set(client.id, client);
+  });
+  return Array.from(map.values());
 }
