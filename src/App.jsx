@@ -997,14 +997,14 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
       </aside>
 
       <section style={{ display: "grid", gap: 18 }}>
-        <ClientRecord client={selectedClient || { ...emptyClient, id: generateId() }} onSave={saveClient} mobile={mobile} saving={saving} />
         {selectedClient ? (
           <>
             <ClientHeader client={selectedClient} onDelete={removeClient} onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)} />
+            <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
             <ClientJourney client={selectedClient} mobile={mobile} />
             <FinalFeedback client={selectedClient} />
           </>
-        ) : null}
+        ) : <ClientRecord client={{ ...emptyClient, id: generateId() }} onSave={saveClient} mobile={mobile} saving={saving} />}
       </section>
     </div>
   );
@@ -1584,6 +1584,8 @@ function ClientHeader({ client, onDelete, onOpenProtocol }) {
 }
 
 function ClientJourney({ client, mobile }) {
+  const validProtocols = getValidProtocols(client.protocolosUsados);
+
   return (
     <Panel>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
@@ -1595,7 +1597,7 @@ function ClientJourney({ client, mobile }) {
         <InfoCard label="Protocolos" value={formatProtocols(client)} />
         <InfoCard label="Inicio" value={formatDate(client.dataInicio)} />
         <InfoCard label="Pagamento" value={client.statusPagamento} />
-        <InfoCard label="Protocolos ativos" value={(client.protocolosUsados || []).join(", ") || "Nao definidos"} />
+        <InfoCard label="Protocolos ativos" value={validProtocols.join(", ") || "Nao definidos"} />
       </div>
     </Panel>
   );
