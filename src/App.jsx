@@ -26,15 +26,8 @@ const METHOD_TABS = [
   { key: "referencias", label: "Referencias" },
 ];
 
-const SESSION_TYPES = ["Mini Harmonizacao", "Sessao Essencial", "Sessao Profunda"];
 const STATUS_OPTIONS = ["Novo contato", "Aguardando inicio", "Em atendimento", "Aguardando devolutiva", "Concluido"];
 const PAYMENT_OPTIONS = ["Pendente", "Parcial", "Pago"];
-const PROCESS_STAGES = [
-  { key: "intake", label: "Acolhimento", days: "Dia 1-3" },
-  { key: "diagnosis", label: "Diagnostico", days: "Dia 4-7" },
-  { key: "intervention", label: "Intervencoes", days: "Dia 8-17" },
-  { key: "closure", label: "Devolutiva", days: "Dia 18-21" },
-];
 
 const TGR_PROTOCOLS = [
   { slug: "despertar", nome: "Despertar", resumo: "Leitura e reorganizacao de padroes centrais de expansao e consciencia." },
@@ -46,6 +39,8 @@ const TGR_PROTOCOLS = [
   { slug: "psicoemocionais", nome: "Psicoemocionais", resumo: "Leitura dos eixos emocionais e mentais envolvidos no processo." },
   { slug: "chakras", nome: "Chakras", resumo: "Observacao da distribuicao energetica e dos centros principais." },
 ];
+
+const PROTOCOL_OPTIONS = TGR_PROTOCOLS.map((item) => item.nome);
 
 const TGR_BIOMETERS = [
   { slug: "numerico", nome: "Biometro Numerico", tema: "Geral" },
@@ -119,9 +114,12 @@ const emptyRelacoesForm = {
   nivelHarmoniaRelacional: "",
   chakrasEmHarmonia: [],
   chakrasEmDesequilibrio: [],
+  leituraChakrasPercentuais: {},
   leituraChakras: "",
   observacoesChakras: "",
   leituraGraficos: "",
+  graficosSelecionados: [],
+  tempoAtivacaoGraficos: {},
   sinteseGraficos: "",
   intervencaoIndicada: "",
   orientacaoTerapeutica: "",
@@ -130,11 +128,6 @@ const emptyRelacoesForm = {
   conclusaoAnalitica: "",
 };
 
-const SESSION_DETAILS = {
-  "Mini Harmonizacao": "Atendimento mais objetivo para reorganizacao inicial e alivio pontual.",
-  "Sessao Essencial": "Processo intermediario para reorganizar padroes centrais com acompanhamento estruturado.",
-  "Sessao Profunda": "Jornada mais completa para casos que pedem leitura ampla e intervencao gradual.",
-};
 
 const THEME = {
   bg: "#f6f1e8",
@@ -157,7 +150,7 @@ const emptyClient = {
   whatsapp: "",
   email: "",
   dataInicio: "",
-  tipoSessao: "Sessao Essencial",
+  protocolosUsados: [],
   queixaPrincipal: "",
   objetivo: "",
   diagnosticoEnergetico: "",
@@ -166,7 +159,6 @@ const emptyClient = {
   intervencoesRealizadas: "",
   observacoes: "",
   status: "Novo contato",
-  diaProcesso: 1,
   evolucao: "",
   valor: "",
   statusPagamento: "Pendente",
@@ -182,7 +174,7 @@ const sampleClients = [
     whatsapp: "(11) 98765-4321",
     email: "marina@email.com",
     dataInicio: "2026-03-10",
-    tipoSessao: "Sessao Profunda",
+    protocolosUsados: ["Harmonia", "Vitalidade"],
     queixaPrincipal: "Cansaco constante e sensacao de travamento emocional.",
     objetivo: "Retomar clareza, vitalidade e estabilidade nas relacoes.",
     diagnosticoEnergetico: "Sobrecarga no campo emocional e dispersao de energia.",
@@ -191,7 +183,6 @@ const sampleClients = [
     intervencoesRealizadas: "Limpeza inicial, harmonizacao progressiva e reorientacao de foco.",
     observacoes: "Cliente responsiva e com boa percepcao do processo.",
     status: "Em atendimento",
-    diaProcesso: 9,
     evolucao: "Mais centrada e com menos oscilacao desde o dia 6.",
     valor: "480",
     statusPagamento: "Pago",
@@ -204,7 +195,7 @@ const sampleClients = [
     nome: "Renata Araujo",
     whatsapp: "(21) 99888-1122",
     dataInicio: "2026-03-16",
-    tipoSessao: "Mini Harmonizacao",
+    protocolosUsados: ["Relacoes"],
     queixaPrincipal: "Ansiedade intensa antes de reunioes importantes.",
     objetivo: "Regular a resposta emocional e sustentar presenca.",
     diagnosticoEnergetico: "Ativacao excessiva do mental e pouca ancoragem corporal.",
@@ -213,7 +204,6 @@ const sampleClients = [
     intervencoesRealizadas: "Ajuste inicial e ancoragem energetica de curto prazo.",
     observacoes: "Aguardar retorno apos os primeiros 3 dias.",
     status: "Aguardando inicio",
-    diaProcesso: 1,
     evolucao: "",
     valor: "180",
     statusPagamento: "Pendente",
@@ -260,21 +250,14 @@ function formatDate(value) {
   return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 }
 
-function getProcessDay(startDate) {
+function getDaysSinceStart(startDate) {
   if (!startDate) return 1;
   const start = new Date(`${startDate}T12:00:00`);
   const today = new Date();
   start.setHours(12, 0, 0, 0);
   today.setHours(12, 0, 0, 0);
   const diff = Math.floor((today.getTime() - start.getTime()) / 86400000) + 1;
-  return Math.max(1, Math.min(21, diff));
-}
-
-function getStageFromDay(day) {
-  if (day <= 3) return PROCESS_STAGES[0];
-  if (day <= 7) return PROCESS_STAGES[1];
-  if (day <= 17) return PROCESS_STAGES[2];
-  return PROCESS_STAGES[3];
+  return Math.max(1, diff);
 }
 
 function getStatusTone(status) {
@@ -314,6 +297,10 @@ function findProtocolName(slug) {
   return TGR_PROTOCOLS.find((item) => item.slug === slug)?.nome || "Despertar";
 }
 
+function formatProtocols(client) {
+  return (client.protocolosUsados || []).length ? client.protocolosUsados.join(", ") : findProtocolName(client.protocolSlug);
+}
+
 const primaryButtonStyle = {
   border: "none",
   borderRadius: 16,
@@ -351,6 +338,7 @@ function App() {
   const [uiMessage, setUiMessage] = useState("");
   const [activeMethod, setActiveMethod] = useState("tgr");
   const [activeMethodTab, setActiveMethodTab] = useState("overview");
+  const [activeTgrProtocol, setActiveTgrProtocol] = useState("relacoes");
   const [relacoesForm, setRelacoesForm] = useState(emptyRelacoesForm);
   const [relacoesContext, setRelacoesContext] = useState(null);
 
@@ -394,11 +382,10 @@ function App() {
   const clientsWithProgress = useMemo(
     () =>
       clients.map((client) => {
-        const computedDay = client.dataInicio ? getProcessDay(client.dataInicio) : Number(client.diaProcesso || 1);
+        const computedDay = client.dataInicio ? getDaysSinceStart(client.dataInicio) : 1;
         return {
           ...client,
-          diaProcesso: computedDay,
-          etapaAtual: getStageFromDay(computedDay),
+          diasAtendimento: computedDay,
           methodSlug: "tgr",
           protocolSlug: inferProtocolSlug(client),
         };
@@ -416,7 +403,7 @@ function App() {
         protocolSlug: client.protocolSlug,
         status: client.status,
         dataInicio: client.dataInicio,
-        diaProcesso: client.diaProcesso,
+        diasAtendimento: client.diasAtendimento,
         queixaPrincipal: client.queixaPrincipal,
         objetivo: client.objetivo,
         valor: client.valor,
@@ -460,7 +447,6 @@ function App() {
     setUiMessage("");
     const record = {
       ...payload,
-      diaProcesso: payload.dataInicio ? getProcessDay(payload.dataInicio) : Number(payload.diaProcesso || 1),
     };
 
     try {
@@ -500,7 +486,7 @@ function App() {
   function handleTabChange(nextTab) {
     if (nextTab === "metodos") {
       setActiveMethod("tgr");
-      setActiveMethodTab("overview");
+      setActiveMethodTab("protocolos");
     }
     setMainTab(nextTab);
   }
@@ -509,10 +495,11 @@ function App() {
     if (!client) return;
     setActiveMethod("tgr");
     setActiveMethodTab("protocolos");
+    setActiveTgrProtocol("relacoes");
     setRelacoesContext({
       clientId: client.id,
       clientName: client.nome,
-      protocolName: findProtocolName(client.protocolSlug),
+      protocolName: formatProtocols(client),
     });
     setRelacoesForm((current) => ({
       ...current,
@@ -612,6 +599,8 @@ function App() {
           setActiveMethod={setActiveMethod}
           activeMethodTab={activeMethodTab}
           setActiveMethodTab={setActiveMethodTab}
+          activeTgrProtocol={activeTgrProtocol}
+          setActiveTgrProtocol={setActiveTgrProtocol}
           relacoesForm={relacoesForm}
           setRelacoesForm={setRelacoesForm}
           relacoesContext={relacoesContext}
@@ -644,6 +633,8 @@ function MainContent(props) {
     setActiveMethod,
     activeMethodTab,
     setActiveMethodTab,
+    activeTgrProtocol,
+    setActiveTgrProtocol,
     relacoesForm,
     setRelacoesForm,
     relacoesContext,
@@ -662,7 +653,11 @@ function MainContent(props) {
           setSelectedId(id);
           setMainTab("clientes");
         }}
-        onOpenMethod={() => setMainTab("metodos")}
+        onOpenMethod={() => {
+          setActiveMethod("tgr");
+          setActiveMethodTab("protocolos");
+          setMainTab("metodos");
+        }}
       />
     );
   }
@@ -707,6 +702,8 @@ function MainContent(props) {
         setActiveMethod={setActiveMethod}
         activeMethodTab={activeMethodTab}
         setActiveMethodTab={setActiveMethodTab}
+        activeTgrProtocol={activeTgrProtocol}
+        setActiveTgrProtocol={setActiveTgrProtocol}
         relacoesForm={relacoesForm}
         setRelacoesForm={setRelacoesForm}
         relacoesContext={relacoesContext}
@@ -751,7 +748,7 @@ function TopMetrics({ metrics, mobile }) {
 }
 
 function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, onOpenMethod }) {
-  const highlighted = appointments.slice().sort((a, b) => a.diaProcesso - b.diaProcesso).slice(0, 4);
+  const highlighted = appointments.slice().sort((a, b) => a.diasAtendimento - b.diasAtendimento).slice(0, 4);
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
@@ -775,23 +772,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
         </Panel>
       </section>
 
-      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 18 }}>
-        <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Processo de 21 dias</div>
-          <div style={{ display: "grid", gap: 10 }}>
-            {PROCESS_STAGES.map((stage, index) => (
-              <div key={stage.key} style={{ display: "grid", gridTemplateColumns: "42px 1fr auto", gap: 12, alignItems: "center", border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: index % 2 === 0 ? THEME.panel : "#fffdfa" }}>
-                <div style={{ width: 42, height: 42, borderRadius: 14, background: stage.key === "intervention" ? THEME.greenSoft : THEME.terracottaSoft, color: stage.key === "intervention" ? THEME.green : THEME.terracotta, display: "grid", placeItems: "center", fontWeight: 800 }}>{index + 1}</div>
-                <div>
-                  <div style={{ fontWeight: 800 }}>{stage.label}</div>
-                  <div style={{ color: THEME.muted, fontSize: 13 }}>{stage.days}</div>
-                </div>
-                <div style={{ color: THEME.muted, fontSize: 12 }}>21 dias</div>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
+      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr", gap: 18 }}>
         <Panel>
           <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Atendimentos em destaque</div>
           <div style={{ display: "grid", gap: 12 }}>
@@ -800,11 +781,11 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                   <div>
                     <div style={{ fontWeight: 800 }}>{appointment.title}</div>
-                    <div style={{ color: THEME.muted, fontSize: 13 }}>{findProtocolName(appointment.protocolSlug)} - TGR</div>
+                    <div style={{ color: THEME.muted, fontSize: 13 }}>{(clients.find((item) => item.id === appointment.clientId)?.protocolosUsados || []).join(", ") || findProtocolName(appointment.protocolSlug)} - TGR</div>
                   </div>
                   <StatusBadge status={appointment.status} />
                 </div>
-                <div style={{ marginTop: 12 }}><ProgressBar value={appointment.diaProcesso} total={21} /></div>
+                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 10 }}>{appointment.diasAtendimento} dias desde o inicio</div>
               </button>
             )) : <div style={{ color: THEME.muted }}>Nenhum atendimento em destaque.</div>}
           </div>
@@ -872,7 +853,7 @@ function AppointmentsView({ appointments, clients, mobile, onOpenClient }) {
                 </div>
                 <div>
                   <div style={{ ...labelStyle, marginBottom: 4 }}>Metodo / protocolo</div>
-                  <div style={{ fontWeight: 700 }}>TGR - {findProtocolName(appointment.protocolSlug)}</div>
+                  <div style={{ fontWeight: 700 }}>TGR - {(client?.protocolosUsados || []).join(", ") || findProtocolName(appointment.protocolSlug)}</div>
                 </div>
                 <button type="button" onClick={() => onOpenClient(appointment.clientId)} style={secondaryButtonStyle}>Abrir cliente</button>
               </div>
@@ -884,7 +865,7 @@ function AppointmentsView({ appointments, clients, mobile, onOpenClient }) {
   );
 }
 
-function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActiveMethodTab, relacoesForm, setRelacoesForm, relacoesContext, appointments, mobile }) {
+function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActiveMethodTab, activeTgrProtocol, setActiveTgrProtocol, relacoesForm, setRelacoesForm, relacoesContext, appointments, mobile }) {
   const methodCards = [{ slug: "tgr", nome: "TGR", resumo: "Metodo principal com protocolos, biometros, graficos e fichas." }];
   const tgrAppointmentCount = appointments.filter((appointment) => appointment.methodSlug === "tgr").length;
 
@@ -909,7 +890,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActive
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>TGR</div>
-              <div style={{ color: THEME.muted }}>Estrutura modular para protocolos, biometros, graficos, fichas e referencias.</div>
+              <div style={{ color: THEME.muted }}>Protocolos, biometros, graficos, fichas e referencias.</div>
             </div>
             <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
           </div>
@@ -921,7 +902,16 @@ function MethodsView({ activeMethod, setActiveMethod, activeMethodTab, setActive
         </Panel>
 
         {activeMethodTab === "overview" && <MethodOverview appointments={appointments} mobile={mobile} />}
-        {activeMethodTab === "protocolos" && <TgrProtocolsView mobile={mobile} relacoesForm={relacoesForm} setRelacoesForm={setRelacoesForm} relacoesContext={relacoesContext} />}
+        {activeMethodTab === "protocolos" && (
+          <TgrProtocolsView
+            mobile={mobile}
+            activeProtocol={activeTgrProtocol}
+            setActiveProtocol={setActiveTgrProtocol}
+            relacoesForm={relacoesForm}
+            setRelacoesForm={setRelacoesForm}
+            relacoesContext={relacoesContext}
+          />
+        )}
         {activeMethodTab === "biometros" && <MethodCatalog title="Biometros TGR" items={TGR_BIOMETERS} mobile={mobile} />}
         {activeMethodTab === "graficos" && <MethodCatalog title="Graficos TGR" items={TGR_GRAPHICS} mobile={mobile} />}
         {activeMethodTab === "fichas" && <MethodCatalog title="Fichas TGR" items={TGR_FICHAS} mobile={mobile} />}
@@ -950,11 +940,24 @@ function MethodOverview({ appointments, mobile }) {
   );
 }
 
-function TgrProtocolsView({ mobile, relacoesForm, setRelacoesForm, relacoesContext }) {
+function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, relacoesContext }) {
+  const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol) || TGR_PROTOCOLS[0];
+
   return (
     <div style={{ display: "grid", gap: 18 }}>
-      <MethodCatalog title="Protocolos TGR" items={TGR_PROTOCOLS} mobile={mobile} />
-      <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} />
+      <MethodCatalog title="Protocolos TGR" items={TGR_PROTOCOLS} mobile={mobile} activeSlug={selectedProtocol.slug} onSelect={setActiveProtocol} />
+      {selectedProtocol.slug === "relacoes" ? (
+        <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} />
+      ) : (
+        <Panel>
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedProtocol.nome}</div>
+            <div style={{ color: THEME.muted, lineHeight: 1.7 }}>
+              Este protocolo vai entrar na mesma estrutura operacional de Relacoes: leitura principal, chakras, graficos usados, tempo de ativacao e conduta.
+            </div>
+          </div>
+        </Panel>
+      )}
     </div>
   );
 }
@@ -975,14 +978,45 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
     });
   }
 
+  function setChakraPercent(chakra, key, value) {
+    setForm((current) => ({
+      ...current,
+      leituraChakrasPercentuais: {
+        ...(current.leituraChakrasPercentuais || {}),
+        [chakra]: {
+          ...((current.leituraChakrasPercentuais || {})[chakra] || {}),
+          [key]: value,
+        },
+      },
+    }));
+  }
+
+  function toggleGraphic(graphic) {
+    setForm((current) => {
+      const values = current.graficosSelecionados || [];
+      const exists = values.includes(graphic);
+      return {
+        ...current,
+        graficosSelecionados: exists ? values.filter((item) => item !== graphic) : [...values, graphic],
+      };
+    });
+  }
+
+  function setGraphicDuration(graphic, value) {
+    setForm((current) => ({
+      ...current,
+      tempoAtivacaoGraficos: {
+        ...(current.tempoAtivacaoGraficos || {}),
+        [graphic]: value,
+      },
+    }));
+  }
+
   return (
     <Panel>
       <div style={{ display: "grid", gap: 18 }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Relacoes</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.65 }}>
-            Primeiro protocolo operacional do TGR dentro do sistema, com leitura de vinculo, campos mental e emocional, e bloco transversal de chakras.
-          </div>
         </div>
 
         {context ? (
@@ -1057,6 +1091,30 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
           <Field label="Observacoes dos chakras">
             <textarea value={form.observacoesChakras} onChange={(event) => setField("observacoesChakras", event.target.value)} style={inputStyle} />
           </Field>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <div style={{ ...labelStyle, marginBottom: 8 }}>Percentual por chakra</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
+              {CHAKRA_OPTIONS.map((chakra) => (
+                <div key={chakra} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa" }}>
+                  <div style={{ fontWeight: 700, marginBottom: 8 }}>{chakra}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 8 }}>
+                    <input
+                      value={form.leituraChakrasPercentuais?.[chakra]?.equilibrio || ""}
+                      onChange={(event) => setChakraPercent(chakra, "equilibrio", event.target.value.replace(/[^\d]/g, "").slice(0, 3))}
+                      placeholder="% equilibrio"
+                      style={inputStyle}
+                    />
+                    <input
+                      value={form.leituraChakrasPercentuais?.[chakra]?.desequilibrio || ""}
+                      onChange={(event) => setChakraPercent(chakra, "desequilibrio", event.target.value.replace(/[^\d]/g, "").slice(0, 3))}
+                      placeholder="% desequilibrio"
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <SectionTitle title="Ferramentas relacionadas" />
@@ -1067,6 +1125,30 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
 
         <SectionTitle title="Sintese e conduta" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <div style={{ ...labelStyle, marginBottom: 8 }}>Graficos usados</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {RELACOES_GRAPHICS.map((graphic) => (
+                <PillButton key={graphic} active={(form.graficosSelecionados || []).includes(graphic)} onClick={() => toggleGraphic(graphic)} label={graphic} />
+              ))}
+            </div>
+          </div>
+          {(form.graficosSelecionados || []).length ? (
+            <div style={{ gridColumn: "1 / -1", display: "grid", gap: 10 }}>
+              <div style={{ ...labelStyle, marginBottom: 0 }}>Tempo ativo de cada grafico</div>
+              {(form.graficosSelecionados || []).map((graphic) => (
+                <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                  <div style={{ fontWeight: 700 }}>{graphic}</div>
+                  <input
+                    value={form.tempoAtivacaoGraficos?.[graphic] || ""}
+                    onChange={(event) => setGraphicDuration(graphic, event.target.value)}
+                    style={inputStyle}
+                    placeholder="Ex.: 7 dias, continuo"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : null}
           <Field label="Leitura dos graficos">
             <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
           </Field>
@@ -1107,16 +1189,28 @@ function ToolListCard({ title, items }) {
   );
 }
 
-function MethodCatalog({ title, items, mobile }) {
+function MethodCatalog({ title, items, mobile, activeSlug, onSelect }) {
   return (
     <Panel>
       <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{title}</div>
       <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
         {items.map((item) => (
-          <div key={item.slug || item.nome} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px" }}>
-            <div style={{ fontWeight: 800, marginBottom: 6 }}>{item.nome}</div>
-            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>{item.resumo || item.tema || item.tipo}</div>
-          </div>
+          <button
+            key={item.slug || item.nome}
+            type="button"
+            onClick={onSelect ? () => onSelect(item.slug) : undefined}
+            style={{
+              border: `1px solid ${activeSlug === item.slug ? THEME.green : THEME.line}`,
+              background: activeSlug === item.slug ? "#f7fbf4" : "#fffdfa",
+              borderRadius: 18,
+              padding: "14px 16px",
+              textAlign: "left",
+              cursor: onSelect ? "pointer" : "default",
+            }}
+          >
+            <div style={{ fontWeight: 800, marginBottom: title === "Protocolos TGR" ? 0 : 6 }}>{item.nome}</div>
+            {title !== "Protocolos TGR" ? <div style={{ color: THEME.muted, lineHeight: 1.6 }}>{item.resumo || item.tema || item.tipo}</div> : null}
+          </button>
         ))}
       </div>
     </Panel>
@@ -1167,7 +1261,7 @@ function FinancialView({ clients, mobile }) {
             <div key={client.id} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.2fr .8fr auto", gap: 12, alignItems: "center" }}>
               <div>
                 <div style={{ fontWeight: 800 }}>{client.nome}</div>
-                <div style={{ color: THEME.muted, fontSize: 13 }}>{findProtocolName(client.protocolSlug)} - TGR</div>
+                <div style={{ color: THEME.muted, fontSize: 13 }}>{formatProtocols(client)} - TGR</div>
               </div>
               <div style={{ fontWeight: 700 }}>{formatCurrency(client.valor)}</div>
               <StatusBadge status={client.statusPagamento === "Pago" ? "Concluido" : "Aguardando inicio"} />
@@ -1191,11 +1285,11 @@ function ClientHeader({ client, onDelete, onOpenRelacoes }) {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14 }}>
             <span>{client.whatsapp || "Contato nao informado"}</span>
             <span>{client.email || "Sem email"}</span>
-            <span>TGR - {findProtocolName(client.protocolSlug)}</span>
+            <span>TGR - {formatProtocols(client)}</span>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="button" onClick={onOpenRelacoes} style={secondaryButtonStyle}>Abrir em Relacoes</button>
+          <button type="button" onClick={onOpenRelacoes} style={secondaryButtonStyle}>Abrir protocolo Relacoes</button>
           <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4" }}>Remover</button>
         </div>
       </div>
@@ -1208,25 +1302,14 @@ function ClientJourney({ client, mobile }) {
     <Panel>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
         <div style={{ fontSize: 18, fontWeight: 800 }}>Timeline do atendimento</div>
-        <div style={{ color: THEME.terracotta, fontWeight: 800 }}>Dia {client.diaProcesso} de 21</div>
-      </div>
-      <ProgressBar value={client.diaProcesso} total={21} />
-      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 10, marginTop: 16 }}>
-        {PROCESS_STAGES.map((stage) => {
-          const current = client.etapaAtual.key === stage.key;
-          return (
-            <div key={stage.key} style={{ border: `1px solid ${current ? THEME.green : THEME.line}`, background: current ? THEME.greenSoft : "#fffdfa", borderRadius: 16, padding: "14px 14px" }}>
-              <div style={{ fontWeight: 800, marginBottom: 4 }}>{stage.label}</div>
-              <div style={{ color: THEME.muted, fontSize: 13 }}>{stage.days}</div>
-            </div>
-          );
-        })}
+        <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o inicio</div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 16 }}>
         <InfoCard label="Metodo" value="TGR" />
-        <InfoCard label="Protocolo" value={findProtocolName(client.protocolSlug)} />
-        <InfoCard label="Etapa atual" value={client.etapaAtual.label} />
+        <InfoCard label="Protocolos" value={formatProtocols(client)} />
+        <InfoCard label="Inicio" value={formatDate(client.dataInicio)} />
         <InfoCard label="Pagamento" value={client.statusPagamento} />
+        <InfoCard label="Protocolos ativos" value={(client.protocolosUsados || []).join(", ") || "Nao definidos"} />
       </div>
     </Panel>
   );
@@ -1249,7 +1332,7 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
     event.preventDefault();
     if (!form.nome.trim()) return setFormError("Informe o nome da cliente para salvar o atendimento.");
     if (!form.whatsapp.trim()) return setFormError("Informe o WhatsApp principal para manter o contato organizado.");
-    if (!form.dataInicio) return setFormError("Defina a data de inicio para calcular corretamente o processo de 21 dias.");
+    if (!form.dataInicio) return setFormError("Defina a data de inicio para acompanhar a duracao do atendimento.");
     setFormError("");
     onSave({ ...form, id: form.id || generateId() });
   }
@@ -1269,15 +1352,30 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
           <Field label="Email"><input value={form.email} onChange={(event) => setField("email", event.target.value)} style={inputStyle} /></Field>
           <Field label="Data de inicio"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
           <Field label="Metodo"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
-          <Field label="Protocolo TGR">
-            <select value={form.tipoSessao} onChange={(event) => setField("tipoSessao", event.target.value)} style={inputStyle}>{SESSION_TYPES.map((item) => <option key={item}>{item}</option>)}</select>
-            <div style={{ color: THEME.muted, fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>{SESSION_DETAILS[form.tipoSessao]}</div>
+          <Field label="Protocolos usados">
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {PROTOCOL_OPTIONS.map((item) => (
+                <PillButton
+                  key={item}
+                  active={(form.protocolosUsados || []).includes(item)}
+                  onClick={() =>
+                    setField(
+                      "protocolosUsados",
+                      (form.protocolosUsados || []).includes(item)
+                        ? form.protocolosUsados.filter((protocol) => protocol !== item)
+                        : [...(form.protocolosUsados || []), item]
+                    )
+                  }
+                  label={item}
+                />
+              ))}
+            </div>
           </Field>
         </div>
         <SectionTitle title="Direcao do atendimento" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           <Field label="Status"><select value={form.status} onChange={(event) => setField("status", event.target.value)} style={inputStyle}>{STATUS_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
-          <Field label="Dia do processo"><input value={form.dataInicio ? getProcessDay(form.dataInicio) : form.diaProcesso} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          <Field label="Dias desde o inicio"><input value={form.dataInicio ? getDaysSinceStart(form.dataInicio) : ""} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
           <Field label="Queixa principal"><textarea value={form.queixaPrincipal} onChange={(event) => setField("queixaPrincipal", event.target.value)} style={inputStyle} /></Field>
           <Field label="Objetivo"><textarea value={form.objetivo} onChange={(event) => setField("objetivo", event.target.value)} style={inputStyle} /></Field>
         </div>
@@ -1294,7 +1392,7 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
           <Field label="Valor"><input value={form.valor} onChange={(event) => setField("valor", event.target.value.replace(/[^\d,.]/g, ""))} style={inputStyle} placeholder="Ex.: 480,00" /></Field>
           <Field label="Status do pagamento"><select value={form.statusPagamento} onChange={(event) => setField("statusPagamento", event.target.value)} style={inputStyle}>{PAYMENT_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
-          <Field label="Etapa atual"><input value={getStageFromDay(form.dataInicio ? getProcessDay(form.dataInicio) : form.diaProcesso).label} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          <Field label="Protocolos selecionados"><input value={(form.protocolosUsados || []).join(", ")} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
         </div>
         <div style={{ display: "grid", gap: 12 }}>
           <Field label="Devolutiva final"><textarea value={form.devolutivaFinal} onChange={(event) => setField("devolutivaFinal", event.target.value)} style={inputStyle} /></Field>
@@ -1328,7 +1426,7 @@ function FeedbackCard({ client }) {
   return (
     <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, background: "#fffdfa", padding: "14px 16px" }}>
       <div style={{ fontWeight: 800, marginBottom: 4 }}>{client.nome}</div>
-      <div style={{ color: THEME.muted, fontSize: 13 }}>{findProtocolName(client.protocolSlug)} - TGR</div>
+      <div style={{ color: THEME.muted, fontSize: 13 }}>{formatProtocols(client)} - TGR</div>
     </div>
   );
 }
@@ -1391,15 +1489,6 @@ function StatusBadge({ status }) {
   return <span style={{ background: tone.bg, color: tone.color, borderRadius: 999, padding: "7px 10px", fontSize: 12, fontWeight: 700 }}>{status}</span>;
 }
 
-function ProgressBar({ value, total }) {
-  const percent = Math.max(0, Math.min(100, (value / total) * 100));
-  return (
-    <div style={{ height: 12, width: "100%", borderRadius: 999, background: "#ebdfd1", overflow: "hidden" }}>
-      <div style={{ width: `${percent}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg, #b76e4d 0%, #6e7f5f 100%)" }} />
-    </div>
-  );
-}
-
 function InfoCard({ label, value }) {
   return (
     <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "13px 14px", background: "#fffdfa" }}>
@@ -1416,9 +1505,8 @@ function ClientListCard({ client, active, onClick }) {
         <div style={{ fontWeight: 800 }}>{client.nome}</div>
         <StatusBadge status={client.status} />
       </div>
-      <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>TGR - {findProtocolName(client.protocolSlug)}</div>
-      <div style={{ marginTop: 12 }}><ProgressBar value={client.diaProcesso} total={21} /></div>
-      <div style={{ color: THEME.muted, fontSize: 12, marginTop: 8 }}>Dia {client.diaProcesso} - {client.etapaAtual.label}</div>
+      <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>TGR - {formatProtocols(client)}</div>
+      <div style={{ color: THEME.muted, fontSize: 12, marginTop: 10 }}>{client.diasAtendimento} dias desde o inicio</div>
     </button>
   );
 }

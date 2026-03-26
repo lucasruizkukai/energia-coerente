@@ -45,13 +45,18 @@ export async function deleteClient(id, currentClients = []) {
 }
 
 function mapRowToClient(row) {
+  const protocolosUsados = String(row.tipo_sessao || "")
+    .split("|")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
   return {
     id: row.id,
     nome: row.nome || "",
     whatsapp: row.whatsapp || "",
     email: row.email || "",
     dataInicio: row.data_inicio || "",
-    tipoSessao: row.tipo_sessao || "",
+    protocolosUsados,
     queixaPrincipal: row.queixa_principal || "",
     objetivo: row.objetivo || "",
     diagnosticoEnergetico: row.diagnostico_energetico || "",
@@ -60,7 +65,6 @@ function mapRowToClient(row) {
     intervencoesRealizadas: row.intervencoes_realizadas || "",
     observacoes: row.observacoes || "",
     status: row.status || "",
-    diaProcesso: Number(row.dia_processo || 1),
     evolucao: row.evolucao || "",
     valor: row.valor?.toString() || "",
     statusPagamento: row.status_pagamento || "",
@@ -70,13 +74,17 @@ function mapRowToClient(row) {
 }
 
 function mapClientToRow(client) {
+  const protocolosUsados = Array.isArray(client.protocolosUsados) ? client.protocolosUsados : [];
+  const diaProcesso = client.dataInicio
+    ? Math.max(1, Math.floor((new Date().setHours(12, 0, 0, 0) - new Date(`${client.dataInicio}T12:00:00`).getTime()) / 86400000) + 1)
+    : 1;
   return {
     id: client.id,
     nome: client.nome,
     whatsapp: client.whatsapp,
     email: client.email || null,
     data_inicio: client.dataInicio || null,
-    tipo_sessao: client.tipoSessao,
+    tipo_sessao: protocolosUsados.join(" | "),
     queixa_principal: client.queixaPrincipal,
     objetivo: client.objetivo,
     diagnostico_energetico: client.diagnosticoEnergetico,
@@ -85,7 +93,7 @@ function mapClientToRow(client) {
     intervencoes_realizadas: client.intervencoesRealizadas,
     observacoes: client.observacoes,
     status: client.status,
-    dia_processo: Number(client.diaProcesso || 1),
+    dia_processo: diaProcesso,
     evolucao: client.evolucao,
     valor: client.valor ? Number(String(client.valor).replace(",", ".")) : null,
     status_pagamento: client.statusPagamento,
