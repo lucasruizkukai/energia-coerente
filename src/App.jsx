@@ -220,6 +220,51 @@ const emptyClient = {
   intervencoesRealizadas: "",
   observacoes: "",
   status: "Novo contato",
+  bovis: "",
+  hawkins: "",
+  corposSutis: {
+    atmico: "",
+    budico: "",
+    mentalSuperior: "",
+    mentalInferior: "",
+    astral: "",
+    duploEterico: "",
+    fisico: "",
+  },
+  chakras: {
+    coronario: "",
+    frontal: "",
+    laringeo: "",
+    cardiaco: "",
+    plexoSolar: "",
+    umbilical: "",
+    basico: "",
+  },
+  funcoes: {
+    respiratoria: "",
+    nutritiva: "",
+    digestiva: "",
+    circulatoria: "",
+    relacional: "",
+    reprodutiva: "",
+    estruturante: "",
+    evolutiva: "",
+    excretora: "",
+  },
+  campos: {
+    energetico: "",
+    mental: "",
+    vital: "",
+    emocional: "",
+    espiritual: "",
+    fisico: "",
+  },
+  aura: {
+    protecao: "",
+    tamanho: "",
+    corExcesso: "",
+    corFalta: "",
+  },
   evolucao: "",
   valor: "",
   statusPagamento: "Pendente",
@@ -1112,27 +1157,6 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  function toggleChakra(key, chakra) {
-    setForm((current) => {
-      const values = current[key];
-      const exists = values.includes(chakra);
-      return {
-        ...current,
-        [key]: exists ? values.filter((item) => item !== chakra) : [...values, chakra],
-      };
-    });
-  }
-
-  function setChakraPercent(chakra, value) {
-    setForm((current) => ({
-      ...current,
-      leituraChakrasPercentuais: {
-        ...(current.leituraChakrasPercentuais || {}),
-        [chakra]: value,
-      },
-    }));
-  }
-
   function toggleGraphic(graphic) {
     setForm((current) => {
       const values = current.graficosSelecionados || [];
@@ -1224,48 +1248,6 @@ function RelacoesProtocolView({ mobile, form, setForm, context }) {
           <Field label="Nivel de harmonia relacional">
             <textarea value={form.nivelHarmoniaRelacional} onChange={(event) => setField("nivelHarmoniaRelacional", event.target.value)} style={inputStyle} />
           </Field>
-        </div>
-
-        <SectionTitle title="Chakras" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 18 }}>
-          <div>
-            <div style={{ ...labelStyle, marginBottom: 8 }}>Em harmonia</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {CHAKRA_OPTIONS.map((chakra) => (
-                <PillButton key={`h-${chakra}`} active={form.chakrasEmHarmonia.includes(chakra)} onClick={() => toggleChakra("chakrasEmHarmonia", chakra)} label={chakra} />
-              ))}
-            </div>
-          </div>
-          <div>
-            <div style={{ ...labelStyle, marginBottom: 8 }}>Em desequilibrio</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {CHAKRA_OPTIONS.map((chakra) => (
-                <PillButton key={`d-${chakra}`} active={form.chakrasEmDesequilibrio.includes(chakra)} onClick={() => toggleChakra("chakrasEmDesequilibrio", chakra)} label={chakra} />
-              ))}
-            </div>
-          </div>
-          <Field label="Leitura dos chakras">
-            <textarea value={form.leituraChakras} onChange={(event) => setField("leituraChakras", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Observacoes dos chakras">
-            <textarea value={form.observacoesChakras} onChange={(event) => setField("observacoesChakras", event.target.value)} style={inputStyle} />
-          </Field>
-          <div style={{ gridColumn: "1 / -1" }}>
-            <div style={{ ...labelStyle, marginBottom: 8 }}>Percentual por chakra</div>
-            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
-              {CHAKRA_OPTIONS.map((chakra) => (
-                <div key={chakra} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa" }}>
-                  <div style={{ fontWeight: 700, marginBottom: 8 }}>{chakra}</div>
-                  <input
-                    value={form.leituraChakrasPercentuais?.[chakra] || ""}
-                    onChange={(event) => setChakraPercent(chakra, event.target.value.replace(/[^\d]/g, "").slice(0, 3))}
-                    placeholder="% desequilibrio"
-                    style={inputStyle}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         <SectionTitle title="Sintese e conduta" />
@@ -1493,6 +1475,16 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function setNestedField(section, key, value) {
+    setForm((current) => ({
+      ...current,
+      [section]: {
+        ...(current[section] || {}),
+        [key]: value,
+      },
+    }));
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     if (!form.nome.trim()) return setFormError("Informe o nome da cliente para salvar o atendimento.");
@@ -1552,6 +1544,76 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
           <Field label="Intervencoes realizadas"><textarea value={form.intervencoesRealizadas} onChange={(event) => setField("intervencoesRealizadas", event.target.value)} style={inputStyle} /></Field>
           <Field label="Evolucao"><textarea value={form.evolucao} onChange={(event) => setField("evolucao", event.target.value)} style={inputStyle} /></Field>
           <Field label="Observacoes"><textarea value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} style={inputStyle} /></Field>
+        </div>
+        <SectionTitle title="Leitura inicial" />
+        <div style={{ display: "grid", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+            <Field label="Bovis"><input value={form.bovis || ""} onChange={(event) => setField("bovis", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Hawkins"><input value={form.hawkins || ""} onChange={(event) => setField("hawkins", event.target.value)} style={inputStyle} /></Field>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Corpos sutis</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Corpo atmico"><input value={form.corposSutis?.atmico || ""} onChange={(event) => setNestedField("corposSutis", "atmico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo budico"><input value={form.corposSutis?.budico || ""} onChange={(event) => setNestedField("corposSutis", "budico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo mental superior"><input value={form.corposSutis?.mentalSuperior || ""} onChange={(event) => setNestedField("corposSutis", "mentalSuperior", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo mental inferior"><input value={form.corposSutis?.mentalInferior || ""} onChange={(event) => setNestedField("corposSutis", "mentalInferior", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo astral"><input value={form.corposSutis?.astral || ""} onChange={(event) => setNestedField("corposSutis", "astral", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo duplo eterico"><input value={form.corposSutis?.duploEterico || ""} onChange={(event) => setNestedField("corposSutis", "duploEterico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo fisico"><input value={form.corposSutis?.fisico || ""} onChange={(event) => setNestedField("corposSutis", "fisico", event.target.value)} style={inputStyle} /></Field>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Chakras</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Chakra coronario"><input value={form.chakras?.coronario || ""} onChange={(event) => setNestedField("chakras", "coronario", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra frontal"><input value={form.chakras?.frontal || ""} onChange={(event) => setNestedField("chakras", "frontal", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra laringeo"><input value={form.chakras?.laringeo || ""} onChange={(event) => setNestedField("chakras", "laringeo", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra cardiaco"><input value={form.chakras?.cardiaco || ""} onChange={(event) => setNestedField("chakras", "cardiaco", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra plexo solar"><input value={form.chakras?.plexoSolar || ""} onChange={(event) => setNestedField("chakras", "plexoSolar", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra umbilical"><input value={form.chakras?.umbilical || ""} onChange={(event) => setNestedField("chakras", "umbilical", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra basico"><input value={form.chakras?.basico || ""} onChange={(event) => setNestedField("chakras", "basico", event.target.value)} style={inputStyle} /></Field>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Funcoes</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
+              <Field label="Funcao respiratoria"><input value={form.funcoes?.respiratoria || ""} onChange={(event) => setNestedField("funcoes", "respiratoria", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao nutritiva"><input value={form.funcoes?.nutritiva || ""} onChange={(event) => setNestedField("funcoes", "nutritiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao digestiva"><input value={form.funcoes?.digestiva || ""} onChange={(event) => setNestedField("funcoes", "digestiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao circulatoria"><input value={form.funcoes?.circulatoria || ""} onChange={(event) => setNestedField("funcoes", "circulatoria", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao relacional"><input value={form.funcoes?.relacional || ""} onChange={(event) => setNestedField("funcoes", "relacional", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao reprodutiva"><input value={form.funcoes?.reprodutiva || ""} onChange={(event) => setNestedField("funcoes", "reprodutiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao estruturante"><input value={form.funcoes?.estruturante || ""} onChange={(event) => setNestedField("funcoes", "estruturante", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao evolutiva"><input value={form.funcoes?.evolutiva || ""} onChange={(event) => setNestedField("funcoes", "evolutiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Funcao excretora"><input value={form.funcoes?.excretora || ""} onChange={(event) => setNestedField("funcoes", "excretora", event.target.value)} style={inputStyle} /></Field>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Campos</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
+              <Field label="Campo energetico"><input value={form.campos?.energetico || ""} onChange={(event) => setNestedField("campos", "energetico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo mental"><input value={form.campos?.mental || ""} onChange={(event) => setNestedField("campos", "mental", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo vital"><input value={form.campos?.vital || ""} onChange={(event) => setNestedField("campos", "vital", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo emocional"><input value={form.campos?.emocional || ""} onChange={(event) => setNestedField("campos", "emocional", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo espiritual"><input value={form.campos?.espiritual || ""} onChange={(event) => setNestedField("campos", "espiritual", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo fisico"><input value={form.campos?.fisico || ""} onChange={(event) => setNestedField("campos", "fisico", event.target.value)} style={inputStyle} /></Field>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Aura</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Protecao"><input value={form.aura?.protecao || ""} onChange={(event) => setNestedField("aura", "protecao", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Tamanho"><input value={form.aura?.tamanho || ""} onChange={(event) => setNestedField("aura", "tamanho", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Cor excesso"><input value={form.aura?.corExcesso || ""} onChange={(event) => setNestedField("aura", "corExcesso", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Cor falta"><input value={form.aura?.corFalta || ""} onChange={(event) => setNestedField("aura", "corFalta", event.target.value)} style={inputStyle} /></Field>
+            </div>
+          </div>
         </div>
         <SectionTitle title="Financeiro e devolutiva" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
