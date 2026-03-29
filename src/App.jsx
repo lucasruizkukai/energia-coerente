@@ -16,7 +16,7 @@ const MAIN_TABS = [
 ];
 
 const METHOD_TABS = [
-  { key: "overview", label: "Visao geral" },
+  { key: "overview", label: "Visão geral" },
   { key: "protocolos", label: "Protocolos" },
 ];
 
@@ -144,11 +144,24 @@ const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convi
 const GRAPHIC_CONTEXT_OPTIONS = ["Relacoes", "Prosperidade e Dinheiro", "Limpeza e Protecao Energetica"];
 const PENDING_ACTION_OPTIONS = ["Dar feedback", "Terminar de analisar", "Montar os graficos"];
 const CHECKLIST_OPTIONS = [
-  { key: "analiseBasica", label: "Analise basica geral" },
+  { key: "analiseBasica", label: "Análise básica geral" },
   { key: "analiseTgr", label: "Analise TGR" },
-  { key: "montagemGraficos", label: "Montagem dos graficos" },
+  { key: "montagemGraficos", label: "Montagem dos gráficos" },
   { key: "feedback", label: "Feedback" },
-  { key: "desmontagemGraficos", label: "Desmontagem dos graficos" },
+  { key: "desmontagemGraficos", label: "Desmontagem dos gráficos" },
+];
+
+const CLIENT_DETAIL_TABS = [
+  { key: "resumo", label: "Resumo" },
+  { key: "ficha", label: "Ficha" },
+  { key: "checklist", label: "Checklist" },
+  { key: "devolutiva", label: "Devolutiva" },
+];
+
+const TGR_FLOW_STAGES = [
+  { key: "leitura", label: "Leitura" },
+  { key: "graficos", label: "Gráficos" },
+  { key: "sintese", label: "Síntese" },
 ];
 
 const PROTOCOL_GRAPHIC_DEFAULTS = {
@@ -1764,6 +1777,12 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
 }
 
 function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, updateClientAnalysisFields, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, onBackToList }) {
+  const [clientDetailTab, setClientDetailTab] = useState("resumo");
+
+  useEffect(() => {
+    if (selectedClient?.id) setClientDetailTab("resumo");
+  }, [selectedClient?.id, selectedClient?.currentAnalysisId]);
+
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
@@ -1777,27 +1796,46 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
           onOpenFeedback={openFeedbackForClient}
           onBack={onBackToList}
         />
-        <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
-        <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
-        <ClientChecklistPanel
-          client={selectedClient}
-          onToggleChecklist={(key, checked) =>
-            updateClientAnalysisFields(selectedClient.id, {
-              checklist: {
-                ...(getAnalysisRecord(selectedClient)?.checklist || emptyAnalysis.checklist),
-                [key]: checked,
-              },
-            }, "Checklist atualizada.")
-          }
-          onTogglePendingAction={(action) => {
-            const currentActions = getAnalysisRecord(selectedClient)?.pendingActions || [];
-            const nextActions = currentActions.includes(action)
-              ? currentActions.filter((item) => item !== action)
-              : [...currentActions, action];
-            return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "Pendencias atualizadas.");
-          }}
-        />
-        <FinalFeedback client={selectedClient} />
+        <Panel>
+          <div style={{ display: "grid", gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Use estas abas para não se perder no prontuário. O TGR continua na etapa própria do atendimento.</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {CLIENT_DETAIL_TABS.map((tab) => (
+                <TabButton key={tab.key} active={clientDetailTab === tab.key} onClick={() => setClientDetailTab(tab.key)} label={tab.label} />
+              ))}
+            </div>
+          </div>
+        </Panel>
+        {clientDetailTab === "resumo" ? (
+          <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
+        ) : null}
+        {clientDetailTab === "ficha" ? (
+          <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
+        ) : null}
+        {clientDetailTab === "checklist" ? (
+          <ClientChecklistPanel
+            client={selectedClient}
+            onToggleChecklist={(key, checked) =>
+              updateClientAnalysisFields(selectedClient.id, {
+                checklist: {
+                  ...(getAnalysisRecord(selectedClient)?.checklist || emptyAnalysis.checklist),
+                  [key]: checked,
+                },
+              }, "Checklist atualizada.")
+            }
+            onTogglePendingAction={(action) => {
+              const currentActions = getAnalysisRecord(selectedClient)?.pendingActions || [];
+              const nextActions = currentActions.includes(action)
+                ? currentActions.filter((item) => item !== action)
+                : [...currentActions, action];
+              return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "Pendências atualizadas.");
+            }}
+          />
+        ) : null}
+        {clientDetailTab === "devolutiva" ? <FinalFeedback client={selectedClient} /> : null}
       </section>
     );
   }
@@ -2104,8 +2142,8 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
         <Panel>
           <div style={{ display: "grid", gap: 12 }}>
             <div>
-              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta analise</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha o protocolo neste unico bloco. Se ele ainda nao estiver ativo, entra na analise automaticamente.</div>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta análise</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha o protocolo neste bloco principal. Se ele ainda não estiver ativo, entra na análise automaticamente.</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
               {TGR_PROTOCOLS.map((protocol) => {
@@ -2150,8 +2188,8 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
             </div>
             {hasUnsavedProtocolChanges ? (
               <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff8f2", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", display: "grid", gap: 4 }}>
-                <div style={{ fontWeight: 800 }}>Ha alteracoes nao salvas</div>
-                <div style={{ fontSize: 13, lineHeight: 1.6 }}>Salve o protocolo atual antes de trocar de analise ou sair do TGR.</div>
+                <div style={{ fontWeight: 800 }}>Há alterações não salvas</div>
+                <div style={{ fontSize: 13, lineHeight: 1.6 }}>Salve o protocolo atual antes de trocar de análise ou sair do TGR.</div>
               </div>
             ) : null}
           </div>
@@ -2194,7 +2232,13 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
 function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolName, onSave, isDirty }) {
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
+  const [activeStage, setActiveStage] = useState("leitura");
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+
+  useEffect(() => {
+    setActiveStage("leitura");
+    setExpandedGraphicConfigs({});
+  }, [currentProtocolName]);
 
   function setField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -2242,7 +2286,8 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
     <Panel>
       <div style={{ display: "grid", gap: 18 }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Relacoes</div>
+          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Relações</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Preencha este protocolo por etapas. Assim a leitura fica mais clara e você não perde o fio da análise.</div>
         </div>
 
         {context ? (
@@ -2255,55 +2300,60 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
 
         <ProtocolSaveBar
           title="Salvar protocolo"
-          text={isDirty ? "Voce fez alteracoes neste protocolo. Salve para registrar no prontuario." : "Use este botao para garantir que o protocolo fique salvo no prontuario da analise."}
+          text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Use este botão para garantir que o protocolo fique salvo no prontuário da análise."}
           onSave={onSave}
           dirty={isDirty}
         />
 
-        <SectionTitle title="Cabecalho da leitura" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Tipo de relacao">
-            <select value={form.tipoRelacao} onChange={(event) => setField("tipoRelacao", event.target.value)} style={inputStyle}>
-              {RELATION_TYPES.map((item) => <option key={item}>{item}</option>)}
-            </select>
-          </Field>
-          <Field label="Pessoa vinculada">
-            <input value={form.pessoaVinculada} onChange={(event) => setField("pessoaVinculada", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Objetivo da leitura">
-            <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Observacao inicial">
-            <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
-          </Field>
-        </div>
+        <ProtocolStageTabs activeStage={activeStage} onChange={setActiveStage} />
 
-        <SectionTitle title="Leitura principal" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Campo mental">
-            <textarea value={form.campoMentalResultado} onChange={(event) => setField("campoMentalResultado", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Campo emocional">
-            <textarea value={form.campoEmocionalResultado} onChange={(event) => setField("campoEmocionalResultado", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Tipo de vinculo">
-            <textarea value={form.tipoVinculoResultado} onChange={(event) => setField("tipoVinculoResultado", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Interferencias identificadas">
-            <textarea value={form.interferenciasIdentificadas} onChange={(event) => setField("interferenciasIdentificadas", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Padrao relacional">
-            <textarea value={form.padraoRelacional} onChange={(event) => setField("padraoRelacional", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Nivel de harmonia relacional">
-            <textarea value={form.nivelHarmoniaRelacional} onChange={(event) => setField("nivelHarmoniaRelacional", event.target.value)} style={inputStyle} />
-          </Field>
-        </div>
+        {activeStage === "leitura" ? (
+          <div style={{ display: "grid", gap: 18 }}>
+            <SectionTitle title="Cabeçalho da leitura" />
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Tipo de relação">
+                <select value={form.tipoRelacao} onChange={(event) => setField("tipoRelacao", event.target.value)} style={inputStyle}>
+                  {RELATION_TYPES.map((item) => <option key={item}>{item}</option>)}
+                </select>
+              </Field>
+              <Field label="Pessoa vinculada">
+                <input value={form.pessoaVinculada} onChange={(event) => setField("pessoaVinculada", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Objetivo da leitura">
+                <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Observação inicial">
+                <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
 
-        <SectionTitle title="Sintese e conduta" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <div style={{ gridColumn: "1 / -1" }}>
-            <div style={{ ...labelStyle, marginBottom: 8 }}>Graficos TGR</div>
+            <SectionTitle title="Leitura principal" />
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Campo mental">
+                <textarea value={form.campoMentalResultado} onChange={(event) => setField("campoMentalResultado", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Campo emocional">
+                <textarea value={form.campoEmocionalResultado} onChange={(event) => setField("campoEmocionalResultado", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Tipo de vínculo">
+                <textarea value={form.tipoVinculoResultado} onChange={(event) => setField("tipoVinculoResultado", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Interferências identificadas">
+                <textarea value={form.interferenciasIdentificadas} onChange={(event) => setField("interferenciasIdentificadas", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Padrão relacional">
+                <textarea value={form.padraoRelacional} onChange={(event) => setField("padraoRelacional", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Nível de harmonia relacional">
+                <textarea value={form.nivelHarmoniaRelacional} onChange={(event) => setField("nivelHarmoniaRelacional", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
+          </div>
+        ) : null}
+
+        {activeStage === "graficos" ? (
+          <div style={{ display: "grid", gap: 16 }}>
+            <SectionTitle title="Gráficos usados" />
             <div style={{ display: "grid", gap: 14 }}>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {TGR_GRAPHIC_GROUPS.map((group) => (
@@ -2332,59 +2382,69 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
                 ))}
               </div>
             </div>
-          </div>
-          {(form.graficosSelecionados || []).length ? (
-            <div style={{ gridColumn: "1 / -1", display: "grid", gap: 10 }}>
-              <div style={{ ...labelStyle, marginBottom: 0 }}>Configuracao dos graficos selecionados</div>
-              {(form.graficosSelecionados || []).map((graphic) => (
-                <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
-                  <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
-                    <span>{graphic}</span>
-                    <span style={{ color: THEME.muted, fontSize: 13 }}>{expandedGraphicConfigs[graphic] ? "Ocultar" : "Configurar"}</span>
-                  </button>
-                  {expandedGraphicConfigs[graphic] ? (
-                    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
-                      <select value={form.contextoGraficos?.[graphic] || "Relacoes"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
-                        {GRAPHIC_CONTEXT_OPTIONS.map((option) => <option key={option}>{option}</option>)}
-                      </select>
-                      <input
-                        value={form.tempoAtivacaoGraficos?.[graphic] || ""}
-                        onChange={(event) => setGraphicDuration(graphic, event.target.value)}
-                        style={inputStyle}
-                        placeholder="Ex.: 7 dias, continuo"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              ))}
+            {(form.graficosSelecionados || []).length ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                <div style={{ ...labelStyle, marginBottom: 0 }}>Configuração dos gráficos selecionados</div>
+                {(form.graficosSelecionados || []).map((graphic) => (
+                  <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
+                    <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
+                      <span>{graphic}</span>
+                      <span style={{ color: THEME.muted, fontSize: 13 }}>{expandedGraphicConfigs[graphic] ? "Ocultar" : "Configurar"}</span>
+                    </button>
+                    {expandedGraphicConfigs[graphic] ? (
+                      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                        <select value={form.contextoGraficos?.[graphic] || "Relacoes"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                          {GRAPHIC_CONTEXT_OPTIONS.map((option) => <option key={option}>{option}</option>)}
+                        </select>
+                        <input
+                          value={form.tempoAtivacaoGraficos?.[graphic] || ""}
+                          onChange={(event) => setGraphicDuration(graphic, event.target.value)}
+                          style={inputStyle}
+                          placeholder="Ex.: 7 dias, contínuo"
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Leitura dos gráficos">
+                <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Síntese dos gráficos">
+                <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
+              </Field>
             </div>
-          ) : null}
-          <Field label="Leitura dos graficos">
-            <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Sintese dos graficos">
-            <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Intervencao indicada">
-            <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Orientacao terapeutica">
-            <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Foco dos proximos dias">
-            <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Conclusao analitica">
-            <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Observacoes finais">
-            <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
-          </Field>
-        </div>
+          </div>
+        ) : null}
+
+        {activeStage === "sintese" ? (
+          <div style={{ display: "grid", gap: 16 }}>
+            <SectionTitle title="Síntese e conduta" />
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Intervenção indicada">
+                <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Orientação terapêutica">
+                <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Foco dos próximos dias">
+                <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Conclusão analítica">
+                <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Observações finais">
+                <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
+          </div>
+        ) : null}
 
         <ProtocolSaveBar
           title="Concluir este protocolo"
-          text={isDirty ? "Ainda ha alteracoes pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
+          text={isDirty ? "Ainda há alterações pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
           onSave={onSave}
           dirty={isDirty}
         />
@@ -2397,11 +2457,13 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
   const defaultGraphicConfig = PROTOCOL_GRAPHIC_DEFAULTS[protocol.slug] || { group: TGR_GRAPHIC_GROUPS[0].slug, context: protocol.nome };
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(defaultGraphicConfig.group);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
+  const [activeStage, setActiveStage] = useState("leitura");
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
 
   useEffect(() => {
     setActiveGraphicGroup(defaultGraphicConfig.group);
     setExpandedGraphicConfigs({});
+    setActiveStage("leitura");
   }, [protocol.slug, defaultGraphicConfig.group]);
 
   function setField(key, value) {
@@ -2464,116 +2526,133 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
 
         <ProtocolSaveBar
           title="Salvar protocolo"
-          text={isDirty ? "Voce fez alteracoes neste protocolo. Salve para registrar no prontuario." : "Use este botao para garantir que o protocolo fique salvo no prontuario da analise."}
+          text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Use este botão para garantir que o protocolo fique salvo no prontuário da análise."}
           onSave={onSave}
           dirty={isDirty}
         />
 
-        <SectionTitle title="Cabecalho da leitura" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Objetivo da leitura">
-            <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Observacao inicial">
-            <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
-          </Field>
-        </div>
+        <ProtocolStageTabs activeStage={activeStage} onChange={setActiveStage} />
 
-        <SectionTitle title="Leitura principal" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Leitura principal">
-            <textarea value={form.leituraPrincipal} onChange={(event) => setField("leituraPrincipal", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Pontos observados">
-            <textarea value={form.pontosObservados} onChange={(event) => setField("pontosObservados", event.target.value)} style={inputStyle} />
-          </Field>
-        </div>
+        {activeStage === "leitura" ? (
+          <div style={{ display: "grid", gap: 18 }}>
+            <SectionTitle title="Cabeçalho da leitura" />
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Objetivo da leitura">
+                <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Observação inicial">
+                <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
 
-        <SectionTitle title="Graficos usados" />
-        <div style={{ display: "grid", gap: 14 }}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {TGR_GRAPHIC_GROUPS.map((group) => (
-              <PillButton key={group.slug} active={currentGraphicGroup.slug === group.slug} onClick={() => setActiveGraphicGroup(group.slug)} label={group.nome} />
-            ))}
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
-            {currentGraphicGroup.graficos.map((graphic) => (
-              <button
-                key={graphic}
-                type="button"
-                onClick={() => toggleGraphic(graphic)}
-                style={{
-                  border: `1px solid ${(form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.line}`,
-                  background: (form.graficosSelecionados || []).includes(graphic) ? "#f7fbf4" : "#fffdfa",
-                  borderRadius: 16,
-                  padding: "12px 14px",
-                  textAlign: "left",
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  color: (form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.text,
-                }}
-              >
-                {graphic}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {(form.graficosSelecionados || []).length ? (
-          <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ ...labelStyle, marginBottom: 0 }}>Configuracao dos graficos selecionados</div>
-            {(form.graficosSelecionados || []).map((graphic) => (
-              <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
-                <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
-                  <span>{graphic}</span>
-                  <span style={{ color: THEME.muted, fontSize: 13 }}>{expandedGraphicConfigs[graphic] ? "Ocultar" : "Configurar"}</span>
-                </button>
-                {expandedGraphicConfigs[graphic] ? (
-                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
-                    <select value={form.contextoGraficos?.[graphic] || defaultGraphicConfig.context} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
-                      {[defaultGraphicConfig.context, ...GRAPHIC_CONTEXT_OPTIONS.filter((option) => option !== defaultGraphicConfig.context)].map((option) => <option key={option}>{option}</option>)}
-                    </select>
-                    <input
-                      value={form.tempoAtivacaoGraficos?.[graphic] || ""}
-                      onChange={(event) => setGraphicDuration(graphic, event.target.value)}
-                      style={inputStyle}
-                      placeholder="Ex.: 7 dias, continuo"
-                    />
-                  </div>
-                ) : null}
-              </div>
-            ))}
+            <SectionTitle title="Leitura principal" />
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Leitura principal">
+                <textarea value={form.leituraPrincipal} onChange={(event) => setField("leituraPrincipal", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Pontos observados">
+                <textarea value={form.pontosObservados} onChange={(event) => setField("pontosObservados", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
           </div>
         ) : null}
 
-        <SectionTitle title="Sintese e conduta" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Leitura dos graficos">
-            <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Sintese dos graficos">
-            <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Intervencao indicada">
-            <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Orientacao terapeutica">
-            <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Foco dos proximos dias">
-            <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Conclusao analitica">
-            <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
-          </Field>
-          <Field label="Observacoes finais">
-            <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
-          </Field>
-        </div>
+        {activeStage === "graficos" ? (
+          <div style={{ display: "grid", gap: 16 }}>
+            <SectionTitle title="Gráficos usados" />
+            <div style={{ display: "grid", gap: 14 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {TGR_GRAPHIC_GROUPS.map((group) => (
+                  <PillButton key={group.slug} active={currentGraphicGroup.slug === group.slug} onClick={() => setActiveGraphicGroup(group.slug)} label={group.nome} />
+                ))}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
+                {currentGraphicGroup.graficos.map((graphic) => (
+                  <button
+                    key={graphic}
+                    type="button"
+                    onClick={() => toggleGraphic(graphic)}
+                    style={{
+                      border: `1px solid ${(form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.line}`,
+                      background: (form.graficosSelecionados || []).includes(graphic) ? "#f7fbf4" : "#fffdfa",
+                      borderRadius: 16,
+                      padding: "12px 14px",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      fontWeight: 700,
+                      color: (form.graficosSelecionados || []).includes(graphic) ? THEME.green : THEME.text,
+                    }}
+                  >
+                    {graphic}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {(form.graficosSelecionados || []).length ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                <div style={{ ...labelStyle, marginBottom: 0 }}>Configuração dos gráficos selecionados</div>
+                {(form.graficosSelecionados || []).map((graphic) => (
+                  <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
+                    <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
+                      <span>{graphic}</span>
+                      <span style={{ color: THEME.muted, fontSize: 13 }}>{expandedGraphicConfigs[graphic] ? "Ocultar" : "Configurar"}</span>
+                    </button>
+                    {expandedGraphicConfigs[graphic] ? (
+                      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
+                        <select value={form.contextoGraficos?.[graphic] || defaultGraphicConfig.context} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                          {[defaultGraphicConfig.context, ...GRAPHIC_CONTEXT_OPTIONS.filter((option) => option !== defaultGraphicConfig.context)].map((option) => <option key={option}>{option}</option>)}
+                        </select>
+                        <input
+                          value={form.tempoAtivacaoGraficos?.[graphic] || ""}
+                          onChange={(event) => setGraphicDuration(graphic, event.target.value)}
+                          style={inputStyle}
+                          placeholder="Ex.: 7 dias, contínuo"
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Leitura dos gráficos">
+                <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Síntese dos gráficos">
+                <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
+          </div>
+        ) : null}
+
+        {activeStage === "sintese" ? (
+          <div style={{ display: "grid", gap: 16 }}>
+            <SectionTitle title="Síntese e conduta" />
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <Field label="Intervenção indicada">
+                <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Orientação terapêutica">
+                <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Foco dos próximos dias">
+                <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Conclusão analítica">
+                <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
+              </Field>
+              <Field label="Observações finais">
+                <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
+              </Field>
+            </div>
+          </div>
+        ) : null}
 
         <ProtocolSaveBar
           title="Concluir este protocolo"
-          text={isDirty ? "Ainda ha alteracoes pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
+          text={isDirty ? "Ainda há alterações pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
           onSave={onSave}
           dirty={isDirty}
         />
@@ -2722,8 +2801,8 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum protocolo"} />
           <InfoCard label="Status" value={client.status} />
           <InfoCard label="Graficos ativos" value={activeGraphics.length ? `${activeGraphics.length} em uso` : "Nenhum grafico"} />
-          <InfoCard label="Ultima analise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
-          <InfoCard label="Proxima acao" value={nextAction} />
+          <InfoCard label="Última análise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
+          <InfoCard label="Próxima ação" value={nextAction} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
@@ -2780,7 +2859,7 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18 }}>
       <Panel>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Resumo da analise</div>
+          <div style={{ fontSize: 18, fontWeight: 800 }}>Resumo da análise</div>
           <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o inicio</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 16 }}>
@@ -2808,7 +2887,7 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
       </Panel>
 
       <Panel>
-        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Historico por data</div>
+        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Histórico por data</div>
         <div style={{ display: "grid", gap: 10 }}>
           {attendanceHistory.map((item) => (
             <button key={item.id} type="button" onClick={() => onSelectAnalysis(client.id, item.id)} style={{ border: `1px solid ${item.isCurrent ? THEME.green : THEME.line}`, background: item.isCurrent ? "#f7fbf4" : "#fffdfa", borderRadius: 16, padding: "12px 14px", textAlign: "left", cursor: "pointer", display: "grid", gap: 6 }}>
@@ -2841,7 +2920,7 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
       <div style={{ display: "grid", gap: 18 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Checklist do atendimento</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque o que ja foi feito nesta analise e selecione apenas as pendencias que voce quer ver no dashboard.</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque o que já foi feito nesta análise e selecione apenas as pendências que você quer ver no dashboard.</div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
@@ -2854,14 +2933,14 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
         </div>
 
         <div style={{ display: "grid", gap: 10 }}>
-          <div style={{ ...labelStyle, marginBottom: 0 }}>Pendencias visiveis no dashboard</div>
+          <div style={{ ...labelStyle, marginBottom: 0 }}>Pendências visíveis no dashboard</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {PENDING_ACTION_OPTIONS.map((action) => (
               <PillButton key={action} active={pendingActions.includes(action)} onClick={() => onTogglePendingAction(action)} label={action} />
             ))}
           </div>
           <div style={{ color: THEME.muted, fontSize: 13 }}>
-            {pendingActions.length ? `Pendencias marcadas: ${pendingActions.join(", ")}` : "Nenhuma pendencia marcada para aparecer no dashboard."}
+            {pendingActions.length ? `Pendências marcadas: ${pendingActions.join(", ")}` : "Nenhuma pendência marcada para aparecer no dashboard."}
           </div>
         </div>
       </div>
@@ -3228,6 +3307,35 @@ function ProtocolSaveBar({ title, text, onSave, dirty }) {
       <button type="button" onClick={onSave} style={primaryButtonStyle}>
         {dirty ? "Salvar alteracoes" : "Salvar protocolo"}
       </button>
+    </div>
+  );
+}
+
+function ProtocolStageTabs({ activeStage, onChange }) {
+  return (
+    <div style={{ display: "grid", gap: 10 }}>
+      <div style={{ ...labelStyle, marginBottom: 0 }}>Etapas do protocolo</div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {TGR_FLOW_STAGES.map((stage) => (
+          <button
+            key={stage.key}
+            type="button"
+            onClick={() => onChange(stage.key)}
+            style={{
+              border: `1px solid ${activeStage === stage.key ? THEME.green : THEME.line}`,
+              background: activeStage === stage.key ? THEME.greenSoft : "#fffdfa",
+              color: activeStage === stage.key ? THEME.green : THEME.muted,
+              borderRadius: 999,
+              padding: "9px 14px",
+              cursor: "pointer",
+              fontWeight: 800,
+              fontSize: 12,
+            }}
+          >
+            {stage.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
