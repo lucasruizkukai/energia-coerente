@@ -1003,7 +1003,8 @@ function App() {
   const selectedAnalysis = selectedClient ? getAnalysisRecord(selectedClient) : null;
   const clientFocusMode =
     (mainTab === "clientes" && Boolean(selectedId)) ||
-    (mainTab === "metodos" && Boolean(relacoesContext?.clientId || selectedId));
+    (mainTab === "metodos" && Boolean(relacoesContext?.clientId || selectedId)) ||
+    (mainTab === "devolutivas" && Boolean(selectedId));
 
   useEffect(() => {
     if (!selectedClient) {
