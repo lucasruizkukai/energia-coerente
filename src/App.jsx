@@ -1054,8 +1054,16 @@ function App() {
     });
 
     if (!record) return;
-
-    openProtocolForClient(record, "Relacoes");
+    setActiveMethod("radiestesia");
+    setActiveSubmethod("tgr");
+    setActiveMethodTab("protocolos");
+    setActiveTgrProtocol("");
+    setRelacoesContext({
+      clientId: record.id,
+      clientName: record.nome,
+      protocolName: "",
+    });
+    setMainTab("metodos");
   }
 
   async function toggleClientProtocol(clientId, protocolName) {
@@ -1081,7 +1089,7 @@ function App() {
     }, { keepMessage: true });
 
     if (!nextProtocols.length) {
-      setActiveTgrProtocol("relacoes");
+      setActiveTgrProtocol("");
     } else if (!nextProtocols.includes(findProtocolName(activeTgrProtocol))) {
       setActiveTgrProtocol(findProtocolSlugByName(nextProtocols[0]));
     }
@@ -1846,8 +1854,8 @@ function MethodOverview({ appointments, mobile }) {
 }
 
 function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext, selectedClient, toggleClientProtocol, saveProtocolToClient }) {
-  const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol) || TGR_PROTOCOLS[0];
-  const supportForm = protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm;
+  const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol) || null;
+  const supportForm = selectedProtocol ? (protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm) : emptyProtocolSupportForm;
   const validProtocols = getValidProtocols(selectedClient?.protocolosUsados);
 
   return (
@@ -1872,8 +1880,17 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
           </div>
         </Panel>
       ) : null}
-      <MethodCatalog title="Protocolos TGR" items={TGR_PROTOCOLS} mobile={mobile} activeSlug={selectedProtocol.slug} onSelect={setActiveProtocol} />
-      {selectedProtocol.slug === "relacoes" ? (
+      <MethodCatalog title="Protocolos TGR" items={TGR_PROTOCOLS} mobile={mobile} activeSlug={selectedProtocol?.slug} onSelect={setActiveProtocol} />
+      {!selectedProtocol ? (
+        <Panel>
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 18, fontWeight: 800 }}>Escolha o protocolo para iniciar</div>
+            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>
+              Selecione entre Relações, Limpeza e Proteção ou Prosperidade para começar a preencher a análise.
+            </div>
+          </div>
+        </Panel>
+      ) : selectedProtocol.slug === "relacoes" ? (
         <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} onSave={() => saveProtocolToClient("relacoes", relacoesForm)} />
       ) : (
         <GenericProtocolView
