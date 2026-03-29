@@ -2294,19 +2294,6 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
   return (
     <Panel>
       <div style={{ display: "grid", gap: 18 }}>
-        <div style={{ border: `1px solid ${protocolTheme.color}`, background: protocolTheme.soft, borderRadius: 20, padding: "16px 18px" }}>
-          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: protocolTheme.color }}>Relações</div>
-          <div style={{ color: THEME.text, lineHeight: 1.65 }}>Preencha este protocolo por etapas. Assim a leitura fica mais clara e você não perde o fio da análise.</div>
-        </div>
-
-        {context ? (
-          <div style={{ border: `1px solid ${THEME.green}`, background: "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "grid", gap: 4 }}>
-            <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
-            <div style={{ color: THEME.muted }}>{context.clientName}</div>
-            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo aberto agora: {currentProtocolName || context.protocolName}</div>
-          </div>
-        ) : null}
-
         <ProtocolSaveBar
           title="Salvar protocolo"
           text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Use este botão para garantir que o protocolo fique salvo no prontuário da análise."}
@@ -2521,19 +2508,6 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
   return (
     <Panel>
       <div style={{ display: "grid", gap: 18 }}>
-        <div style={{ border: `1px solid ${protocolTheme.color}`, background: protocolTheme.soft, borderRadius: 20, padding: "16px 18px" }}>
-          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: protocolTheme.color }}>{protocol.nome}</div>
-          <div style={{ color: THEME.text, lineHeight: 1.65 }}>{protocol.resumo}</div>
-        </div>
-
-        {context ? (
-          <div style={{ border: `1px solid ${THEME.green}`, background: "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "grid", gap: 4 }}>
-            <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
-            <div style={{ color: THEME.muted }}>{context.clientName}</div>
-            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo aberto agora: {currentProtocolName || context.protocolName}</div>
-          </div>
-        ) : null}
-
         <ProtocolSaveBar
           title="Salvar protocolo"
           text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Use este botão para garantir que o protocolo fique salvo no prontuário da análise."}
