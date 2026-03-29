@@ -258,6 +258,12 @@ const THEME = {
   beige: "#efe4d2",
   sand: "#c9ab8a",
   shadow: "0 18px 40px rgba(79, 54, 39, 0.08)",
+  protocolRelacoes: "#6f8f73",
+  protocolRelacoesSoft: "#e4efe3",
+  protocolLimpeza: "#b26b4f",
+  protocolLimpezaSoft: "#f4e2d8",
+  protocolProsperidade: "#9b7a3e",
+  protocolProsperidadeSoft: "#f2e8cf",
 };
 
 const emptyClient = {
@@ -454,8 +460,9 @@ const inputStyle = {
   boxSizing: "border-box",
   border: `1px solid ${THEME.line}`,
   borderRadius: 16,
-  padding: "13px 14px",
-  fontSize: 14,
+  padding: "14px 15px",
+  fontSize: 15,
+  lineHeight: 1.5,
   color: THEME.text,
   background: "#fffdfa",
   outline: "none",
@@ -463,9 +470,9 @@ const inputStyle = {
 
 const labelStyle = {
   display: "block",
-  marginBottom: 6,
-  fontSize: 11,
-  fontWeight: 700,
+  marginBottom: 7,
+  fontSize: 12,
+  fontWeight: 800,
   color: THEME.muted,
   letterSpacing: 0.8,
   textTransform: "uppercase",
@@ -477,6 +484,29 @@ function generateId() {
 
 function getTodayDate() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function getProtocolTheme(protocol) {
+  const value = String(protocol || "").toLowerCase();
+
+  if (value.includes("limpeza")) {
+    return {
+      color: THEME.protocolLimpeza,
+      soft: THEME.protocolLimpezaSoft,
+    };
+  }
+
+  if (value.includes("prosperidade")) {
+    return {
+      color: THEME.protocolProsperidade,
+      soft: THEME.protocolProsperidadeSoft,
+    };
+  }
+
+  return {
+    color: THEME.protocolRelacoes,
+    soft: THEME.protocolRelacoesSoft,
+  };
 }
 
 function cloneStructuredSection(section, fallback) {
@@ -885,22 +915,24 @@ function serializeFormState(value) {
 
 const primaryButtonStyle = {
   border: "none",
-  borderRadius: 16,
+  borderRadius: 18,
   background: THEME.text,
   color: "#fff",
-  padding: "12px 18px",
+  padding: "13px 20px",
   cursor: "pointer",
-  fontWeight: 700,
+  fontWeight: 800,
+  fontSize: 14,
 };
 
 const secondaryButtonStyle = {
   border: `1px solid ${THEME.line}`,
-  borderRadius: 14,
+  borderRadius: 16,
   background: "#fffdfa",
   color: THEME.text,
-  padding: "10px 14px",
+  padding: "11px 15px",
   cursor: "pointer",
-  fontWeight: 700,
+  fontWeight: 800,
+  fontSize: 14,
 };
 
 function App() {
@@ -1703,11 +1735,11 @@ function Header({ user, onLogout, mobile }) {
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "14px 14px" : "18px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
-            <div style={{ fontSize: mobile ? 22 : 28, fontWeight: 800, letterSpacing: 0.2 }}>{BRAND.name}</div>
-            <div style={{ color: THEME.terracotta, fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>{BRAND.subtitle}</div>
+            <div style={{ fontSize: mobile ? 24 : 32, fontWeight: 800, letterSpacing: 0.1 }}>{BRAND.name}</div>
+            <div style={{ color: THEME.terracotta, fontSize: 14, fontWeight: 800, letterSpacing: 1.3, textTransform: "uppercase" }}>{BRAND.subtitle}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ color: THEME.muted, fontSize: 13 }}>{user?.email}</span>
+            <span style={{ color: THEME.muted, fontSize: 14 }}>{user?.email}</span>
             <button type="button" onClick={onLogout} style={secondaryButtonStyle}>Sair</button>
           </div>
         </div>
@@ -2148,6 +2180,7 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
   const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol && validProtocols.includes(item.nome)) || null;
   const supportForm = selectedProtocol ? (protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm) : emptyProtocolSupportForm;
   const activeProtocolDirty = selectedProtocol ? Boolean(protocolDirtyState?.[selectedProtocol.slug]) : false;
+  const selectedProtocolTheme = getProtocolTheme(selectedProtocol?.slug || selectedProtocol?.nome);
 
   function handleProtocolChoice(protocol) {
     const isActive = validProtocols.includes(protocol.nome);
@@ -2168,29 +2201,31 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
               {TGR_PROTOCOLS.map((protocol) => {
                 const isActive = validProtocols.includes(protocol.nome);
                 const isSelected = selectedProtocol?.slug === protocol.slug;
+                const protocolTheme = getProtocolTheme(protocol.slug);
                 return (
                   <button
                     key={protocol.slug}
                     type="button"
                     onClick={() => handleProtocolChoice(protocol)}
                     style={{
-                      border: `1px solid ${isSelected ? THEME.green : THEME.line}`,
-                      background: isSelected ? "#f7fbf4" : "#fffdfa",
-                      borderRadius: 18,
-                      padding: "14px 16px",
+                      border: `1px solid ${isSelected ? protocolTheme.color : isActive ? protocolTheme.soft : THEME.line}`,
+                      background: isSelected ? protocolTheme.soft : "#fffdfa",
+                      borderRadius: 20,
+                      padding: "15px 16px",
                       textAlign: "left",
                       cursor: "pointer",
                       display: "grid",
-                      gap: 6,
+                      gap: 8,
+                      boxShadow: isSelected ? "0 12px 24px rgba(62,49,40,0.08)" : "none",
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                      <div style={{ fontWeight: 800, color: isSelected ? THEME.green : THEME.text }}>{protocol.nome}</div>
-                      <span style={{ fontSize: 11, fontWeight: 800, color: isActive ? THEME.green : THEME.muted }}>
+                      <div style={{ fontWeight: 800, fontSize: 16, color: isSelected ? protocolTheme.color : THEME.text }}>{protocol.nome}</div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: isActive ? protocolTheme.color : THEME.muted }}>
                         {isSelected ? "ABERTO" : isActive ? "ATIVO" : "ADICIONAR"}
                       </span>
                     </div>
-                    <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.55 }}>{protocol.resumo}</div>
+                    <div style={{ color: THEME.muted, fontSize: 14, lineHeight: 1.6 }}>{protocol.resumo}</div>
                   </button>
                 );
               })}
@@ -2206,7 +2241,7 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
               {selectedProtocol ? <>Protocolo aberto agora: <strong style={{ color: THEME.text }}>{selectedProtocol.nome}</strong></> : "Nenhum protocolo aberto ainda. Escolha um card acima para continuar."}
             </div>
             {hasUnsavedProtocolChanges ? (
-              <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff8f2", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", display: "grid", gap: 4 }}>
+              <div style={{ border: `1px solid ${selectedProtocolTheme.color}`, background: selectedProtocolTheme.soft, borderRadius: 18, padding: "12px 14px", color: selectedProtocolTheme.color, display: "grid", gap: 4 }}>
                 <div style={{ fontWeight: 800 }}>Há alterações não salvas</div>
                 <div style={{ fontSize: 13, lineHeight: 1.6 }}>Salve o protocolo atual antes de trocar de análise ou sair do TGR.</div>
               </div>
@@ -2253,6 +2288,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
   const [activeStage, setActiveStage] = useState("leitura");
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+  const protocolTheme = getProtocolTheme("relacoes");
 
   useEffect(() => {
     setActiveStage("leitura");
@@ -2304,9 +2340,9 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
   return (
     <Panel>
       <div style={{ display: "grid", gap: 18 }}>
-        <div>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Relações</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Preencha este protocolo por etapas. Assim a leitura fica mais clara e você não perde o fio da análise.</div>
+        <div style={{ border: `1px solid ${protocolTheme.color}`, background: protocolTheme.soft, borderRadius: 20, padding: "16px 18px" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: protocolTheme.color }}>Relações</div>
+          <div style={{ color: THEME.text, lineHeight: 1.65 }}>Preencha este protocolo por etapas. Assim a leitura fica mais clara e você não perde o fio da análise.</div>
         </div>
 
         {context ? (
@@ -2478,6 +2514,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
   const [activeStage, setActiveStage] = useState("leitura");
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
+  const protocolTheme = getProtocolTheme(protocol.slug);
 
   useEffect(() => {
     setActiveGraphicGroup(defaultGraphicConfig.group);
@@ -2530,9 +2567,9 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
   return (
     <Panel>
       <div style={{ display: "grid", gap: 18 }}>
-        <div>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{protocol.nome}</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.7 }}>{protocol.resumo}</div>
+        <div style={{ border: `1px solid ${protocolTheme.color}`, background: protocolTheme.soft, borderRadius: 20, padding: "16px 18px" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: protocolTheme.color }}>{protocol.nome}</div>
+          <div style={{ color: THEME.text, lineHeight: 1.65 }}>{protocol.resumo}</div>
         </div>
 
         {context ? (
@@ -3200,12 +3237,12 @@ function FeedbackCard({ client }) {
 
 function Shell({ children }) {
   return (
-    <div style={{ minHeight: "100vh", background: `linear-gradient(180deg, #f8f4ee 0%, ${THEME.bg} 56%, #f4ede2 100%)`, color: THEME.text, fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: `radial-gradient(circle at top left, #fffaf3 0%, ${THEME.bg} 48%, #efe4d4 100%)`, color: THEME.text, fontFamily: "'Segoe UI Variable Display', 'Segoe UI', 'Trebuchet MS', sans-serif" }}>
       <style>{`
         * { box-sizing: border-box; }
         body { margin: 0; background: ${THEME.bg}; }
         button, input, textarea, select { font: inherit; }
-        textarea { min-height: 108px; resize: vertical; }
+        textarea { min-height: 118px; resize: vertical; }
       `}</style>
       {children}
     </div>
@@ -3213,7 +3250,7 @@ function Shell({ children }) {
 }
 
 function Panel({ children, style }) {
-  return <section style={{ background: "rgba(255,253,249,0.92)", border: `1px solid ${THEME.line}`, borderRadius: 24, padding: 18, boxShadow: THEME.shadow, ...style }}>{children}</section>;
+  return <section style={{ background: "rgba(255,253,249,0.95)", border: `1px solid ${THEME.line}`, borderRadius: 26, padding: 20, boxShadow: THEME.shadow, ...style }}>{children}</section>;
 }
 
 function Field({ label, children }) {
@@ -3235,22 +3272,22 @@ function ActionTile({ title, text }) {
 }
 
 function TabButton({ active, onClick, label }) {
-  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.text : THEME.line}`, background: active ? THEME.text : "#fffdfa", color: active ? "#fff" : THEME.muted, padding: "10px 14px", borderRadius: 999, cursor: "pointer", fontWeight: 700 }}>{label}</button>;
+  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.text : THEME.line}`, background: active ? THEME.text : "#fffdfa", color: active ? "#fff" : THEME.muted, padding: "11px 16px", borderRadius: 999, cursor: "pointer", fontWeight: 800, fontSize: 14 }}>{label}</button>;
 }
 
 function StagePill({ label, active }) {
-  return <span style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "8px 12px", fontWeight: 700, fontSize: 12 }}>{label}</span>;
+  return <span style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "9px 13px", fontWeight: 800, fontSize: 13 }}>{label}</span>;
 }
 
 function PillButton({ active, onClick, label }) {
-  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>{label}</button>;
+  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "9px 13px", cursor: "pointer", fontWeight: 800, fontSize: 13 }}>{label}</button>;
 }
 
 function MetricTile({ label, value, accent }) {
   return (
     <div style={{ background: "#fffdfa", border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "16px 14px" }}>
-      <div style={{ color: accent, fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{value}</div>
-      <div style={{ color: THEME.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.7, fontWeight: 700 }}>{label}</div>
+      <div style={{ color: accent, fontSize: 24, fontWeight: 800, marginBottom: 5 }}>{value}</div>
+      <div style={{ color: THEME.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 800 }}>{label}</div>
     </div>
   );
 }
@@ -3263,8 +3300,8 @@ function StatusBadge({ status }) {
 function InfoCard({ label, value }) {
   return (
     <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "13px 14px", background: "#fffdfa" }}>
-      <div style={{ ...labelStyle, marginBottom: 4 }}>{label}</div>
-      <div style={{ fontWeight: 700 }}>{value}</div>
+      <div style={{ ...labelStyle, marginBottom: 5 }}>{label}</div>
+      <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.45 }}>{value}</div>
     </div>
   );
 }
@@ -3277,19 +3314,19 @@ function CommandCardButton({ title, text, onClick, primary = false, disabled = f
       disabled={disabled}
       style={{
         border: `1px solid ${primary ? THEME.text : THEME.line}`,
-        borderRadius: 18,
-        padding: "15px 16px",
+        borderRadius: 20,
+        padding: "16px 18px",
         background: primary ? THEME.text : "#fffdfa",
         color: primary ? "#fff" : THEME.text,
         textAlign: "left",
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.6 : 1,
         display: "grid",
-        gap: 6,
+        gap: 7,
       }}
     >
-      <span style={{ fontWeight: 800 }}>{title}</span>
-      <span style={{ color: primary ? "rgba(255,255,255,0.82)" : THEME.muted, lineHeight: 1.55 }}>{text}</span>
+      <span style={{ fontWeight: 800, fontSize: 16 }}>{title}</span>
+      <span style={{ color: primary ? "rgba(255,255,255,0.82)" : THEME.muted, lineHeight: 1.6, fontSize: 14 }}>{text}</span>
     </button>
   );
 }
