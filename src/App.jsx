@@ -3101,25 +3101,6 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
           <Field label="Email"><input value={form.email} onChange={(event) => setField("email", event.target.value)} style={inputStyle} /></Field>
           <Field label="Data de inicio"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
           <Field label="Metodo"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
-          <Field label="Protocolos usados">
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {PROTOCOL_OPTIONS.map((item) => (
-                <PillButton
-                  key={item}
-                  active={(form.protocolosUsados || []).includes(item)}
-                  onClick={() =>
-                    setField(
-                      "protocolosUsados",
-                      (form.protocolosUsados || []).includes(item)
-                        ? form.protocolosUsados.filter((protocol) => protocol !== item)
-                        : [...(form.protocolosUsados || []), item]
-                    )
-                  }
-                  label={item}
-                />
-              ))}
-            </div>
-          </Field>
         </div>
         <SectionTitle title="Direcao do atendimento" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
