@@ -2156,11 +2156,15 @@ function RelacoesProtocolView({ mobile, form, setForm, context, onSave, isDirty 
             <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
             <div style={{ color: THEME.muted }}>{context.clientName}</div>
             <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
-            <div style={{ marginTop: 8 }}>
-              <button type="button" onClick={onSave} style={secondaryButtonStyle}>{isDirty ? "Salvar alteracoes" : "Salvar no prontuario"}</button>
-            </div>
           </div>
         ) : null}
+
+        <ProtocolSaveBar
+          title="Salvar protocolo"
+          text={isDirty ? "Voce fez alteracoes neste protocolo. Salve para registrar no prontuario." : "Use este botao para garantir que o protocolo fique salvo no prontuario da analise."}
+          onSave={onSave}
+          dirty={isDirty}
+        />
 
         <SectionTitle title="Cabecalho da leitura" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
@@ -2283,6 +2287,13 @@ function RelacoesProtocolView({ mobile, form, setForm, context, onSave, isDirty 
             <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
           </Field>
         </div>
+
+        <ProtocolSaveBar
+          title="Concluir este protocolo"
+          text={isDirty ? "Ainda ha alteracoes pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
+          onSave={onSave}
+          dirty={isDirty}
+        />
       </div>
     </Panel>
   );
@@ -2354,11 +2365,15 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, onSave,
             <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
             <div style={{ color: THEME.muted }}>{context.clientName}</div>
             <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
-            <div style={{ marginTop: 8 }}>
-              <button type="button" onClick={onSave} style={secondaryButtonStyle}>{isDirty ? "Salvar alteracoes" : "Salvar no prontuario"}</button>
-            </div>
           </div>
         ) : null}
+
+        <ProtocolSaveBar
+          title="Salvar protocolo"
+          text={isDirty ? "Voce fez alteracoes neste protocolo. Salve para registrar no prontuario." : "Use este botao para garantir que o protocolo fique salvo no prontuario da analise."}
+          onSave={onSave}
+          dirty={isDirty}
+        />
 
         <SectionTitle title="Cabecalho da leitura" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
@@ -2461,6 +2476,13 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, onSave,
             <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
           </Field>
         </div>
+
+        <ProtocolSaveBar
+          title="Concluir este protocolo"
+          text={isDirty ? "Ainda ha alteracoes pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
+          onSave={onSave}
+          dirty={isDirty}
+        />
       </div>
     </Panel>
   );
@@ -3060,6 +3082,20 @@ function SummaryBlock({ title, text }) {
     <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "15px 16px", background: "#fffdfa" }}>
       <div style={{ fontWeight: 800, marginBottom: 6 }}>{title}</div>
       <div style={{ color: THEME.muted, lineHeight: 1.65 }}>{text}</div>
+    </div>
+  );
+}
+
+function ProtocolSaveBar({ title, text, onSave, dirty }) {
+  return (
+    <div style={{ border: `1px solid ${dirty ? THEME.terracotta : THEME.green}`, background: dirty ? "#fff8f2" : "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+      <div style={{ display: "grid", gap: 4 }}>
+        <div style={{ fontWeight: 800 }}>{title}</div>
+        <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.6 }}>{text}</div>
+      </div>
+      <button type="button" onClick={onSave} style={primaryButtonStyle}>
+        {dirty ? "Salvar alteracoes" : "Salvar protocolo"}
+      </button>
     </div>
   );
 }
