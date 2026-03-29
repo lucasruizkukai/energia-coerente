@@ -12,7 +12,6 @@ const MAIN_TABS = [
   { key: "dashboard", label: "Dashboard" },
   { key: "clientes", label: "Clientes" },
   { key: "atendimentos", label: "Atendimentos" },
-  { key: "devolutivas", label: "Devolutivas" },
   { key: "financeiro", label: "Financeiro" },
 ];
 
