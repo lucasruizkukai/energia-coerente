@@ -1099,6 +1099,7 @@ function App() {
   }
 
   async function switchClientAnalysis(clientId, analysisId) {
+    if (selectedClient?.id === clientId && !confirmUnsavedNavigation("outra analise")) return;
     const currentClient = clients.find((item) => item.id === clientId);
     if (!currentClient) return;
     const normalized = normalizeClientRecord(currentClient);
@@ -1228,11 +1229,23 @@ function App() {
     setUiMessage(`Protocolo ${protocolName} salvo na analise.`);
   }
 
+  function confirmUnsavedNavigation(destinationLabel = "continuar") {
+    if (!(mainTab === "metodos" && hasUnsavedProtocolChanges)) return true;
+    return window.confirm(`Ha alteracoes nao salvas no TGR. Deseja sair para ${destinationLabel} mesmo assim?`);
+  }
+
+  function openTgrWorkspace() {
+    setActiveMethod("radiestesia");
+    setActiveSubmethod("tgr");
+    setActiveMethodTab("protocolos");
+    setMainTab("metodos");
+  }
+
   function handleTabChange(nextTab) {
+    if (!confirmUnsavedNavigation(nextTab)) return;
     if (nextTab === "metodos") {
-      setActiveMethod("radiestesia");
-      setActiveSubmethod("tgr");
-      setActiveMethodTab("protocolos");
+      openTgrWorkspace();
+      return;
     }
     setMainTab(nextTab);
   }
@@ -1243,9 +1256,7 @@ function App() {
     const normalizedClient = normalizeClientRecord(client);
     const currentAnalysis = normalizedClient.analyses.find((analysis) => analysis.id === normalizedClient.currentAnalysisId) || extractAnalysisFromClient(normalizedClient);
     const protocolForms = cloneProtocolForms(currentAnalysis.protocolForms);
-    setActiveMethod("radiestesia");
-    setActiveSubmethod("tgr");
-    setActiveMethodTab("protocolos");
+    openTgrWorkspace();
     setActiveTgrProtocol(protocolSlug);
     setRelacoesContext({
       clientId: client.id,
@@ -1270,7 +1281,6 @@ function App() {
         },
       } : {}),
     }));
-    setMainTab("metodos");
   }
 
   async function handleLogin(event) {
@@ -1338,8 +1348,8 @@ function App() {
           </div>
         ) : (
           <Panel style={{ marginTop: 10, marginBottom: 18, padding: "14px 16px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-              <div>
+            <div style={{ display: "grid", gap: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ fontSize: 18, fontWeight: 800 }}>
                   {selectedClient?.nome || relacoesContext?.clientName || "Atendimento em foco"}
                 </div>
@@ -1347,7 +1357,7 @@ function App() {
                   Navegação reduzida para manter o atendimento mais seguro e direto.
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <div style={{ display: "none", gap: 8, flexWrap: "wrap" }}>
                 <button type="button" onClick={() => setMainTab("clientes")} style={secondaryButtonStyle}>Prontuário</button>
                 <button
                   type="button"
@@ -1372,6 +1382,28 @@ function App() {
                   style={primaryButtonStyle}
                 >
                   Menu central
+                </button>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <StagePill label="Prontuario" active={mainTab === "clientes"} />
+                <StagePill label="TGR" active={mainTab === "metodos"} />
+                <StagePill label="Devolutiva" active={mainTab === "devolutivas"} />
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" onClick={() => { if (!confirmUnsavedNavigation("o prontuario")) return; setMainTab("clientes"); }} style={mainTab === "clientes" ? primaryButtonStyle : secondaryButtonStyle}>Prontuario</button>
+                <button type="button" onClick={() => openTgrWorkspace()} style={mainTab === "metodos" ? primaryButtonStyle : secondaryButtonStyle}>TGR</button>
+                <button type="button" onClick={() => { if (!confirmUnsavedNavigation("a devolutiva")) return; setMainTab("devolutivas"); }} style={mainTab === "devolutivas" ? primaryButtonStyle : secondaryButtonStyle}>Devolutiva</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!confirmUnsavedNavigation("o menu central")) return;
+                    setSelectedId("");
+                    setRelacoesContext(null);
+                    setMainTab("dashboard");
+                  }}
+                  style={secondaryButtonStyle}
+                >
+                  Voltar ao menu
                 </button>
               </div>
             </div>
@@ -1517,6 +1549,7 @@ function MainContent(props) {
           isCreatingClient={isCreatingClient}
           openProtocolForClient={openProtocolForClient}
           startNewClient={startNewClient}
+          openFeedbackForClient={() => setMainTab("devolutivas")}
           onBackToList={() => setSelectedId("")}
         />
     );
@@ -1645,7 +1678,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient })
   );
 }
 
-function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, onBackToList }) {
+function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, onBackToList }) {
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
@@ -1656,6 +1689,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
           onSelectAnalysis={switchClientAnalysis}
           onNewAnalysis={createNewAnalysis}
           onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
+          onOpenFeedback={openFeedbackForClient}
           onBack={onBackToList}
         />
         <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
@@ -2487,7 +2521,7 @@ function FinancialView({ clients, mobile }) {
   );
 }
 
-function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol, onBack }) {
+function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol, onOpenFeedback, onBack }) {
   const currentAnalysis = getAnalysisRecord(client);
   const validProtocols = getValidProtocols(currentAnalysis.protocolosUsados);
   const attendanceDateOptions = buildAttendanceDateOptions(client);
@@ -2516,7 +2550,12 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
             <button type="button" onClick={() => onFinalize(client.id)} disabled={client.status === "Concluido"} style={{ ...secondaryButtonStyle, opacity: client.status === "Concluido" ? 0.65 : 1, cursor: client.status === "Concluido" ? "default" : "pointer" }}>
               Finalizar analise
             </button>
-            <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4" }}>Remover</button>
+            <details style={{ position: "relative" }}>
+              <summary style={{ ...secondaryButtonStyle, listStyle: "none", cursor: "pointer" }}>Mais acoes</summary>
+              <div style={{ position: "absolute", right: 0, top: "calc(100% + 8px)", minWidth: 180, zIndex: 4, border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 16, padding: 10, boxShadow: THEME.shadow, display: "grid", gap: 8 }}>
+                <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4", width: "100%" }}>Remover cliente</button>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -2526,6 +2565,13 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           <InfoCard label="Graficos ativos" value={activeGraphics.length ? `${activeGraphics.length} em uso` : "Nenhum grafico"} />
           <InfoCard label="Ultima analise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
           <InfoCard label="Proxima acao" value={nextAction} />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+          <CommandCardButton title="Abrir TGR" text="Entrar no protocolo da analise atual." onClick={() => onOpenProtocol(validProtocols[0] || "")} primary />
+          <CommandCardButton title="Nova analise" text="Criar uma nova data sem perder o historico." onClick={() => onNewAnalysis(client.id)} />
+          <CommandCardButton title="Finalizar analise" text="Encerrar a analise atual quando concluir a etapa." onClick={() => onFinalize(client.id)} disabled={client.status === "Concluido"} />
+          <CommandCardButton title="Ver devolutiva" text="Abrir a devolutiva guiada desta cliente." onClick={onOpenFeedback} />
         </div>
 
         <div style={{ display: "grid", gap: 8 }}>
@@ -2540,9 +2586,6 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
             <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
               Use esta lista para localizar a analise pela data. Quando o prontuario tiver mais atendimentos, eles aparecerao aqui.
             </div>
-          </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={() => onOpenProtocol(validProtocols[0] || "")} style={primaryButtonStyle}>Abrir TGR</button>
           </div>
           <div style={{ ...labelStyle, marginBottom: 0 }}>Protocolos da analise</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -2900,6 +2943,10 @@ function TabButton({ active, onClick, label }) {
   return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.text : THEME.line}`, background: active ? THEME.text : "#fffdfa", color: active ? "#fff" : THEME.muted, padding: "10px 14px", borderRadius: 999, cursor: "pointer", fontWeight: 700 }}>{label}</button>;
 }
 
+function StagePill({ label, active }) {
+  return <span style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "8px 12px", fontWeight: 700, fontSize: 12 }}>{label}</span>;
+}
+
 function PillButton({ active, onClick, label }) {
   return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>{label}</button>;
 }
@@ -2924,6 +2971,31 @@ function InfoCard({ label, value }) {
       <div style={{ ...labelStyle, marginBottom: 4 }}>{label}</div>
       <div style={{ fontWeight: 700 }}>{value}</div>
     </div>
+  );
+}
+
+function CommandCardButton({ title, text, onClick, primary = false, disabled = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        border: `1px solid ${primary ? THEME.text : THEME.line}`,
+        borderRadius: 18,
+        padding: "15px 16px",
+        background: primary ? THEME.text : "#fffdfa",
+        color: primary ? "#fff" : THEME.text,
+        textAlign: "left",
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.6 : 1,
+        display: "grid",
+        gap: 6,
+      }}
+    >
+      <span style={{ fontWeight: 800 }}>{title}</span>
+      <span style={{ color: primary ? "rgba(255,255,255,0.82)" : THEME.muted, lineHeight: 1.55 }}>{text}</span>
+    </button>
   );
 }
 
