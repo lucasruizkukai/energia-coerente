@@ -16,7 +16,6 @@ const MAIN_TABS = [
 ];
 
 const METHOD_TABS = [
-  { key: "overview", label: "Visão geral" },
   { key: "protocolos", label: "Protocolos" },
 ];
 
@@ -952,7 +951,7 @@ function App() {
   const [uiMessage, setUiMessage] = useState("");
   const [activeMethod, setActiveMethod] = useState("radiestesia");
   const [activeSubmethod, setActiveSubmethod] = useState("tgr");
-  const [activeMethodTab, setActiveMethodTab] = useState("overview");
+  const [activeMethodTab, setActiveMethodTab] = useState("protocolos");
   const [activeTgrProtocol, setActiveTgrProtocol] = useState("relacoes");
   const [relacoesForm, setRelacoesForm] = useState(emptyRelacoesForm);
   const [protocolSupportForms, setProtocolSupportForms] = useState({});
@@ -2011,31 +2010,22 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
             </div>
             <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
-            {METHOD_TABS.map((tab) => (
-              <PillButton key={tab.key} active={activeMethodTab === tab.key} onClick={() => setActiveMethodTab(tab.key)} label={tab.label} />
-            ))}
-          </div>
         </Panel>
-
-        {activeMethodTab === "overview" && <MethodOverview appointments={appointments} mobile={mobile} />}
-        {activeMethodTab === "protocolos" && (
-          <TgrProtocolsView
-            mobile={mobile}
-            activeProtocol={activeTgrProtocol}
-            setActiveProtocol={setActiveTgrProtocol}
-            relacoesForm={relacoesForm}
-            setRelacoesForm={setRelacoesForm}
-            protocolSupportForms={protocolSupportForms}
-            setProtocolSupportForms={setProtocolSupportForms}
-            relacoesContext={relacoesContext}
-            selectedClient={selectedClient}
-            protocolDirtyState={protocolDirtyState}
-            hasUnsavedProtocolChanges={hasUnsavedProtocolChanges}
-            toggleClientProtocol={toggleClientProtocol}
-            saveProtocolToClient={saveProtocolToClient}
-          />
-        )}
+        <TgrProtocolsView
+          mobile={mobile}
+          activeProtocol={activeTgrProtocol}
+          setActiveProtocol={setActiveTgrProtocol}
+          relacoesForm={relacoesForm}
+          setRelacoesForm={setRelacoesForm}
+          protocolSupportForms={protocolSupportForms}
+          setProtocolSupportForms={setProtocolSupportForms}
+          relacoesContext={relacoesContext}
+          selectedClient={selectedClient}
+          protocolDirtyState={protocolDirtyState}
+          hasUnsavedProtocolChanges={hasUnsavedProtocolChanges}
+          toggleClientProtocol={toggleClientProtocol}
+          saveProtocolToClient={saveProtocolToClient}
+        />
       </section>
     );
   }
@@ -2126,31 +2116,23 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
                 </div>
                 <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
-                {METHOD_TABS.map((tab) => (
-                  <PillButton key={tab.key} active={activeMethodTab === tab.key} onClick={() => setActiveMethodTab(tab.key)} label={tab.label} />
-                ))}
-              </div>
             </Panel>
 
-            {activeMethodTab === "overview" && <MethodOverview appointments={appointments} mobile={mobile} />}
-            {activeMethodTab === "protocolos" && (
-              <TgrProtocolsView
-                mobile={mobile}
-                activeProtocol={activeTgrProtocol}
-                setActiveProtocol={setActiveTgrProtocol}
-                relacoesForm={relacoesForm}
-                setRelacoesForm={setRelacoesForm}
-                protocolSupportForms={protocolSupportForms}
-                setProtocolSupportForms={setProtocolSupportForms}
-                relacoesContext={relacoesContext}
-                selectedClient={selectedClient}
-                protocolDirtyState={protocolDirtyState}
-                hasUnsavedProtocolChanges={hasUnsavedProtocolChanges}
-                toggleClientProtocol={toggleClientProtocol}
-                saveProtocolToClient={saveProtocolToClient}
-              />
-            )}
+            <TgrProtocolsView
+              mobile={mobile}
+              activeProtocol={activeTgrProtocol}
+              setActiveProtocol={setActiveTgrProtocol}
+              relacoesForm={relacoesForm}
+              setRelacoesForm={setRelacoesForm}
+              protocolSupportForms={protocolSupportForms}
+              setProtocolSupportForms={setProtocolSupportForms}
+              relacoesContext={relacoesContext}
+              selectedClient={selectedClient}
+              protocolDirtyState={protocolDirtyState}
+              hasUnsavedProtocolChanges={hasUnsavedProtocolChanges}
+              toggleClientProtocol={toggleClientProtocol}
+              saveProtocolToClient={saveProtocolToClient}
+            />
               </>
             )}
           </>
