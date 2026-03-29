@@ -12,7 +12,6 @@ const MAIN_TABS = [
   { key: "dashboard", label: "Dashboard" },
   { key: "clientes", label: "Clientes" },
   { key: "atendimentos", label: "Atendimentos" },
-  { key: "metodos", label: "Metodos" },
   { key: "devolutivas", label: "Devolutivas" },
   { key: "financeiro", label: "Financeiro" },
 ];
@@ -1491,12 +1490,6 @@ function MainContent(props) {
           setSelectedId(id);
           setMainTab("clientes");
         }}
-        onOpenMethod={() => {
-          setActiveMethod("radiestesia");
-          setActiveSubmethod("tgr");
-          setActiveMethodTab("protocolos");
-          setMainTab("metodos");
-        }}
       />
     );
   }
@@ -1604,7 +1597,7 @@ function TopMetrics({ metrics, mobile }) {
   );
 }
 
-function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, onOpenMethod }) {
+function DashboardView({ clients, appointments, metrics, mobile, onOpenClient }) {
   const highlighted = appointments.slice().sort((a, b) => a.diasAtendimento - b.diasAtendimento).slice(0, 4);
 
   return (
@@ -1616,16 +1609,16 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
             <ActionTile title="Clientes" text={`${clients.length} clientes cadastrados`} />
             <ActionTile title="Atendimentos" text={`${appointments.length} atendimentos registrados`} />
             <ActionTile title="Pendencias" text={`${metrics.pendingFeedback} aguardando devolutiva`} />
-            <ActionTile title="Metodos" text="Radiestesia estruturada como primeiro bloco ativo" />
+            <ActionTile title="Fluxo principal" text="Cliente > prontuario > TGR > devolutiva." />
           </div>
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Metodos</div>
-          <button type="button" onClick={onOpenMethod} style={{ ...secondaryButtonStyle, width: "100%", justifyContent: "space-between", display: "flex", padding: "14px 16px" }}>
-            <span>Radiestesia</span>
-            <span style={{ color: THEME.muted }}>TGR, FRT e UNE</span>
-          </button>
+          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Como navegar</div>
+          <div style={{ display: "grid", gap: 12 }}>
+            <ActionTile title="Abrir atendimento" text="Entre em Clientes e escolha o prontuario que deseja trabalhar." />
+            <ActionTile title="Usar TGR" text="Dentro da cliente, abra o TGR e selecione o protocolo da analise." />
+          </div>
         </Panel>
       </section>
 
