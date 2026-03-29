@@ -1317,11 +1317,15 @@ function App() {
     if (!currentAnalysis) return;
 
     const updatedAnalysis = buildAnalysisDraft(currentAnalysis, updates);
-    await persistClientRecord({
+    const nextClientRecord = {
       ...applyAnalysisToClient(normalized, updatedAnalysis),
       analyses: normalized.analyses.map((analysis) => (analysis.id === updatedAnalysis.id ? updatedAnalysis : analysis)),
       currentAnalysisId: updatedAnalysis.id,
-    }, { keepMessage: !successMessage, successMessage });
+    };
+
+    setClients((current) => current.map((item) => (item.id === clientId ? nextClientRecord : item)));
+
+    await persistClientRecord(nextClientRecord, { keepMessage: !successMessage, successMessage });
 
     if (successMessage) setUiMessage(successMessage);
   }
