@@ -142,6 +142,14 @@ const CHAKRA_OPTIONS = [
 
 const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convivio", "Outro"];
 const GRAPHIC_CONTEXT_OPTIONS = ["Relacoes", "Prosperidade e Dinheiro", "Limpeza e Protecao Energetica"];
+const PENDING_ACTION_OPTIONS = ["Dar feedback", "Terminar de analisar", "Montar os graficos"];
+const CHECKLIST_OPTIONS = [
+  { key: "analiseBasica", label: "Analise basica geral" },
+  { key: "analiseTgr", label: "Analise TGR" },
+  { key: "montagemGraficos", label: "Montagem dos graficos" },
+  { key: "feedback", label: "Feedback" },
+  { key: "desmontagemGraficos", label: "Desmontagem dos graficos" },
+];
 
 const PROTOCOL_GRAPHIC_DEFAULTS = {
   relacoes: { group: "harmonia", context: "Relacoes" },
@@ -371,6 +379,14 @@ const emptyAnalysis = {
   statusPagamento: "Pendente",
   devolutivaFinal: "",
   proximosPassos: "",
+  pendingActions: [],
+  checklist: {
+    analiseBasica: false,
+    analiseTgr: false,
+    montagemGraficos: false,
+    feedback: false,
+    desmontagemGraficos: false,
+  },
   protocolForms: cloneProtocolForms(),
 };
 
@@ -471,6 +487,12 @@ function buildAnalysisDraft(source = {}, overrides = {}) {
     funcoes: cloneStructuredSection(overrides.funcoes || source.funcoes, emptyAnalysis.funcoes),
     campos: cloneStructuredSection(overrides.campos || source.campos, emptyAnalysis.campos),
     aura: cloneStructuredSection(overrides.aura || source.aura, emptyAnalysis.aura),
+    pendingActions: [...(overrides.pendingActions || source.pendingActions || [])],
+    checklist: {
+      ...emptyAnalysis.checklist,
+      ...(source.checklist || {}),
+      ...(overrides.checklist || {}),
+    },
     protocolForms: cloneProtocolForms(overrides.protocolForms || source.protocolForms),
   };
 }
@@ -502,6 +524,8 @@ function extractAnalysisFromClient(client = {}, overrides = {}) {
       statusPagamento: client.statusPagamento,
       devolutivaFinal: client.devolutivaFinal,
       proximosPassos: client.proximosPassos,
+      pendingActions: client.pendingActions,
+      checklist: client.checklist,
       protocolForms: client.protocolForms,
     },
     overrides
@@ -535,6 +559,11 @@ function applyAnalysisToClient(client, analysis) {
     statusPagamento: mergedAnalysis.statusPagamento,
     devolutivaFinal: mergedAnalysis.devolutivaFinal,
     proximosPassos: mergedAnalysis.proximosPassos,
+    pendingActions: [...(mergedAnalysis.pendingActions || [])],
+    checklist: {
+      ...emptyAnalysis.checklist,
+      ...(mergedAnalysis.checklist || {}),
+    },
     protocolForms: cloneProtocolForms(mergedAnalysis.protocolForms),
   };
 }
@@ -798,17 +827,23 @@ function getLatestAnalysis(client) {
     .sort((a, b) => String(b.dataInicio || "").localeCompare(String(a.dataInicio || "")))[0] || getAnalysisRecord(client);
 }
 
-function getNextAction(client) {
+  function getNextAction(client) {
   const analysis = getAnalysisRecord(client);
   const protocols = getValidProtocols(analysis?.protocolosUsados);
   const activeGraphics = getActiveGraphicsFromAnalysis(analysis);
+  const pendingActions = analysis?.pendingActions || [];
 
+  if (pendingActions.length) return pendingActions[0];
   if (!protocols.length) return "Escolher protocolo no TGR";
   if (!activeGraphics.length) return "Adicionar graficos aos protocolos";
   if (client?.status === "Aguardando devolutiva") return "Preparar devolutiva final";
   if (client?.status === "Concluido") return "Iniciar nova analise ou revisar historico";
   if (client?.statusPagamento !== "Pago") return "Conferir pagamento e acompanhar evolucao";
   return "Acompanhar graficos ativos e registrar conduta";
+}
+
+function formatPendingActions(actions = []) {
+  return actions.length ? actions.join(", ") : "Sem pendencias marcadas";
 }
 
 function buildAnalysisHistoryCards(client) {
@@ -1228,6 +1263,23 @@ function App() {
     setUiMessage(`Protocolo ${protocolName} salvo na analise.`);
   }
 
+  async function updateClientAnalysisFields(clientId, updates, successMessage = "") {
+    const currentClient = clients.find((item) => item.id === clientId);
+    if (!currentClient) return;
+    const normalized = normalizeClientRecord(currentClient);
+    const currentAnalysis = normalized.analyses.find((analysis) => analysis.id === normalized.currentAnalysisId);
+    if (!currentAnalysis) return;
+
+    const updatedAnalysis = buildAnalysisDraft(currentAnalysis, updates);
+    await persistClientRecord({
+      ...applyAnalysisToClient(normalized, updatedAnalysis),
+      analyses: normalized.analyses.map((analysis) => (analysis.id === updatedAnalysis.id ? updatedAnalysis : analysis)),
+      currentAnalysisId: updatedAnalysis.id,
+    }, { keepMessage: !successMessage, successMessage });
+
+    if (successMessage) setUiMessage(successMessage);
+  }
+
   function confirmUnsavedNavigation(destinationLabel = "continuar") {
     if (!(mainTab === "metodos" && hasUnsavedProtocolChanges)) return true;
     return window.confirm(`Ha alteracoes nao salvas no TGR. Deseja sair para ${destinationLabel} mesmo assim?`);
@@ -1245,6 +1297,10 @@ function App() {
     if (nextTab === "metodos") {
       openTgrWorkspace();
       return;
+    }
+    if (nextTab === "clientes") {
+      setSelectedId("");
+      setRelacoesContext(null);
     }
     setMainTab(nextTab);
   }
@@ -1435,6 +1491,7 @@ function App() {
           finalizeClient={finalizeClient}
           switchClientAnalysis={switchClientAnalysis}
           createNewAnalysis={createNewAnalysis}
+          updateClientAnalysisFields={updateClientAnalysisFields}
           saving={saving}
           activeMethod={activeMethod}
           setActiveMethod={setActiveMethod}
@@ -1485,6 +1542,7 @@ function MainContent(props) {
     finalizeClient,
     switchClientAnalysis,
     createNewAnalysis,
+    updateClientAnalysisFields,
     saving,
     activeMethod,
     setActiveMethod,
@@ -1518,6 +1576,11 @@ function MainContent(props) {
         metrics={metrics}
         mobile={mobile}
         onNewClient={startNewClient}
+        onOpenClientsList={() => {
+          setSelectedId("");
+          setRelacoesContext(null);
+          setMainTab("clientes");
+        }}
         onOpenClient={(id) => {
           setSelectedId(id);
           setMainTab("clientes");
@@ -1543,6 +1606,7 @@ function MainContent(props) {
           finalizeClient={finalizeClient}
           switchClientAnalysis={switchClientAnalysis}
           createNewAnalysis={createNewAnalysis}
+          updateClientAnalysisFields={updateClientAnalysisFields}
           saving={saving}
           mobile={mobile}
           clientDetailOpen={clientDetailOpen}
@@ -1630,25 +1694,18 @@ function TopMetrics({ metrics, mobile }) {
   );
 }
 
-function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, onNewClient }) {
-  const highlighted = appointments.slice().sort((a, b) => a.diasAtendimento - b.diasAtendimento).slice(0, 4);
-  const latestClients = clients
+function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, onNewClient, onOpenClientsList }) {
+  const pendingClients = clients
+    .filter((client) => (getAnalysisRecord(client)?.pendingActions || []).length > 0)
     .slice()
-    .sort((a, b) => String(getLatestAnalysis(b)?.dataInicio || "").localeCompare(String(getLatestAnalysis(a)?.dataInicio || "")))
-    .slice(0, 4);
-  const actionQueue = clients
-    .filter((client) => client.status === "Aguardando devolutiva" || client.status === "Em atendimento" || client.statusPagamento !== "Pago")
+    .sort((a, b) => String(getLatestAnalysis(b)?.dataInicio || "").localeCompare(String(getLatestAnalysis(a)?.dataInicio || "")));
+  const allClients = clients
     .slice()
-    .sort((a, b) => {
-      const statusWeight = (item) => (item.status === "Aguardando devolutiva" ? 0 : item.status === "Em atendimento" ? 1 : 2);
-      return statusWeight(a) - statusWeight(b);
-    })
-    .slice(0, 5);
-  const currentClient = clients.find((client) => client.status === "Em atendimento") || latestClients[0] || null;
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
-      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18 }}>
+      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr", gap: 18 }}>
         <Panel>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
             <div>
@@ -1657,63 +1714,47 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
             </div>
             <button type="button" onClick={onNewClient} style={primaryButtonStyle}>Novo cliente</button>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
-            <CommandCardButton title="Clientes" text={`${clients.length} prontuarios cadastrados`} onClick={() => onOpenClient(latestClients[0]?.id || currentClient?.id || "")} disabled={!clients.length} />
-            <CommandCardButton title="Retomar ultima analise" text={currentClient ? `${currentClient.nome} em foco` : "Nenhuma analise em andamento"} onClick={() => currentClient && onOpenClient(currentClient.id)} primary disabled={!currentClient} />
-            <CommandCardButton title="Pendencias do dia" text={`${metrics.pendingFeedback} aguardando devolutiva e ${metrics.pendingPayment} com financeiro pendente`} onClick={() => actionQueue[0] && onOpenClient(actionQueue[0].id)} disabled={!actionQueue.length} />
-          </div>
-        </Panel>
-
-        <Panel>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Fila de agora</div>
-          <div style={{ display: "grid", gap: 12 }}>
-            {actionQueue.length ? actionQueue.map((client) => (
-              <button key={client.id} type="button" onClick={() => onOpenClient(client.id)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                  <div style={{ fontWeight: 800 }}>{client.nome}</div>
-                  <StatusBadge status={client.status} />
-                </div>
-                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>{getNextAction(client)}</div>
-              </button>
-            )) : <ActionTile title="Sem pendencias imediatas" text="O fluxo principal esta livre para iniciar novos atendimentos." />}
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(2, 1fr)", gap: 12 }}>
+            <CommandCardButton title="Todos os clientes" text={`${clients.length} prontuarios cadastrados`} onClick={onOpenClientsList} primary disabled={!clients.length} />
+            <CommandCardButton title="Pendencias" text={pendingClients.length ? `${pendingClients.length} cliente(s) com acao marcada manualmente` : "Nenhuma pendencia manual marcada"} onClick={() => pendingClients[0] && onOpenClient(pendingClients[0].id)} disabled={!pendingClients.length} />
           </div>
         </Panel>
       </section>
 
       <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 18 }}>
         <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Atendimentos em destaque</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Todos os clientes</div>
           <div style={{ display: "grid", gap: 12 }}>
-            {highlighted.length ? highlighted.map((appointment) => (
-              <button key={appointment.id} type="button" onClick={() => onOpenClient(appointment.clientId)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
+            {allClients.length ? allClients.map((client) => (
+              <button key={client.id} type="button" onClick={() => onOpenClient(client.id)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                   <div>
-                    <div style={{ fontWeight: 800 }}>{appointment.title}</div>
-                    <div style={{ color: THEME.muted, fontSize: 13 }}>{(clients.find((item) => item.id === appointment.clientId)?.protocolosUsados || []).join(", ") || findProtocolName(appointment.protocolSlug)} - TGR</div>
+                    <div style={{ fontWeight: 800 }}>{client.nome}</div>
+                    <div style={{ color: THEME.muted, fontSize: 13 }}>{formatProtocols(client)} - TGR</div>
                   </div>
-                  <StatusBadge status={appointment.status} />
+                  <StatusBadge status={client.status} />
                 </div>
-                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 10 }}>{appointment.diasAtendimento} dias desde o inicio</div>
+                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 10 }}>{getNextAction(client)}</div>
               </button>
-            )) : <div style={{ color: THEME.muted }}>Nenhum atendimento em destaque.</div>}
+            )) : <div style={{ color: THEME.muted }}>Nenhum cliente cadastrado.</div>}
           </div>
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Ultimos prontuarios</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Pendencias</div>
           <div style={{ display: "grid", gap: 12 }}>
-            {latestClients.length ? latestClients.map((client) => (
+            {pendingClients.length ? pendingClients.map((client) => (
               <button key={client.id} type="button" onClick={() => onOpenClient(client.id)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                   <div style={{ fontWeight: 800 }}>{client.nome}</div>
                   <StatusBadge status={client.status} />
                 </div>
-                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>{formatProtocols(client)}</div>
+                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>{formatPendingActions(getAnalysisRecord(client)?.pendingActions || [])}</div>
                 <div style={{ color: THEME.muted, fontSize: 12, marginTop: 8 }}>
                   Ultima analise: {getLatestAnalysis(client)?.dataInicio ? formatFullDate(getLatestAnalysis(client).dataInicio) : "Sem data"}
                 </div>
               </button>
-            )) : <div style={{ color: THEME.muted }}>Nenhum prontuario recente.</div>}
+            )) : <div style={{ color: THEME.muted }}>Nenhuma pendencia marcada manualmente.</div>}
           </div>
         </Panel>
       </section>
@@ -1721,7 +1762,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, onBackToList }) {
+function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, updateClientAnalysisFields, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, onBackToList }) {
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
@@ -1737,6 +1778,24 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
         />
         <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
         <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
+        <ClientChecklistPanel
+          client={selectedClient}
+          onToggleChecklist={(key, checked) =>
+            updateClientAnalysisFields(selectedClient.id, {
+              checklist: {
+                ...(getAnalysisRecord(selectedClient)?.checklist || emptyAnalysis.checklist),
+                [key]: checked,
+              },
+            }, "Checklist atualizada.")
+          }
+          onTogglePendingAction={(action) => {
+            const currentActions = getAnalysisRecord(selectedClient)?.pendingActions || [];
+            const nextActions = currentActions.includes(action)
+              ? currentActions.filter((item) => item !== action)
+              : [...currentActions, action];
+            return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "Pendencias atualizadas.");
+          }}
+        />
         <FinalFeedback client={selectedClient} />
       </section>
     );
@@ -2768,6 +2827,44 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
         </div>
       </Panel>
     </div>
+  );
+}
+
+function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction }) {
+  const analysis = getAnalysisRecord(client);
+  const checklist = analysis?.checklist || emptyAnalysis.checklist;
+  const pendingActions = analysis?.pendingActions || [];
+
+  return (
+    <Panel>
+      <div style={{ display: "grid", gap: 18 }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Checklist do atendimento</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque o que ja foi feito nesta analise e selecione apenas as pendencias que voce quer ver no dashboard.</div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+          {CHECKLIST_OPTIONS.map((item) => (
+            <label key={item.key} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "13px 14px", background: checklist[item.key] ? "#f7fbf4" : "#fffdfa", display: "flex", gap: 10, alignItems: "center", cursor: "pointer" }}>
+              <input type="checkbox" checked={Boolean(checklist[item.key])} onChange={(event) => onToggleChecklist(item.key, event.target.checked)} />
+              <span style={{ fontWeight: 700 }}>{item.label}</span>
+            </label>
+          ))}
+        </div>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ ...labelStyle, marginBottom: 0 }}>Pendencias visiveis no dashboard</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {PENDING_ACTION_OPTIONS.map((action) => (
+              <PillButton key={action} active={pendingActions.includes(action)} onClick={() => onTogglePendingAction(action)} label={action} />
+            ))}
+          </div>
+          <div style={{ color: THEME.muted, fontSize: 13 }}>
+            {pendingActions.length ? `Pendencias marcadas: ${pendingActions.join(", ")}` : "Nenhuma pendencia marcada para aparecer no dashboard."}
+          </div>
+        </div>
+      </div>
+    </Panel>
   );
 }
 

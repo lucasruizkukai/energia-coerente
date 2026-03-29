@@ -28,6 +28,14 @@ const ANALYSIS_DEFAULTS = {
   statusPagamento: "Pendente",
   devolutivaFinal: "",
   proximosPassos: "",
+  pendingActions: [],
+  checklist: {
+    analiseBasica: false,
+    analiseTgr: false,
+    montagemGraficos: false,
+    feedback: false,
+    desmontagemGraficos: false,
+  },
   protocolForms: {
     relacoes: {},
     "limpeza-protecao": {},
@@ -226,6 +234,12 @@ function buildAnalysisFromSource(source = {}, overrides = {}) {
     funcoes: { ...(source.funcoes || {}), ...(overrides.funcoes || {}) },
     campos: { ...(source.campos || {}), ...(overrides.campos || {}) },
     aura: { ...(source.aura || {}), ...(overrides.aura || {}) },
+    pendingActions: [...(overrides.pendingActions || source.pendingActions || [])],
+    checklist: {
+      ...ANALYSIS_DEFAULTS.checklist,
+      ...(source.checklist || {}),
+      ...(overrides.checklist || {}),
+    },
     protocolForms: {
       relacoes: { ...(source.protocolForms?.relacoes || {}), ...(overrides.protocolForms?.relacoes || {}) },
       "limpeza-protecao": { ...(source.protocolForms?.["limpeza-protecao"] || {}), ...(overrides.protocolForms?.["limpeza-protecao"] || {}) },
@@ -261,6 +275,8 @@ function extractAnalysisFromClient(client = {}, overrides = {}) {
       statusPagamento: client.statusPagamento,
       devolutivaFinal: client.devolutivaFinal,
       proximosPassos: client.proximosPassos,
+      pendingActions: client.pendingActions,
+      checklist: client.checklist,
       protocolForms: client.protocolForms,
     },
     overrides
@@ -314,6 +330,8 @@ function normalizeClientAnalyses(client = {}) {
     statusPagamento: activeAnalysis.statusPagamento,
     devolutivaFinal: activeAnalysis.devolutivaFinal,
     proximosPassos: activeAnalysis.proximosPassos,
+    pendingActions: activeAnalysis.pendingActions,
+    checklist: activeAnalysis.checklist,
   };
 }
 
