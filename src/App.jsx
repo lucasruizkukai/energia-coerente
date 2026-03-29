@@ -2981,10 +2981,42 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
           {CHECKLIST_OPTIONS.map((item) => (
-            <label key={item.key} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "13px 14px", background: checklist[item.key] ? "#f7fbf4" : "#fffdfa", display: "flex", gap: 10, alignItems: "center", cursor: "pointer" }}>
-              <input type="checkbox" checked={Boolean(checklist[item.key])} onChange={(event) => onToggleChecklist(item.key, event.target.checked)} />
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => onToggleChecklist(item.key, !Boolean(checklist[item.key]))}
+              style={{
+                border: `1px solid ${checklist[item.key] ? THEME.green : THEME.line}`,
+                borderRadius: 16,
+                padding: "13px 14px",
+                background: checklist[item.key] ? "#f7fbf4" : "#fffdfa",
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: 6,
+                  border: `1px solid ${checklist[item.key] ? THEME.green : THEME.line}`,
+                  background: checklist[item.key] ? THEME.greenSoft : "#fff",
+                  display: "inline-grid",
+                  placeItems: "center",
+                  color: THEME.green,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                {checklist[item.key] ? "✓" : ""}
+              </span>
               <span style={{ fontWeight: 700 }}>{item.label}</span>
-            </label>
+            </button>
           ))}
         </div>
 
