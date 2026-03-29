@@ -1047,6 +1047,17 @@ function App() {
     setMainTab("clientes");
   }
 
+  async function createClientAndOpenTgr(payload) {
+    const record = await persistClientRecord(payload, {
+      resetDraft: true,
+      successMessage: "Cliente salvo. TGR aberto.",
+    });
+
+    if (!record) return;
+
+    openProtocolForClient(record, "Relacoes");
+  }
+
   async function toggleClientProtocol(clientId, protocolName) {
     const currentClient = clients.find((item) => item.id === clientId);
     if (!currentClient) return;
@@ -1288,6 +1299,7 @@ function App() {
           setStatusFilter={setStatusFilter}
           setSelectedId={setSelectedId}
           saveClient={saveClient}
+          saveClientAndOpenTgr={createClientAndOpenTgr}
           removeClient={removeClient}
           finalizeClient={finalizeClient}
           switchClientAnalysis={switchClientAnalysis}
@@ -1335,6 +1347,7 @@ function MainContent(props) {
     setStatusFilter,
     setSelectedId,
     saveClient,
+    saveClientAndOpenTgr,
     removeClient,
     finalizeClient,
     switchClientAnalysis,
@@ -1395,6 +1408,7 @@ function MainContent(props) {
           setStatusFilter={setStatusFilter}
           setSelectedId={setSelectedId}
           saveClient={saveClient}
+          saveClientAndOpenTgr={saveClientAndOpenTgr}
           removeClient={removeClient}
           finalizeClient={finalizeClient}
           switchClientAnalysis={switchClientAnalysis}
@@ -1531,7 +1545,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, onBackToList }) {
+function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, onBackToList }) {
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
@@ -1563,7 +1577,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
             <button type="button" onClick={onBackToList} style={secondaryButtonStyle}>Voltar para clientes</button>
           </div>
         </Panel>
-        <ClientRecord client={draftClient} onSave={saveClient} mobile={mobile} saving={saving} />
+        <ClientRecord client={draftClient} onSave={saveClient} onSaveAndOpenTgr={saveClientAndOpenTgr} mobile={mobile} saving={saving} />
       </section>
     );
   }
@@ -2472,7 +2486,7 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
   );
 }
 
-function ClientRecord({ client, onSave, mobile, saving = false }) {
+function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false }) {
   const [form, setForm] = useState(client);
   const [formError, setFormError] = useState("");
 
@@ -2504,6 +2518,14 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
     onSave({ ...form, id: form.id || generateId() });
   }
 
+  function handleSaveAndOpenTgr() {
+    if (!form.nome.trim()) return setFormError("Informe o nome da cliente para salvar o atendimento.");
+    if (!form.whatsapp.trim()) return setFormError("Informe o WhatsApp principal para manter o contato organizado.");
+    if (!form.dataInicio) return setFormError("Defina a data de inicio para acompanhar a duracao do atendimento.");
+    setFormError("");
+    onSaveAndOpenTgr?.({ ...form, id: form.id || generateId() });
+  }
+
   function applyGeneratedField(field, generator) {
     const generated = generator(form);
     setField(field, appendGeneratedText(form[field], generated));
@@ -2514,7 +2536,14 @@ function ClientRecord({ client, onSave, mobile, saving = false }) {
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ fontSize: 18, fontWeight: 800 }}>Ficha do atendimento</div>
-          <button type="submit" disabled={saving} style={{ ...primaryButtonStyle, opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>{saving ? "Salvando..." : "Salvar"}</button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {onSaveAndOpenTgr ? (
+              <button type="button" onClick={handleSaveAndOpenTgr} disabled={saving} style={{ ...secondaryButtonStyle, opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>
+                {saving ? "Salvando..." : "Salvar e abrir TGR"}
+              </button>
+            ) : null}
+            <button type="submit" disabled={saving} style={{ ...primaryButtonStyle, opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>{saving ? "Salvando..." : "Salvar"}</button>
+          </div>
         </div>
         {formError ? <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff5f1", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", fontWeight: 700 }}>{formError}</div> : null}
         <SectionTitle title="Cliente e metodo" />
