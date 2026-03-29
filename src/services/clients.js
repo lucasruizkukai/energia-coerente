@@ -85,10 +85,15 @@ export async function upsertClient(client, currentClients = []) {
   const { data, error } = await supabase.from(TABLE_NAME).upsert(payload).select().single();
   if (error) throw error;
   const savedClient = mapRowToClient(data);
-  const exists = currentClients.some((item) => item.id === savedClient.id);
-  const nextClients = exists ? currentClients.map((item) => (item.id === savedClient.id ? savedClient : item)) : [savedClient, ...currentClients];
+  const mergedSavedClient = normalizeClientAnalyses({
+    ...savedClient,
+    ...client,
+    id: savedClient.id,
+  });
+  const exists = currentClients.some((item) => item.id === mergedSavedClient.id);
+  const nextClients = exists ? currentClients.map((item) => (item.id === mergedSavedClient.id ? mergedSavedClient : item)) : [mergedSavedClient, ...currentClients];
   writeLocalClients(nextClients);
-  return { mode: "supabase", data: savedClient, all: nextClients };
+  return { mode: "supabase", data: mergedSavedClient, all: nextClients };
 }
 
 export async function deleteClient(id, currentClients = []) {

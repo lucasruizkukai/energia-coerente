@@ -2885,12 +2885,6 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
               Use esta lista para localizar a analise pela data. Quando o prontuario tiver mais atendimentos, eles aparecerao aqui.
             </div>
           </div>
-          <div style={{ ...labelStyle, marginBottom: 0 }}>Protocolos da analise</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {validProtocols.length ? validProtocols.map((protocol) => (
-              <PillButton key={protocol} active onClick={() => onOpenProtocol(protocol)} label={protocol} />
-            )) : <span style={{ color: THEME.muted, fontSize: 14 }}>Nenhum protocolo selecionado ainda.</span>}
-          </div>
           {activeGraphics.length ? (
             <>
               <div style={{ ...labelStyle, marginBottom: 0 }}>Graficos ativos nesta analise</div>
