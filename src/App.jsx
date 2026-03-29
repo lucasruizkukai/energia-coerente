@@ -2776,26 +2776,27 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
   const activeGraphics = getActiveGraphicsFromAnalysis(currentAnalysis);
   const latestAnalysis = getLatestAnalysis(client);
   const nextAction = getNextAction(client);
+  const canFinalize = client.status !== "Concluido";
 
   return (
     <Panel>
-      <div style={{ display: "grid", gap: 14 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-          <div>
-            {onBack ? <button type="button" onClick={onBack} style={{ ...secondaryButtonStyle, marginBottom: 12 }}>Voltar para clientes</button> : null}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 10 }}>
-              <div style={{ fontSize: 24, fontWeight: 800 }}>{client.nome}</div>
+      <div style={{ display: "grid", gap: 18 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 8 }}>
+            {onBack ? <button type="button" onClick={onBack} style={{ ...secondaryButtonStyle, justifySelf: "start" }}>Voltar para clientes</button> : null}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+              <div style={{ fontSize: 28, fontWeight: 800 }}>{client.nome}</div>
               <StatusBadge status={client.status} />
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14, lineHeight: 1.6 }}>
               <span>{client.whatsapp || "Contato nao informado"}</span>
               <span>{client.email || "Sem email"}</span>
-              <span>TGR - {formatProtocols(client)}</span>
+              <span>{validProtocols.length ? validProtocols.join(", ") : "Sem protocolo ativo"}</span>
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button type="button" onClick={() => onNewAnalysis(client.id)} style={secondaryButtonStyle}>Nova analise</button>
-            <button type="button" onClick={() => onFinalize(client.id)} disabled={client.status === "Concluido"} style={{ ...secondaryButtonStyle, opacity: client.status === "Concluido" ? 0.65 : 1, cursor: client.status === "Concluido" ? "default" : "pointer" }}>
+            <button type="button" onClick={() => onFinalize(client.id)} disabled={!canFinalize} style={{ ...secondaryButtonStyle, opacity: canFinalize ? 1 : 0.65, cursor: canFinalize ? "pointer" : "default" }}>
               Finalizar analise
             </button>
             <details style={{ position: "relative" }}>
@@ -2807,23 +2808,15 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-          <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum protocolo"} />
-          <InfoCard label="Status" value={client.status} />
-          <InfoCard label="Graficos ativos" value={activeGraphics.length ? `${activeGraphics.length} em uso` : "Nenhum grafico"} />
-          <InfoCard label="Última análise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
-          <InfoCard label="Próxima ação" value={nextAction} />
-        </div>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, background: "#fffdfa", padding: "16px 18px", display: "grid", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+            <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum protocolo"} />
+            <InfoCard label="Status" value={client.status} />
+            <InfoCard label="Ultima analise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
+            <InfoCard label="Proxima acao" value={nextAction} />
+          </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-          <CommandCardButton title="Abrir TGR" text="Entrar no protocolo da analise atual." onClick={() => onOpenProtocol(validProtocols[0] || "")} primary />
-          <CommandCardButton title="Nova analise" text="Criar uma nova data sem perder o historico." onClick={() => onNewAnalysis(client.id)} />
-          <CommandCardButton title="Finalizar analise" text="Encerrar a analise atual quando concluir a etapa." onClick={() => onFinalize(client.id)} disabled={client.status === "Concluido"} />
-          <CommandCardButton title="Ver devolutiva" text="Abrir a devolutiva guiada desta cliente." onClick={onOpenFeedback} />
-        </div>
-
-        <div style={{ display: "grid", gap: 8 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 280px) 1fr", gap: 12, alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 300px) 1fr", gap: 12, alignItems: "end" }}>
             <Field label="Atendimentos por data">
               <select value={client.currentAnalysisId || attendanceDateOptions[0]?.value || ""} onChange={(event) => onSelectAnalysis(client.id, event.target.value)} style={inputStyle}>
                 {attendanceDateOptions.map((item) => (
@@ -2831,23 +2824,30 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
                 ))}
               </select>
             </Field>
-            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
-              Use esta lista para localizar a analise pela data. Quando o prontuario tiver mais atendimentos, eles aparecerao aqui.
+            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.55 }}>
+              Selecione a data para abrir outra analise deste prontuario.
             </div>
           </div>
-          {activeGraphics.length ? (
-            <>
-              <div style={{ ...labelStyle, marginBottom: 0 }}>Graficos ativos nesta analise</div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {activeGraphics.map((item) => (
-                  <span key={`${item.protocol}-${item.nome}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 999, padding: "8px 12px", background: "#fffdfa", fontSize: 12, fontWeight: 700, color: THEME.text }}>
-                    {item.nome} · {item.protocol}
-                  </span>
-                ))}
-              </div>
-            </>
-          ) : null}
         </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+          <CommandCardButton title="Abrir TGR" text="Entrar no protocolo da analise atual." onClick={() => onOpenProtocol(validProtocols[0] || "")} primary />
+          <CommandCardButton title="Ver devolutiva" text="Abrir a devolutiva guiada desta cliente." onClick={onOpenFeedback} />
+          <CommandCardButton title="Finalizar analise" text="Encerrar a analise atual quando concluir a etapa." onClick={() => onFinalize(client.id)} disabled={!canFinalize} />
+        </div>
+
+        {activeGraphics.length ? (
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Graficos ativos nesta analise</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {activeGraphics.map((item) => (
+                <span key={`${item.protocol}-${item.nome}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 999, padding: "9px 13px", background: "#fffdfa", fontSize: 13, fontWeight: 800, color: THEME.text }}>
+                  {item.nome} - {item.protocol}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </Panel>
   );
