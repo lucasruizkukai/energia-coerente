@@ -10,7 +10,7 @@ const BRAND = {
 };
 
 const MAIN_TABS = [
-  { key: "dashboard", label: "Início" },
+  { key: "dashboard", label: "InÃ­cio" },
   { key: "clientes", label: "Clientes" },
   { key: "atendimentos", label: "Atendimentos" },
   { key: "financeiro", label: "Financeiro" },
@@ -21,29 +21,29 @@ const METHOD_TABS = [
 ];
 
 const METHOD_CATALOG = [
-  { slug: "aka", nome: "AKA", resumo: "Método salvo para futura estruturação." },
+  { slug: "aka", nome: "AKA", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
   { slug: "radiestesia", nome: "Radiestesia", resumo: "Abriga TGR, FRT e UNE." },
-  { slug: "pendulo-hebreu", nome: "Pêndulo Hebreu", resumo: "Método salvo para futura estruturação." },
-  { slug: "interface-venusiana", nome: "Interface Venusiana", resumo: "Método salvo para futura estruturação." },
-  { slug: "alquimia-das-rosas", nome: "Alquimia das Rosas", resumo: "Método salvo para futura estruturação." },
-  { slug: "ascensao-estelar", nome: "Ascensão Estelar", resumo: "Método salvo para futura estruturação." },
-  { slug: "circulo-reconectivo", nome: "Círculo Reconectivo", resumo: "Método salvo para futura estruturação." },
-  { slug: "money-reiki", nome: "Money Reiki", resumo: "Método salvo para futura estruturação." },
+  { slug: "pendulo-hebreu", nome: "PÃªndulo Hebreu", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
+  { slug: "interface-venusiana", nome: "Interface Venusiana", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
+  { slug: "alquimia-das-rosas", nome: "Alquimia das Rosas", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
+  { slug: "ascensao-estelar", nome: "AscensÃ£o Estelar", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
+  { slug: "circulo-reconectivo", nome: "CÃ­rculo Reconectivo", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
+  { slug: "money-reiki", nome: "Money Reiki", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
 ];
 
 const RADIOESTHESIA_METHODS = [
-  { slug: "tgr", nome: "TGR", resumo: "Protocolos e gráficos." },
-  { slug: "frt", nome: "FRT", resumo: "Método salvo para futura estruturação." },
-  { slug: "une", nome: "UNE", resumo: "Método salvo para futura estruturação." },
+  { slug: "tgr", nome: "TGR", resumo: "Protocolos e grÃ¡ficos." },
+  { slug: "frt", nome: "FRT", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
+  { slug: "une", nome: "UNE", resumo: "MÃ©todo salvo para futura estruturaÃ§Ã£o." },
 ];
 
-const STATUS_OPTIONS = ["Novo contato", "Aguardando início", "Em atendimento", "Aguardando devolutiva", "Concluído"];
+const STATUS_OPTIONS = ["Novo contato", "Aguardando inÃ­cio", "Em atendimento", "Aguardando devolutiva", "ConcluÃ­do"];
 const PAYMENT_OPTIONS = ["Pendente", "Parcial", "Pago"];
 
 const TGR_PROTOCOLS = [
-  { slug: "relacoes", nome: "Relações", resumo: "Leitura profunda de vínculos, interferências e padrões relacionais." },
-  { slug: "limpeza-protecao", nome: "Limpeza e Proteção", resumo: "Identificação de sobrecargas, interferências e camadas de proteção." },
-  { slug: "prosperidade", nome: "Prosperidade", resumo: "Mapeamento de bloqueios e organização de campos ligados a fluxo e realização." },
+  { slug: "relacoes", nome: "RelaÃ§Ãµes", resumo: "Leitura profunda de vÃ­nculos, interferÃªncias e padrÃµes relacionais." },
+  { slug: "limpeza-protecao", nome: "Limpeza e ProteÃ§Ã£o", resumo: "IdentificaÃ§Ã£o de sobrecargas, interferÃªncias e camadas de proteÃ§Ã£o." },
+  { slug: "prosperidade", nome: "Prosperidade", resumo: "Mapeamento de bloqueios e organizaÃ§Ã£o de campos ligados a fluxo e realizaÃ§Ã£o." },
 ];
 
 const PROTOCOL_OPTIONS = TGR_PROTOCOLS.map((item) => item.nome);
@@ -80,7 +80,7 @@ const TGR_GRAPHIC_GROUPS = [
   },
   {
     slug: "protecao",
-    nome: "Proteção",
+    nome: "ProteÃ§Ã£o",
     graficos: ["9 Circulos", "7 Circulos / Iave", "Psicoprotetor", "Tetragrammaton"],
   },
   {
@@ -89,13 +89,13 @@ const TGR_GRAPHIC_GROUPS = [
     graficos: [
       "Abertura",
       "Aceitar e Soltar",
-      "Amor ao Próximo",
+      "Amor ao PrÃ³ximo",
       "Amor Universal",
       "Confiar com Alegria",
       "Coragem",
-      "Dependência e Vícios",
-      "Desilusão Amorosa",
-      "Força de Vontade",
+      "DependÃªncia e VÃ­cios",
+      "DesilusÃ£o Amorosa",
+      "ForÃ§a de Vontade",
       "Mundo Interior",
       "Positividade",
       "Pureza Interior",
@@ -108,17 +108,17 @@ const TGR_GRAPHIC_GROUPS = [
     graficos: [
       "Archine",
       "Captador de Energia Solar",
-      "Cruz de São Mauro",
+      "Cruz de SÃ£o Mauro",
       "Magnetismo Vital e Curativo",
       "Relaxamento",
-      "Forças Universais",
+      "ForÃ§as Universais",
     ],
   },
   {
     slug: "limpeza",
     nome: "Limpeza",
     graficos: [
-      "Corte Energético",
+      "Corte EnergÃ©tico",
       "Cruz Ansata",
       "Guedes II",
       "Keiti",
@@ -131,24 +131,24 @@ const TGR_GRAPHIC_GROUPS = [
 ];
 
 const CHAKRA_OPTIONS = [
-  "Coronário",
+  "CoronÃ¡rio",
   "Frontal",
-  "Laríngeo",
-  "Cardíaco",
+  "LarÃ­ngeo",
+  "CardÃ­aco",
   "Plexo Solar",
   "Sacral",
-  "Básico",
+  "BÃ¡sico",
 ];
 
-const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "Convívio", "Outro"];
-const GRAPHIC_CONTEXT_OPTIONS = ["Relações", "Prosperidade e Dinheiro", "Limpeza e Proteção Energética"];
-const PENDING_ACTION_OPTIONS = ["Dar feedback", "Terminar de analisar", "Montar os gráficos"];
+const RELATION_TYPES = ["Amorosa", "Familiar", "Profissional", "Amizade", "ConvÃ­vio", "Outro"];
+const GRAPHIC_CONTEXT_OPTIONS = ["RelaÃ§Ãµes", "Prosperidade e Dinheiro", "Limpeza e ProteÃ§Ã£o EnergÃ©tica"];
+const PENDING_ACTION_OPTIONS = ["Dar feedback", "Terminar de analisar", "Montar os grÃ¡ficos"];
 const CHECKLIST_OPTIONS = [
-  { key: "analiseBasica", label: "Análise básica geral" },
-  { key: "analiseTgr", label: "Análise TGR" },
-  { key: "montagemGraficos", label: "Montagem dos gráficos" },
+  { key: "analiseBasica", label: "AnÃ¡lise bÃ¡sica geral" },
+  { key: "analiseTgr", label: "AnÃ¡lise TGR" },
+  { key: "montagemGraficos", label: "Montagem dos grÃ¡ficos" },
   { key: "feedback", label: "Feedback" },
-  { key: "desmontagemGraficos", label: "Desmontagem dos gráficos" },
+  { key: "desmontagemGraficos", label: "Desmontagem dos grÃ¡ficos" },
 ];
 
 const CLIENT_DETAIL_TABS = [
@@ -159,13 +159,13 @@ const CLIENT_DETAIL_TABS = [
 
 const TGR_FLOW_STAGES = [
   { key: "leitura", label: "Leitura" },
-  { key: "graficos", label: "Gráficos" },
-  { key: "sintese", label: "Síntese" },
+  { key: "graficos", label: "GrÃ¡ficos" },
+  { key: "sintese", label: "SÃ­ntese" },
 ];
 
 const PROTOCOL_GRAPHIC_DEFAULTS = {
-  relacoes: { group: "harmonia", context: "Relações" },
-  "limpeza-protecao": { group: "limpeza", context: "Limpeza e Proteção Energética" },
+  relacoes: { group: "harmonia", context: "RelaÃ§Ãµes" },
+  "limpeza-protecao": { group: "limpeza", context: "Limpeza e ProteÃ§Ã£o EnergÃ©tica" },
   prosperidade: { group: "despertar", context: "Prosperidade e Dinheiro" },
 };
 const emptyRelacoesForm = {
@@ -415,7 +415,7 @@ const sampleClients = [
     whatsapp: "(11) 98765-4321",
     email: "marina@email.com",
     dataInicio: "2026-03-10",
-    protocolosUsados: ["Relações", "Limpeza e Proteção"],
+    protocolosUsados: ["RelaÃ§Ãµes", "Limpeza e ProteÃ§Ã£o"],
     queixaPrincipal: "Cansaco constante e sensacao de travamento emocional.",
     objetivo: "Retomar clareza, vitalidade e estabilidade nas relacoes.",
     diagnosticoEnergetico: "Sobrecarga no campo emocional e dispersao de energia.",
@@ -436,7 +436,7 @@ const sampleClients = [
     nome: "Renata Araujo",
     whatsapp: "(21) 99888-1122",
     dataInicio: "2026-03-16",
-    protocolosUsados: ["Relações"],
+    protocolosUsados: ["RelaÃ§Ãµes"],
     queixaPrincipal: "Ansiedade intensa antes de reunioes importantes.",
     objetivo: "Regular a resposta emocional e sustentar presenca.",
     diagnosticoEnergetico: "Ativacao excessiva do mental e pouca ancoragem corporal.",
@@ -444,7 +444,7 @@ const sampleClients = [
     areasAfetadas: "Mental e emocional.",
     intervencoesRealizadas: "Ajuste inicial e ancoragem energetica de curto prazo.",
     observacoes: "Aguardar retorno apos os primeiros 3 dias.",
-    status: "Aguardando início",
+    status: "Aguardando inÃ­cio",
     evolucao: "",
     valor: "180",
     statusPagamento: "Pendente",
@@ -663,7 +663,7 @@ function buildAttendanceDateOptions(client) {
     .sort((a, b) => String(b.dataInicio || "").localeCompare(String(a.dataInicio || "")))
     .map((analysis) => ({
       value: analysis.id,
-      label: `${formatFullDate(analysis.dataInicio)}${analysis.id === client.currentAnalysisId ? " · Análise atual" : ""}${analysis.status ? ` · ${analysis.status}` : ""}`,
+      label: `${formatFullDate(analysis.dataInicio)}${analysis.id === client.currentAnalysisId ? " Â· AnÃ¡lise atual" : ""}${analysis.status ? ` Â· ${analysis.status}` : ""}`,
     }));
 }
 
@@ -680,10 +680,10 @@ function getDaysSinceStart(startDate) {
 function getStatusTone(status) {
   const tones = {
     "Novo contato": { bg: "#f1ece4", color: "#6f5846" },
-    "Aguardando início": { bg: "#efe4d2", color: "#8b5e3d" },
+    "Aguardando inÃ­cio": { bg: "#efe4d2", color: "#8b5e3d" },
     "Em atendimento": { bg: "#dde4d6", color: "#536549" },
     "Aguardando devolutiva": { bg: "#ead6ca", color: "#8b5438" },
-    Concluído: { bg: "#e7efe2", color: "#4e6446" },
+    ConcluÃ­do: { bg: "#e7efe2", color: "#4e6446" },
   };
   return tones[status] || { bg: THEME.beige, color: THEME.text };
 }
@@ -691,11 +691,11 @@ function getStatusTone(status) {
 function buildFinalSummary(client) {
   const parts = [
     client.devolutivaFinal,
-    client.diagnosticoEnergetico ? `Diagnóstico observado: ${client.diagnosticoEnergetico}.` : "",
+    client.diagnosticoEnergetico ? `DiagnÃ³stico observado: ${client.diagnosticoEnergetico}.` : "",
     client.causasIdentificadas ? `Causas identificadas: ${client.causasIdentificadas}.` : "",
-    client.intervencoesRealizadas ? `Intervenções realizadas: ${client.intervencoesRealizadas}.` : "",
-    client.evolucao ? `Evolução percebida: ${client.evolucao}.` : "",
-    client.proximosPassos ? `Orientação final: ${client.proximosPassos}.` : "",
+    client.intervencoesRealizadas ? `IntervenÃ§Ãµes realizadas: ${client.intervencoesRealizadas}.` : "",
+    client.evolucao ? `EvoluÃ§Ã£o percebida: ${client.evolucao}.` : "",
+    client.proximosPassos ? `OrientaÃ§Ã£o final: ${client.proximosPassos}.` : "",
   ].filter(Boolean);
   return parts.length ? parts.join(" ") : "Ainda sem devolutiva registrada.";
 }
@@ -723,36 +723,36 @@ function buildInitialReadingLines(client) {
 
   lines.push(
     ...formatFilledEntries([
-      ["Corpo átmico", client.corposSutis?.atmico],
-      ["Corpo búdico", client.corposSutis?.budico],
+      ["Corpo Ã¡tmico", client.corposSutis?.atmico],
+      ["Corpo bÃºdico", client.corposSutis?.budico],
       ["Corpo mental superior", client.corposSutis?.mentalSuperior],
       ["Corpo mental inferior", client.corposSutis?.mentalInferior],
       ["Corpo astral", client.corposSutis?.astral],
-      ["Corpo duplo etérico", client.corposSutis?.duploEterico],
-      ["Corpo físico", client.corposSutis?.fisico],
-      ["Chakra coronário", client.chakras?.coronario],
+      ["Corpo duplo etÃ©rico", client.corposSutis?.duploEterico],
+      ["Corpo fÃ­sico", client.corposSutis?.fisico],
+      ["Chakra coronÃ¡rio", client.chakras?.coronario],
       ["Chakra frontal", client.chakras?.frontal],
-      ["Chakra laríngeo", client.chakras?.laringeo],
-      ["Chakra cardíaco", client.chakras?.cardiaco],
+      ["Chakra larÃ­ngeo", client.chakras?.laringeo],
+      ["Chakra cardÃ­aco", client.chakras?.cardiaco],
       ["Chakra plexo solar", client.chakras?.plexoSolar],
       ["Chakra umbilical", client.chakras?.umbilical],
-      ["Chakra básico", client.chakras?.basico],
-      ["Função respiratória", client.funcoes?.respiratoria],
-      ["Função nutritiva", client.funcoes?.nutritiva],
-      ["Função digestiva", client.funcoes?.digestiva],
-      ["Função circulatória", client.funcoes?.circulatoria],
-      ["Função relacional", client.funcoes?.relacional],
-      ["Função reprodutiva", client.funcoes?.reprodutiva],
-      ["Função estruturante", client.funcoes?.estruturante],
-      ["Função evolutiva", client.funcoes?.evolutiva],
-      ["Função excretora", client.funcoes?.excretora],
-      ["Campo energético", client.campos?.energetico],
+      ["Chakra bÃ¡sico", client.chakras?.basico],
+      ["FunÃ§Ã£o respiratÃ³ria", client.funcoes?.respiratoria],
+      ["FunÃ§Ã£o nutritiva", client.funcoes?.nutritiva],
+      ["FunÃ§Ã£o digestiva", client.funcoes?.digestiva],
+      ["FunÃ§Ã£o circulatÃ³ria", client.funcoes?.circulatoria],
+      ["FunÃ§Ã£o relacional", client.funcoes?.relacional],
+      ["FunÃ§Ã£o reprodutiva", client.funcoes?.reprodutiva],
+      ["FunÃ§Ã£o estruturante", client.funcoes?.estruturante],
+      ["FunÃ§Ã£o evolutiva", client.funcoes?.evolutiva],
+      ["FunÃ§Ã£o excretora", client.funcoes?.excretora],
+      ["Campo energÃ©tico", client.campos?.energetico],
       ["Campo mental", client.campos?.mental],
       ["Campo vital", client.campos?.vital],
       ["Campo emocional", client.campos?.emocional],
       ["Campo espiritual", client.campos?.espiritual],
-      ["Campo físico", client.campos?.fisico],
-      ["Aura - proteção", client.aura?.protecao],
+      ["Campo fÃ­sico", client.campos?.fisico],
+      ["Aura - proteÃ§Ã£o", client.aura?.protecao],
       ["Aura - tamanho", client.aura?.tamanho],
       ["Aura - cor excesso", client.aura?.corExcesso],
       ["Aura - cor falta", client.aura?.corFalta],
@@ -769,17 +769,17 @@ function buildDiagnosticSuggestion(client) {
     lines.push(`Leitura inicial registrada com ${[client.bovis ? `Bovis ${client.bovis}` : "", client.hawkins ? `Hawkins ${client.hawkins}` : ""].filter(Boolean).join(" e ")}.`);
   }
   if (protocols.length) {
-    lines.push(`Protocolos em uso nesta análise: ${protocols.join(", ")}.`);
+    lines.push(`Protocolos em uso nesta anÃ¡lise: ${protocols.join(", ")}.`);
   }
   if (client.queixaPrincipal) {
-    lines.push(`Queixa principal em observação: ${client.queixaPrincipal}.`);
+    lines.push(`Queixa principal em observaÃ§Ã£o: ${client.queixaPrincipal}.`);
   }
   if (client.objetivo) {
-    lines.push(`Objetivo terapêutico declarado: ${client.objetivo}.`);
+    lines.push(`Objetivo terapÃªutico declarado: ${client.objetivo}.`);
   }
   const readingCount = buildInitialReadingLines(client).length;
   if (readingCount) {
-    lines.push("Leitura inicial preenchida para apoiar o fechamento diagnóstico dos campos alterados.");
+    lines.push("Leitura inicial preenchida para apoiar o fechamento diagnÃ³stico dos campos alterados.");
   }
   return lines.join(" ");
 }
@@ -792,7 +792,7 @@ function buildAreasSuggestion(client) {
   const sections = [
     ["Corpos sutis", Object.values(client.corposSutis || {}).some((value) => String(value || "").trim())],
     ["Chakras", Object.values(client.chakras || {}).some((value) => String(value || "").trim())],
-    ["Funções", Object.values(client.funcoes || {}).some((value) => String(value || "").trim())],
+    ["FunÃ§Ãµes", Object.values(client.funcoes || {}).some((value) => String(value || "").trim())],
     ["Campos", Object.values(client.campos || {}).some((value) => String(value || "").trim())],
     ["Aura", Object.values(client.aura || {}).some((value) => String(value || "").trim())],
   ]
@@ -804,7 +804,7 @@ function buildAreasSuggestion(client) {
 
 function buildInterventionsSuggestion(client) {
   const protocols = getValidProtocols(client.protocolosUsados);
-  const lines = ["Método: TGR"];
+  const lines = ["MÃ©todo: TGR"];
   if (protocols.length) lines.push(`Protocolos: ${protocols.join(", ")}`);
   return lines.join("\n");
 }
@@ -818,7 +818,7 @@ function inferProtocolSlug(client) {
 }
 
 function findProtocolName(slug) {
-  return TGR_PROTOCOLS.find((item) => item.slug === slug)?.nome || "Relações";
+  return TGR_PROTOCOLS.find((item) => item.slug === slug)?.nome || "RelaÃ§Ãµes";
 }
 
 function getValidProtocols(protocols = []) {
@@ -876,15 +876,15 @@ function getLatestAnalysis(client) {
 
   if (pendingActions.length) return pendingActions[0];
   if (!protocols.length) return "Escolher protocolo no TGR";
-  if (!activeGraphics.length) return "Adicionar gráficos aos protocolos";
+  if (!activeGraphics.length) return "Adicionar grÃ¡ficos aos protocolos";
   if (client?.status === "Aguardando devolutiva") return "Preparar devolutiva final";
-  if (client?.status === "Concluído") return "Iniciar nova análise ou revisar histórico";
-  if (client?.statusPagamento !== "Pago") return "Conferir pagamento e acompanhar evolução";
-  return "Acompanhar gráficos ativos e registrar conduta";
+  if (client?.status === "ConcluÃ­do") return "Iniciar nova anÃ¡lise ou revisar histÃ³rico";
+  if (client?.statusPagamento !== "Pago") return "Conferir pagamento e acompanhar evoluÃ§Ã£o";
+  return "Acompanhar grÃ¡ficos ativos e registrar conduta";
 }
 
 function formatPendingActions(actions = []) {
-  return actions.length ? actions.join(", ") : "Sem pendências marcadas";
+  return actions.length ? actions.join(", ") : "Sem pendÃªncias marcadas";
 }
 
 function buildAnalysisHistoryCards(client) {
@@ -974,7 +974,7 @@ function App() {
         if (!mounted) return;
         setAppMode(hasSupabaseEnv ? "supabase" : "local");
         setClients(hasSupabaseEnv ? [] : sampleClients);
-        setUiMessage(hasSupabaseEnv ? "Não foi possivel carregar os clientes salvos. Revise a conexao com o banco." : "Não foi possivel carregar os clientes locais.");
+        setUiMessage(hasSupabaseEnv ? "NÃ£o foi possivel carregar os clientes salvos. Revise a conexao com o banco." : "NÃ£o foi possivel carregar os clientes locais.");
       } finally {
         if (!mounted) return;
         setAuthReady(true);
@@ -1130,7 +1130,7 @@ function App() {
       if (options.successMessage) setUiMessage(options.successMessage);
       return record;
     } catch (error) {
-      setUiMessage(error?.message || options.errorMessage || "Não foi possivel salvar o atendimento.");
+      setUiMessage(error?.message || options.errorMessage || "NÃ£o foi possivel salvar o atendimento.");
       return null;
     } finally {
       setSaving(false);
@@ -1154,7 +1154,7 @@ function App() {
       if (selectedId === id) setSelectedId("");
       setUiMessage("Atendimento removido.");
     } catch (error) {
-      setUiMessage(error?.message || "Não foi possivel remover o atendimento.");
+      setUiMessage(error?.message || "NÃ£o foi possivel remover o atendimento.");
     }
   }
 
@@ -1164,20 +1164,20 @@ function App() {
     const normalized = normalizeClientRecord(currentClient);
     const finalizedAnalysis = buildAnalysisDraft(
       normalized.analyses.find((analysis) => analysis.id === normalized.currentAnalysisId),
-      { status: "Concluído" }
+      { status: "ConcluÃ­do" }
     );
 
     await persistClientRecord({
       ...normalized,
       analyses: normalized.analyses.map((analysis) => (analysis.id === finalizedAnalysis.id ? finalizedAnalysis : analysis)),
       currentAnalysisId: finalizedAnalysis.id,
-      status: "Concluído",
-    }, { successMessage: "Análise finalizada." });
-    setUiMessage("Análise finalizada.");
+      status: "ConcluÃ­do",
+    }, { successMessage: "AnÃ¡lise finalizada." });
+    setUiMessage("AnÃ¡lise finalizada.");
   }
 
   async function switchClientAnalysis(clientId, analysisId) {
-    if (selectedClient?.id === clientId && !confirmUnsavedNavigation("outra análise")) return;
+    if (selectedClient?.id === clientId && !confirmUnsavedNavigation("outra anÃ¡lise")) return;
     const currentClient = clients.find((item) => item.id === clientId);
     if (!currentClient) return;
     const normalized = normalizeClientRecord(currentClient);
@@ -1206,8 +1206,8 @@ function App() {
       ...applyAnalysisToClient(normalized, newAnalysis),
       analyses: [newAnalysis, ...normalized.analyses],
       currentAnalysisId: newAnalysis.id,
-    }, { successMessage: "Nova análise iniciada." });
-    setUiMessage("Nova análise iniciada.");
+    }, { successMessage: "Nova anÃ¡lise iniciada." });
+    setUiMessage("Nova anÃ¡lise iniciada.");
   }
 
   function startNewClient() {
@@ -1302,9 +1302,9 @@ function App() {
       ...applyAnalysisToClient(normalized, updatedAnalysis),
       analyses: normalized.analyses.map((analysis) => (analysis.id === updatedAnalysis.id ? updatedAnalysis : analysis)),
       currentAnalysisId: updatedAnalysis.id,
-    }, { successMessage: `Protocolo ${protocolName} salvo na análise.` });
+    }, { successMessage: `Protocolo ${protocolName} salvo na anÃ¡lise.` });
 
-    setUiMessage(`Protocolo ${protocolName} salvo na análise.`);
+    setUiMessage(`Protocolo ${protocolName} salvo na anÃ¡lise.`);
   }
 
   async function updateClientAnalysisFields(clientId, updates, successMessage = "") {
@@ -1330,7 +1330,7 @@ function App() {
 
   function confirmUnsavedNavigation(destinationLabel = "continuar") {
     if (!(mainTab === "metodos" && hasUnsavedProtocolChanges)) return true;
-    return window.confirm(`Ha alteracoes não salvas no TGR. Deseja sair para ${destinationLabel} mesmo assim?`);
+    return window.confirm(`Ha alteracoes nÃ£o salvas no TGR. Deseja sair para ${destinationLabel} mesmo assim?`);
   }
 
   function openTgrWorkspace() {
@@ -1396,7 +1396,7 @@ function App() {
       const clientsState = await listClients(sampleClients);
       setClients(clientsState.data);
     } catch (error) {
-      setAuthError(error?.message || "Não foi possivel entrar.");
+      setAuthError(error?.message || "NÃ£o foi possivel entrar.");
     }
   }
 
@@ -1446,18 +1446,18 @@ function App() {
           <button
             type="button"
             onClick={() => {
-              if (!confirmUnsavedNavigation("o início")) return;
+              if (!confirmUnsavedNavigation("o inÃ­cio")) return;
               setSelectedId("");
               setRelacoesContext(null);
               setMainTab("dashboard");
             }}
             style={mainTab === "dashboard" && !clientFocusMode ? primaryButtonStyle : secondaryButtonStyle}
           >
-            Início
+            InÃ­cio
           </button>
           {clientFocusMode ? (
             <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
-              Volte ao início quando quiser sair do atendimento em foco sem se perder na navegação.
+              Volte ao inÃ­cio quando quiser sair do atendimento em foco sem se perder na navegaÃ§Ã£o.
             </div>
           ) : null}
         </div>
@@ -1476,11 +1476,11 @@ function App() {
                   {selectedClient?.nome || relacoesContext?.clientName || "Atendimento em foco"}
                 </div>
                 <div style={{ color: THEME.muted, fontSize: 13 }}>
-                  Navegação reduzida para manter o atendimento mais seguro e direto.
+                  NavegaÃ§Ã£o reduzida para manter o atendimento mais seguro e direto.
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button type="button" onClick={() => { if (!confirmUnsavedNavigation("o prontuário")) return; setMainTab("clientes"); }} style={mainTab === "clientes" ? primaryButtonStyle : secondaryButtonStyle}>Prontuário</button>
+                <button type="button" onClick={() => { if (!confirmUnsavedNavigation("o prontuÃ¡rio")) return; setMainTab("clientes"); }} style={mainTab === "clientes" ? primaryButtonStyle : secondaryButtonStyle}>ProntuÃ¡rio</button>
                 <button type="button" onClick={() => openTgrWorkspace()} style={mainTab === "metodos" ? primaryButtonStyle : secondaryButtonStyle}>TGR</button>
                 <button type="button" onClick={() => { if (!confirmUnsavedNavigation("a devolutiva")) return; setMainTab("devolutivas"); }} style={mainTab === "devolutivas" ? primaryButtonStyle : secondaryButtonStyle}>Devolutiva</button>
                 <button
@@ -1745,13 +1745,13 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Mesa de trabalho</div>
-              <div style={{ color: THEME.muted }}>Acesso rápido ao que pede ação agora.</div>
+              <div style={{ color: THEME.muted }}>Acesso rÃ¡pido ao que pede aÃ§Ã£o agora.</div>
             </div>
             <button type="button" onClick={onNewClient} style={primaryButtonStyle}>Novo cliente</button>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(2, 1fr)", gap: 12 }}>
-            <CommandCardButton title="Todos os clientes" text={`${clients.length} prontuários cadastrados`} onClick={onOpenClientsList} primary disabled={!clients.length} />
-            <CommandCardButton title="Pendências" text={pendingClients.length ? `${pendingClients.length} cliente(s) com ação marcada manualmente` : "Nenhuma pendência manual marcada"} onClick={() => pendingClients[0] && onOpenClient(pendingClients[0].id)} disabled={!pendingClients.length} />
+            <CommandCardButton title="Todos os clientes" text={`${clients.length} prontuÃ¡rios cadastrados`} onClick={onOpenClientsList} primary disabled={!clients.length} />
+            <CommandCardButton title="PendÃªncias" text={pendingClients.length ? `${pendingClients.length} cliente(s) com aÃ§Ã£o marcada manualmente` : "Nenhuma pendÃªncia manual marcada"} onClick={() => pendingClients[0] && onOpenClient(pendingClients[0].id)} disabled={!pendingClients.length} />
           </div>
         </Panel>
       </section>
@@ -1769,14 +1769,14 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
                   </div>
                   <StatusBadge status={client.status} />
                 </div>
-                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 10 }}>Próxima ação: {getNextAction(client)}</div>
+                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 10 }}>PrÃ³xima aÃ§Ã£o: {getNextAction(client)}</div>
               </button>
             )) : <div style={{ color: THEME.muted }}>Nenhum cliente cadastrado.</div>}
           </div>
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Pendências</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>PendÃªncias</div>
           <div style={{ display: "grid", gap: 12 }}>
             {pendingClients.length ? pendingClients.map((client) => (
               <button key={client.id} type="button" onClick={() => onOpenClient(client.id)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
@@ -1786,10 +1786,10 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
                 </div>
                 <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>{formatPendingActions(getAnalysisRecord(client)?.pendingActions || [])}</div>
                 <div style={{ color: THEME.muted, fontSize: 12, marginTop: 8 }}>
-                  Última análise: {getLatestAnalysis(client)?.dataInicio ? formatFullDate(getLatestAnalysis(client).dataInicio) : "Sem data"}
+                  Ãltima anÃ¡lise: {getLatestAnalysis(client)?.dataInicio ? formatFullDate(getLatestAnalysis(client).dataInicio) : "Sem data"}
                 </div>
               </button>
-            )) : <div style={{ color: THEME.muted }}>Nenhuma pendência marcada manualmente.</div>}
+            )) : <div style={{ color: THEME.muted }}>Nenhuma pendÃªncia marcada manualmente.</div>}
           </div>
         </Panel>
       </section>
@@ -1810,8 +1810,8 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
         <Panel>
           <div style={{ display: "grid", gap: 12 }}>
             <div>
-              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Use estas abas para não se perder no prontuário. A devolutiva continua no menu principal do atendimento.</div>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>NavegaÃ§Ã£o da cliente</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Use estas abas para nÃ£o se perder no prontuÃ¡rio. A devolutiva continua no menu principal do atendimento.</div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {CLIENT_DETAIL_TABS.map((tab) => (
@@ -1820,7 +1820,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
             </div>
           </div>
         </Panel>
-        <RenderGuard title="prontuário da cliente">
+        <RenderGuard title="prontuÃ¡rio da cliente">
           <ClientHeader
             client={selectedClient}
             onDelete={removeClient}
@@ -1830,6 +1830,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
             onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
             onOpenFeedback={openFeedbackForClient}
             onBack={onBackToList}
+            mobile={mobile}
           />
           {clientDetailTab === "resumo" ? (
             <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
@@ -1853,7 +1854,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
                 const nextActions = currentActions.includes(action)
                   ? currentActions.filter((item) => item !== action)
                   : [...currentActions, action];
-                return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "Pendências atualizadas.");
+                return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "PendÃªncias atualizadas.");
               }}
             />
           ) : null}
@@ -1869,7 +1870,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Novo cliente</div>
-              <div style={{ color: THEME.muted }}>Preencha a ficha inicial para criar o prontuário.</div>
+              <div style={{ color: THEME.muted }}>Preencha a ficha inicial para criar o prontuÃ¡rio.</div>
             </div>
             <button type="button" onClick={onBackToList} style={secondaryButtonStyle}>Voltar para clientes</button>
           </div>
@@ -1884,7 +1885,7 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
       <Panel>
         <div style={{ display: "grid", gap: 10 }}>
           <div style={{ fontSize: 22, fontWeight: 800 }}>Clientes</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha uma cliente para abrir o prontuário em modo focado.</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha uma cliente para abrir o prontuÃ¡rio em modo focado.</div>
         </div>
         <div style={{ marginTop: 14 }}>
           <button type="button" onClick={startNewClient} style={primaryButtonStyle}>Novo cliente</button>
@@ -1917,9 +1918,9 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
         <section style={{ display: "grid", gap: 18 }}>
           <Panel>
             <div style={{ display: "grid", placeItems: "center", minHeight: 320, textAlign: "center", gap: 10 }}>
-              <div style={{ fontSize: 22, fontWeight: 800 }}>Nenhum prontuário aberto</div>
+              <div style={{ fontSize: 22, fontWeight: 800 }}>Nenhum prontuÃ¡rio aberto</div>
               <div style={{ color: THEME.muted, maxWidth: 420, lineHeight: 1.7 }}>
-                Selecione uma cliente na lista para abrir a análise em uma tela focada, sem menus paralelos competindo pela navegação.
+                Selecione uma cliente na lista para abrir a anÃ¡lise em uma tela focada, sem menus paralelos competindo pela navegaÃ§Ã£o.
               </div>
             </div>
           </Panel>
@@ -1944,10 +1945,10 @@ function AppointmentsView({ appointments, clients, mobile, onOpenClient }) {
                     <div style={{ fontWeight: 800 }}>{appointment.title}</div>
                     <StatusBadge status={appointment.status} />
                   </div>
-                  <div style={{ color: THEME.muted, fontSize: 13 }}>{client?.whatsapp || "Contato não informado"}</div>
+                  <div style={{ color: THEME.muted, fontSize: 13 }}>{client?.whatsapp || "Contato nÃ£o informado"}</div>
                 </div>
                 <div>
-                  <div style={{ ...labelStyle, marginBottom: 4 }}>Método / protocolo</div>
+                  <div style={{ ...labelStyle, marginBottom: 4 }}>MÃ©todo / protocolo</div>
                   <div style={{ fontWeight: 700 }}>TGR - {(client?.protocolosUsados || []).join(", ") || findProtocolName(appointment.protocolSlug)}</div>
                 </div>
                 <button type="button" onClick={() => onOpenClient(appointment.clientId)} style={secondaryButtonStyle}>Abrir cliente</button>
@@ -2002,7 +2003,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "260px minmax(0, 1fr)", gap: 18 }}>
       <aside style={{ display: "grid", gap: 14, alignSelf: "start" }}>
         <Panel>
-          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Métodos</div>
+          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>MÃ©todos</div>
           <div style={{ display: "grid", gap: 10 }}>
             {METHOD_CATALOG.map((method) => (
               <button key={method.slug} type="button" onClick={() => setActiveMethod(method.slug)} style={{ border: `1px solid ${activeMethod === method.slug ? THEME.green : THEME.line}`, background: activeMethod === method.slug ? "#f7fbf4" : "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
@@ -2033,7 +2034,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
           <Panel>
             <div style={{ display: "grid", gap: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{selectedMethod.nome}</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo ja esta reservado na estrutura do prontuário e sera detalhado quando entrarmos no conteudo dele.</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.7 }}>Este metodo ja esta reservado na estrutura do prontuÃ¡rio e sera detalhado quando entrarmos no conteudo dele.</div>
             </div>
           </Panel>
         ) : (
@@ -2080,7 +2081,7 @@ function MethodsView({ activeMethod, setActiveMethod, activeSubmethod, setActive
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Radiestesia - TGR</div>
-                  <div style={{ color: THEME.muted }}>Protocolos e gráficos.</div>
+                  <div style={{ color: THEME.muted }}>Protocolos e grÃ¡ficos.</div>
                 </div>
                 <div style={{ color: THEME.green, fontWeight: 800 }}>{tgrAppointmentCount} atendimentos usando TGR</div>
               </div>
@@ -2115,11 +2116,11 @@ function MethodOverview({ appointments, mobile }) {
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 18 }}>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Protocolos</div>
-        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Cada protocolo deve ser organizado com objetivo, etapas, leitura inicial, gráficos usados e conduta terapêutica.</div>
+        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Cada protocolo deve ser organizado com objetivo, etapas, leitura inicial, grÃ¡ficos usados e conduta terapÃªutica.</div>
       </Panel>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Ferramentas</div>
-        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Os gráficos são escolhidos dentro de cada protocolo, junto do contexto de uso e do tempo ativo no atendimento.</div>
+        <div style={{ color: THEME.muted, lineHeight: 1.65 }}>Os grÃ¡ficos sÃ£o escolhidos dentro de cada protocolo, junto do contexto de uso e do tempo ativo no atendimento.</div>
       </Panel>
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>Uso atual</div>
@@ -2149,8 +2150,8 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
           <div style={{ display: "grid", gap: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta análise</div>
-                <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha só um protocolo por vez para preencher. Se ele ainda não estiver ativo, entra na análise automaticamente.</div>
+                <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta anÃ¡lise</div>
+                <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha sÃ³ um protocolo por vez para preencher. Se ele ainda nÃ£o estiver ativo, entra na anÃ¡lise automaticamente.</div>
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
@@ -2188,8 +2189,8 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
             </div>
             {hasUnsavedProtocolChanges ? (
               <div style={{ border: `1px solid ${selectedProtocolTheme.color}`, background: selectedProtocolTheme.soft, borderRadius: 18, padding: "12px 14px", color: selectedProtocolTheme.color, display: "grid", gap: 4 }}>
-                <div style={{ fontWeight: 800 }}>Há alterações não salvas</div>
-                <div style={{ fontSize: 13, lineHeight: 1.6 }}>Salve o protocolo atual antes de trocar de análise ou sair do TGR.</div>
+                <div style={{ fontWeight: 800 }}>HÃ¡ alteraÃ§Ãµes nÃ£o salvas</div>
+                <div style={{ fontSize: 13, lineHeight: 1.6 }}>Salve o protocolo atual antes de trocar de anÃ¡lise ou sair do TGR.</div>
               </div>
             ) : null}
           </div>
@@ -2200,7 +2201,7 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
           <div style={{ display: "grid", gap: 8 }}>
             <div style={{ fontSize: 18, fontWeight: 800 }}>Escolha um protocolo para preencher</div>
             <div style={{ color: THEME.muted, lineHeight: 1.6 }}>
-              Selecione entre Relações, Limpeza e Proteção ou Prosperidade para começar a preencher a análise.
+              Selecione entre RelaÃ§Ãµes, Limpeza e ProteÃ§Ã£o ou Prosperidade para comeÃ§ar a preencher a anÃ¡lise.
             </div>
           </div>
         </Panel>
@@ -2288,7 +2289,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
       <div style={{ display: "grid", gap: 18 }}>
         <ProtocolSaveBar
           title="Salvar protocolo"
-          text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Salve este protocolo para registrar a etapa atual no prontuário."}
+          text={isDirty ? "VocÃª fez alteraÃ§Ãµes neste protocolo. Salve para registrar no prontuÃ¡rio." : "Salve este protocolo para registrar a etapa atual no prontuÃ¡rio."}
           onSave={onSave}
           dirty={isDirty}
         />
@@ -2297,9 +2298,9 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
 
         {activeStage === "leitura" ? (
           <div style={{ display: "grid", gap: 18 }}>
-            <SectionTitle title="Cabeçalho da leitura" />
+            <SectionTitle title="CabeÃ§alho da leitura" />
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Tipo de relação">
+              <Field label="Tipo de relaÃ§Ã£o">
                 <select value={form.tipoRelacao} onChange={(event) => setField("tipoRelacao", event.target.value)} style={inputStyle}>
                   {RELATION_TYPES.map((item) => <option key={item}>{item}</option>)}
                 </select>
@@ -2310,7 +2311,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
               <Field label="Objetivo da leitura">
                 <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Observação inicial">
+              <Field label="ObservaÃ§Ã£o inicial">
                 <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2323,16 +2324,16 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
               <Field label="Campo emocional">
                 <textarea value={form.campoEmocionalResultado} onChange={(event) => setField("campoEmocionalResultado", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Tipo de vínculo">
+              <Field label="Tipo de vÃ­nculo">
                 <textarea value={form.tipoVinculoResultado} onChange={(event) => setField("tipoVinculoResultado", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Interferências identificadas">
+              <Field label="InterferÃªncias identificadas">
                 <textarea value={form.interferenciasIdentificadas} onChange={(event) => setField("interferenciasIdentificadas", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Padrão relacional">
+              <Field label="PadrÃ£o relacional">
                 <textarea value={form.padraoRelacional} onChange={(event) => setField("padraoRelacional", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Nível de harmonia relacional">
+              <Field label="NÃ­vel de harmonia relacional">
                 <textarea value={form.nivelHarmoniaRelacional} onChange={(event) => setField("nivelHarmoniaRelacional", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2341,7 +2342,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
 
         {activeStage === "graficos" ? (
           <div style={{ display: "grid", gap: 16 }}>
-            <SectionTitle title="Gráficos usados" />
+            <SectionTitle title="GrÃ¡ficos usados" />
             <div style={{ display: "grid", gap: 14 }}>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {TGR_GRAPHIC_GROUPS.map((group) => (
@@ -2372,7 +2373,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
             </div>
             {(form.graficosSelecionados || []).length ? (
               <div style={{ display: "grid", gap: 10 }}>
-                <div style={{ ...labelStyle, marginBottom: 0 }}>Configuração dos gráficos selecionados</div>
+                <div style={{ ...labelStyle, marginBottom: 0 }}>ConfiguraÃ§Ã£o dos grÃ¡ficos selecionados</div>
                 {(form.graficosSelecionados || []).map((graphic) => (
                   <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
                     <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
@@ -2381,14 +2382,14 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
                     </button>
                     {expandedGraphicConfigs[graphic] ? (
                       <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 220px", gap: 10, alignItems: "center" }}>
-                        <select value={form.contextoGraficos?.[graphic] || "Relações"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
+                        <select value={form.contextoGraficos?.[graphic] || "RelaÃ§Ãµes"} onChange={(event) => setGraphicContext(graphic, event.target.value)} style={inputStyle}>
                           {GRAPHIC_CONTEXT_OPTIONS.map((option) => <option key={option}>{option}</option>)}
                         </select>
                         <input
                           value={form.tempoAtivacaoGraficos?.[graphic] || ""}
                           onChange={(event) => setGraphicDuration(graphic, event.target.value)}
                           style={inputStyle}
-                          placeholder="Ex.: 7 dias, contínuo"
+                          placeholder="Ex.: 7 dias, contÃ­nuo"
                         />
                       </div>
                     ) : null}
@@ -2397,10 +2398,10 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
               </div>
             ) : null}
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Leitura dos gráficos">
+              <Field label="Leitura dos grÃ¡ficos">
                 <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Síntese dos gráficos">
+              <Field label="SÃ­ntese dos grÃ¡ficos">
                 <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2409,21 +2410,21 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
 
         {activeStage === "sintese" ? (
           <div style={{ display: "grid", gap: 16 }}>
-            <SectionTitle title="Síntese e conduta" />
+            <SectionTitle title="SÃ­ntese e conduta" />
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Intervenção indicada">
+              <Field label="IntervenÃ§Ã£o indicada">
                 <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Orientação terapêutica">
+              <Field label="OrientaÃ§Ã£o terapÃªutica">
                 <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Foco dos próximos dias">
+              <Field label="Foco dos prÃ³ximos dias">
                 <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Conclusão analítica">
+              <Field label="ConclusÃ£o analÃ­tica">
                 <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Observações finais">
+              <Field label="ObservaÃ§Ãµes finais">
                 <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2432,7 +2433,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
 
         <ProtocolSaveBar
           title="Concluir este protocolo"
-          text={isDirty ? "Ainda há alterações pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
+          text={isDirty ? "Ainda hÃ¡ alteraÃ§Ãµes pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
           onSave={onSave}
           dirty={isDirty}
         />
@@ -2502,7 +2503,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
       <div style={{ display: "grid", gap: 18 }}>
         <ProtocolSaveBar
           title="Salvar protocolo"
-          text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Salve este protocolo para registrar a etapa atual no prontuário."}
+          text={isDirty ? "VocÃª fez alteraÃ§Ãµes neste protocolo. Salve para registrar no prontuÃ¡rio." : "Salve este protocolo para registrar a etapa atual no prontuÃ¡rio."}
           onSave={onSave}
           dirty={isDirty}
         />
@@ -2511,12 +2512,12 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
 
         {activeStage === "leitura" ? (
           <div style={{ display: "grid", gap: 18 }}>
-            <SectionTitle title="Cabeçalho da leitura" />
+            <SectionTitle title="CabeÃ§alho da leitura" />
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               <Field label="Objetivo da leitura">
                 <textarea value={form.objetivoLeitura} onChange={(event) => setField("objetivoLeitura", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Observação inicial">
+              <Field label="ObservaÃ§Ã£o inicial">
                 <textarea value={form.observacaoInicial} onChange={(event) => setField("observacaoInicial", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2535,7 +2536,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
 
         {activeStage === "graficos" ? (
           <div style={{ display: "grid", gap: 16 }}>
-            <SectionTitle title="Gráficos usados" />
+            <SectionTitle title="GrÃ¡ficos usados" />
             <div style={{ display: "grid", gap: 14 }}>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {TGR_GRAPHIC_GROUPS.map((group) => (
@@ -2567,7 +2568,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
 
             {(form.graficosSelecionados || []).length ? (
               <div style={{ display: "grid", gap: 10 }}>
-                <div style={{ ...labelStyle, marginBottom: 0 }}>Configuração dos gráficos selecionados</div>
+                <div style={{ ...labelStyle, marginBottom: 0 }}>ConfiguraÃ§Ã£o dos grÃ¡ficos selecionados</div>
                 {(form.graficosSelecionados || []).map((graphic) => (
                   <div key={graphic} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gap: 10 }}>
                     <button type="button" onClick={() => toggleGraphicConfig(graphic)} style={{ border: "none", background: "transparent", padding: 0, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", fontWeight: 700, color: THEME.text }}>
@@ -2583,7 +2584,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
                           value={form.tempoAtivacaoGraficos?.[graphic] || ""}
                           onChange={(event) => setGraphicDuration(graphic, event.target.value)}
                           style={inputStyle}
-                          placeholder="Ex.: 7 dias, contínuo"
+                          placeholder="Ex.: 7 dias, contÃ­nuo"
                         />
                       </div>
                     ) : null}
@@ -2593,10 +2594,10 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
             ) : null}
 
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Leitura dos gráficos">
+              <Field label="Leitura dos grÃ¡ficos">
                 <textarea value={form.leituraGraficos} onChange={(event) => setField("leituraGraficos", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Síntese dos gráficos">
+              <Field label="SÃ­ntese dos grÃ¡ficos">
                 <textarea value={form.sinteseGraficos} onChange={(event) => setField("sinteseGraficos", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2605,21 +2606,21 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
 
         {activeStage === "sintese" ? (
           <div style={{ display: "grid", gap: 16 }}>
-            <SectionTitle title="Síntese e conduta" />
+            <SectionTitle title="SÃ­ntese e conduta" />
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Intervenção indicada">
+              <Field label="IntervenÃ§Ã£o indicada">
                 <textarea value={form.intervencaoIndicada} onChange={(event) => setField("intervencaoIndicada", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Orientação terapêutica">
+              <Field label="OrientaÃ§Ã£o terapÃªutica">
                 <textarea value={form.orientacaoTerapeutica} onChange={(event) => setField("orientacaoTerapeutica", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Foco dos próximos dias">
+              <Field label="Foco dos prÃ³ximos dias">
                 <textarea value={form.focoProximosDias} onChange={(event) => setField("focoProximosDias", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Conclusão analítica">
+              <Field label="ConclusÃ£o analÃ­tica">
                 <textarea value={form.conclusaoAnalitica} onChange={(event) => setField("conclusaoAnalitica", event.target.value)} style={inputStyle} />
               </Field>
-              <Field label="Observações finais">
+              <Field label="ObservaÃ§Ãµes finais">
                 <textarea value={form.observacoesFinais} onChange={(event) => setField("observacoesFinais", event.target.value)} style={inputStyle} />
               </Field>
             </div>
@@ -2628,7 +2629,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
 
         <ProtocolSaveBar
           title="Concluir este protocolo"
-          text={isDirty ? "Ainda há alterações pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
+          text={isDirty ? "Ainda hÃ¡ alteraÃ§Ãµes pendentes. Salve antes de sair ou trocar de protocolo." : "Protocolo pronto. Se fizer novos ajustes, salve novamente."}
           onSave={onSave}
           dirty={isDirty}
         />
@@ -2681,7 +2682,7 @@ function FeedbacksView({ clients, mobile, selectedClient }) {
   }
 
   const pending = clients.filter((client) => client.status === "Aguardando devolutiva");
-  const completed = clients.filter((client) => client.status === "Concluído");
+  const completed = clients.filter((client) => client.status === "ConcluÃ­do");
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 18 }}>
@@ -2694,7 +2695,7 @@ function FeedbacksView({ clients, mobile, selectedClient }) {
       <Panel>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Concluidas</div>
         <div style={{ display: "grid", gap: 12 }}>
-          {completed.length ? completed.map((client) => <FeedbackCard key={client.id} client={client} />) : <div style={{ color: THEME.muted }}>Nenhuma devolutiva concluída.</div>}
+          {completed.length ? completed.map((client) => <FeedbackCard key={client.id} client={client} />) : <div style={{ color: THEME.muted }}>Nenhuma devolutiva concluÃ­da.</div>}
         </div>
       </Panel>
     </div>
@@ -2726,7 +2727,7 @@ function FinancialView({ clients, mobile }) {
                 <div style={{ color: THEME.muted, fontSize: 13 }}>{formatProtocols(client)} - TGR</div>
               </div>
               <div style={{ fontWeight: 700 }}>{formatCurrency(client.valor)}</div>
-              <StatusBadge status={client.statusPagamento === "Pago" ? "Concluído" : "Aguardando início"} />
+              <StatusBadge status={client.statusPagamento === "Pago" ? "ConcluÃ­do" : "Aguardando inÃ­cio"} />
             </div>
           ))}
         </div>
@@ -2735,14 +2736,14 @@ function FinancialView({ clients, mobile }) {
   );
 }
 
-function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol, onOpenFeedback, onBack }) {
+function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol, onOpenFeedback, onBack, mobile }) {
   const currentAnalysis = getAnalysisRecord(client);
   const validProtocols = getValidProtocols(currentAnalysis.protocolosUsados);
   const attendanceDateOptions = buildAttendanceDateOptions(client);
   const activeGraphics = getActiveGraphicsFromAnalysis(currentAnalysis);
   const latestAnalysis = getLatestAnalysis(client);
   const nextAction = getNextAction(client);
-  const canFinalize = client.status !== "Concluído";
+  const canFinalize = client.status !== "ConcluÃ­do";
 
   return (
     <Panel>
@@ -2755,18 +2756,18 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
               <StatusBadge status={client.status} />
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14, lineHeight: 1.6 }}>
-              <span>{client.whatsapp || "Contato não informado"}</span>
+              <span>{client.whatsapp || "Contato nÃ£o informado"}</span>
               <span>{client.email || "Sem email"}</span>
               <span>{validProtocols.length ? validProtocols.join(", ") : "Sem protocolo ativo"}</span>
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={() => onNewAnalysis(client.id)} style={secondaryButtonStyle}>Nova análise</button>
+            <button type="button" onClick={() => onNewAnalysis(client.id)} style={secondaryButtonStyle}>Nova anÃ¡lise</button>
             <button type="button" onClick={() => onFinalize(client.id)} disabled={!canFinalize} style={{ ...secondaryButtonStyle, opacity: canFinalize ? 1 : 0.65, cursor: canFinalize ? "pointer" : "default" }}>
-              Finalizar análise
+              Finalizar anÃ¡lise
             </button>
             <details style={{ position: "relative" }}>
-              <summary style={{ ...secondaryButtonStyle, listStyle: "none", cursor: "pointer" }}>Mais ações</summary>
+              <summary style={{ ...secondaryButtonStyle, listStyle: "none", cursor: "pointer" }}>Mais aÃ§Ãµes</summary>
               <div style={{ position: "absolute", right: 0, top: "calc(100% + 8px)", minWidth: 180, zIndex: 4, border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 16, padding: 10, boxShadow: THEME.shadow, display: "grid", gap: 8 }}>
                 <button type="button" onClick={() => onDelete(client.id)} style={{ ...secondaryButtonStyle, color: "#8a4f38", background: "#fff7f4", width: "100%" }}>Remover cliente</button>
               </div>
@@ -2778,12 +2779,12 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
             <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum"} />
             <InfoCard label="Status" value={client.status} />
-            <InfoCard label="Última análise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
-            <InfoCard label="Próxima ação" value={nextAction} />
+            <InfoCard label="Ãltima anÃ¡lise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
+            <InfoCard label="PrÃ³xima aÃ§Ã£o" value={nextAction} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "minmax(240px, 320px) 1fr", gap: 12, alignItems: "end" }}>
-            <Field label="Histórico por data">
+            <Field label="HistÃ³rico por data">
               <select value={client.currentAnalysisId || attendanceDateOptions[0]?.value || ""} onChange={(event) => onSelectAnalysis(client.id, event.target.value)} style={inputStyle}>
                 {attendanceDateOptions.map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
@@ -2791,18 +2792,18 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
               </select>
             </Field>
             <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.55 }}>
-              Escolha a data para abrir outra análise deste prontuário sem perder o que já foi feito.
+              Escolha a data para abrir outra anÃ¡lise deste prontuÃ¡rio sem perder o que jÃ¡ foi feito.
             </div>
           </div>
         </div>
 
         {activeGraphics.length ? (
           <div style={{ display: "grid", gap: 8 }}>
-            <div style={{ ...labelStyle, marginBottom: 0 }}>Gráficos ativos nesta análise</div>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>GrÃ¡ficos ativos nesta anÃ¡lise</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {activeGraphics.map((item) => (
                 <span key={`${item.protocol}-${item.nome}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 999, padding: "9px 13px", background: "#fffdfa", fontSize: 13, fontWeight: 800, color: THEME.text }}>
-                  {item.nome} · {item.protocol}
+                  {item.nome} Â· {item.protocol}
                 </span>
               ))}
             </div>
@@ -2823,25 +2824,25 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18 }}>
       <Panel>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Resumo da análise</div>
-          <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o início</div>
+          <div style={{ fontSize: 18, fontWeight: 800 }}>Resumo da anÃ¡lise</div>
+          <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o inÃ­cio</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 16 }}>
-          <InfoCard label="Método" value="TGR" />
+          <InfoCard label="MÃ©todo" value="TGR" />
           <InfoCard label="Protocolos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum protocolo"} />
-          <InfoCard label="Início" value={formatDate(client.dataInicio)} />
+          <InfoCard label="InÃ­cio" value={formatDate(client.dataInicio)} />
           <InfoCard label="Pagamento" value={client.statusPagamento} />
           <InfoCard label="Status" value={client.status} />
-          <InfoCard label="Gráficos ativos" value={activeGraphics.length ? String(activeGraphics.length) : "0"} />
-          <InfoCard label="Queixa" value={client.queixaPrincipal || "Não registrada"} />
-          <InfoCard label="Objetivo" value={client.objetivo || "Não registrado"} />
+          <InfoCard label="GrÃ¡ficos ativos" value={activeGraphics.length ? String(activeGraphics.length) : "0"} />
+          <InfoCard label="Queixa" value={client.queixaPrincipal || "NÃ£o registrada"} />
+          <InfoCard label="Objetivo" value={client.objetivo || "NÃ£o registrado"} />
         </div>
         {activeGraphics.length ? (
           <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
-            <div style={{ ...labelStyle, marginBottom: 0 }}>Gráficos ativos por protocolo</div>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>GrÃ¡ficos ativos por protocolo</div>
             {activeGraphics.map((item) => (
               <div key={`${item.protocol}-${item.nome}-${item.contexto}-${item.tempo}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr .9fr .8fr", gap: 10 }}>
-                <div><strong>{item.nome}</strong> <span style={{ color: THEME.muted }}>· {item.protocol}</span></div>
+                <div><strong>{item.nome}</strong> <span style={{ color: THEME.muted }}>Â· {item.protocol}</span></div>
                 <div style={{ color: THEME.muted }}>{item.contexto || "Sem contexto"}</div>
                 <div style={{ color: THEME.muted }}>{item.tempo || "Sem tempo"}</div>
               </div>
@@ -2851,7 +2852,7 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
       </Panel>
 
       <Panel>
-        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Histórico por data</div>
+        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>HistÃ³rico por data</div>
         <div style={{ display: "grid", gap: 10 }}>
           {attendanceHistory.map((item) => (
             <button key={item.id} type="button" onClick={() => onSelectAnalysis(client.id, item.id)} style={{ border: `1px solid ${item.isCurrent ? THEME.green : THEME.line}`, background: item.isCurrent ? "#f7fbf4" : "#fffdfa", borderRadius: 16, padding: "12px 14px", textAlign: "left", cursor: "pointer", display: "grid", gap: 6 }}>
@@ -2861,13 +2862,13 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
               </div>
               <div style={{ color: THEME.muted, fontSize: 13 }}>{item.protocolLabel}</div>
               <div style={{ color: THEME.muted, fontSize: 12 }}>
-                {item.graphicsCount ? `${item.graphicsCount} gráficos ativos` : "Sem gráficos registrados"}
+                {item.graphicsCount ? `${item.graphicsCount} grÃ¡ficos ativos` : "Sem grÃ¡ficos registrados"}
               </div>
             </button>
           ))}
         </div>
         <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.6, marginTop: 14 }}>
-          Cada data representa uma análise diferente dentro do prontuário desta cliente.
+          Cada data representa uma anÃ¡lise diferente dentro do prontuÃ¡rio desta cliente.
         </div>
       </Panel>
     </div>
@@ -2884,7 +2885,7 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
       <div style={{ display: "grid", gap: 18 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Checklist do atendimento</div>
-          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque o que já foi feito nesta análise e escolha apenas as pendências que devem aparecer no início.</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque o que jÃ¡ foi feito nesta anÃ¡lise e escolha apenas as pendÃªncias que devem aparecer no inÃ­cio.</div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
@@ -2921,7 +2922,7 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
                   flexShrink: 0,
                 }}
               >
-                {checklist[item.key] ? "✓" : ""}
+                {checklist[item.key] ? "â" : ""}
               </span>
               <span style={{ fontWeight: 700 }}>{item.label}</span>
             </button>
@@ -2929,14 +2930,14 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
         </div>
 
         <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 16px", background: "#fffdfa", display: "grid", gap: 10 }}>
-          <div style={{ ...labelStyle, marginBottom: 0 }}>Pendências visíveis no início</div>
+          <div style={{ ...labelStyle, marginBottom: 0 }}>PendÃªncias visÃ­veis no inÃ­cio</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {PENDING_ACTION_OPTIONS.map((action) => (
               <PillButton key={action} active={pendingActions.includes(action)} onClick={() => onTogglePendingAction(action)} label={action} />
             ))}
           </div>
           <div style={{ color: THEME.muted, fontSize: 13 }}>
-            {pendingActions.length ? `Pendências marcadas: ${pendingActions.join(", ")}` : "Nenhuma pendência marcada para aparecer no início."}
+            {pendingActions.length ? `PendÃªncias marcadas: ${pendingActions.join(", ")}` : "Nenhuma pendÃªncia marcada para aparecer no inÃ­cio."}
           </div>
         </div>
       </div>
@@ -2971,7 +2972,7 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
     event.preventDefault();
     if (!form.nome.trim()) return setFormError("Informe o nome da cliente para salvar o atendimento.");
     if (!form.whatsapp.trim()) return setFormError("Informe o WhatsApp principal para manter o contato organizado.");
-    if (!form.dataInicio) return setFormError("Defina a data de início para acompanhar a duração do atendimento.");
+    if (!form.dataInicio) return setFormError("Defina a data de inÃ­cio para acompanhar a duraÃ§Ã£o do atendimento.");
     setFormError("");
     onSave({ ...form, id: form.id || generateId() });
   }
@@ -2979,7 +2980,7 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
   function handleSaveAndOpenTgr() {
     if (!form.nome.trim()) return setFormError("Informe o nome da cliente para salvar o atendimento.");
     if (!form.whatsapp.trim()) return setFormError("Informe o WhatsApp principal para manter o contato organizado.");
-    if (!form.dataInicio) return setFormError("Defina a data de início para acompanhar a duração do atendimento.");
+    if (!form.dataInicio) return setFormError("Defina a data de inÃ­cio para acompanhar a duraÃ§Ã£o do atendimento.");
     setFormError("");
     onSaveAndOpenTgr?.({ ...form, id: form.id || generateId() });
   }
@@ -3004,35 +3005,35 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
           </div>
         </div>
         {formError ? <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff5f1", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", fontWeight: 700 }}>{formError}</div> : null}
-        <SectionTitle title="Cliente e método" />
+        <SectionTitle title="Cliente e mÃ©todo" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           <Field label="Nome"><input value={form.nome} onChange={(event) => setField("nome", event.target.value)} style={inputStyle} /></Field>
           <Field label="WhatsApp"><input value={form.whatsapp} onChange={(event) => setField("whatsapp", event.target.value)} style={inputStyle} /></Field>
           <Field label="Email"><input value={form.email} onChange={(event) => setField("email", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Data de início"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Método"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          <Field label="Data de inÃ­cio"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
+          <Field label="MÃ©todo"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
         </div>
-        <SectionTitle title="Direção do atendimento" />
+        <SectionTitle title="DireÃ§Ã£o do atendimento" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           <Field label="Status"><select value={form.status} onChange={(event) => setField("status", event.target.value)} style={inputStyle}>{STATUS_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
-          <Field label="Dias desde o início"><input value={form.dataInicio ? getDaysSinceStart(form.dataInicio) : ""} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          <Field label="Dias desde o inÃ­cio"><input value={form.dataInicio ? getDaysSinceStart(form.dataInicio) : ""} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
           <Field label="Queixa principal"><textarea value={form.queixaPrincipal} onChange={(event) => setField("queixaPrincipal", event.target.value)} style={inputStyle} /></Field>
           <Field label="Objetivo"><textarea value={form.objetivo} onChange={(event) => setField("objetivo", event.target.value)} style={inputStyle} /></Field>
         </div>
-        <SectionTitle title="Leitura e intervenção" />
+        <SectionTitle title="Leitura e intervenÃ§Ã£o" />
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="button" onClick={() => applyGeneratedField("diagnosticoEnergetico", buildDiagnosticSuggestion)} style={secondaryButtonStyle}>Preencher diagnóstico base</button>
+          <button type="button" onClick={() => applyGeneratedField("diagnosticoEnergetico", buildDiagnosticSuggestion)} style={secondaryButtonStyle}>Preencher diagnÃ³stico base</button>
           <button type="button" onClick={() => applyGeneratedField("causasIdentificadas", buildCausesSuggestion)} style={secondaryButtonStyle}>Puxar leitura para causas</button>
-          <button type="button" onClick={() => applyGeneratedField("areasAfetadas", buildAreasSuggestion)} style={secondaryButtonStyle}>Listar áreas afetadas</button>
-          <button type="button" onClick={() => applyGeneratedField("intervencoesRealizadas", buildInterventionsSuggestion)} style={secondaryButtonStyle}>Montar intervenções base</button>
+          <button type="button" onClick={() => applyGeneratedField("areasAfetadas", buildAreasSuggestion)} style={secondaryButtonStyle}>Listar Ã¡reas afetadas</button>
+          <button type="button" onClick={() => applyGeneratedField("intervencoesRealizadas", buildInterventionsSuggestion)} style={secondaryButtonStyle}>Montar intervenÃ§Ãµes base</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Diagnóstico energético"><textarea value={form.diagnosticoEnergetico} onChange={(event) => setField("diagnosticoEnergetico", event.target.value)} style={inputStyle} /></Field>
+          <Field label="DiagnÃ³stico energÃ©tico"><textarea value={form.diagnosticoEnergetico} onChange={(event) => setField("diagnosticoEnergetico", event.target.value)} style={inputStyle} /></Field>
           <Field label="Causas identificadas"><textarea value={form.causasIdentificadas} onChange={(event) => setField("causasIdentificadas", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Ãreas afetadas"><textarea value={form.areasAfetadas} onChange={(event) => setField("areasAfetadas", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Intervenções realizadas"><textarea value={form.intervencoesRealizadas} onChange={(event) => setField("intervencoesRealizadas", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Evolução"><textarea value={form.evolucao} onChange={(event) => setField("evolucao", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Observações"><textarea value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} style={inputStyle} /></Field>
+          <Field label="ÃÂreas afetadas"><textarea value={form.areasAfetadas} onChange={(event) => setField("areasAfetadas", event.target.value)} style={inputStyle} /></Field>
+          <Field label="IntervenÃ§Ãµes realizadas"><textarea value={form.intervencoesRealizadas} onChange={(event) => setField("intervencoesRealizadas", event.target.value)} style={inputStyle} /></Field>
+          <Field label="EvoluÃ§Ã£o"><textarea value={form.evolucao} onChange={(event) => setField("evolucao", event.target.value)} style={inputStyle} /></Field>
+          <Field label="ObservaÃ§Ãµes"><textarea value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} style={inputStyle} /></Field>
         </div>
         <SectionTitle title="Leitura inicial" />
         <div style={{ display: "grid", gap: 16 }}>
@@ -3044,60 +3045,60 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
           <div style={{ display: "grid", gap: 10 }}>
             <div style={{ ...labelStyle, marginBottom: 0 }}>Corpos sutis</div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Corpo átmico"><input value={form.corposSutis?.atmico || ""} onChange={(event) => setNestedField("corposSutis", "atmico", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Corpo búdico"><input value={form.corposSutis?.budico || ""} onChange={(event) => setNestedField("corposSutis", "budico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo Ã¡tmico"><input value={form.corposSutis?.atmico || ""} onChange={(event) => setNestedField("corposSutis", "atmico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo bÃºdico"><input value={form.corposSutis?.budico || ""} onChange={(event) => setNestedField("corposSutis", "budico", event.target.value)} style={inputStyle} /></Field>
               <Field label="Corpo mental superior"><input value={form.corposSutis?.mentalSuperior || ""} onChange={(event) => setNestedField("corposSutis", "mentalSuperior", event.target.value)} style={inputStyle} /></Field>
               <Field label="Corpo mental inferior"><input value={form.corposSutis?.mentalInferior || ""} onChange={(event) => setNestedField("corposSutis", "mentalInferior", event.target.value)} style={inputStyle} /></Field>
               <Field label="Corpo astral"><input value={form.corposSutis?.astral || ""} onChange={(event) => setNestedField("corposSutis", "astral", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Corpo duplo etérico"><input value={form.corposSutis?.duploEterico || ""} onChange={(event) => setNestedField("corposSutis", "duploEterico", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Corpo físico"><input value={form.corposSutis?.fisico || ""} onChange={(event) => setNestedField("corposSutis", "fisico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo duplo etÃ©rico"><input value={form.corposSutis?.duploEterico || ""} onChange={(event) => setNestedField("corposSutis", "duploEterico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Corpo fÃ­sico"><input value={form.corposSutis?.fisico || ""} onChange={(event) => setNestedField("corposSutis", "fisico", event.target.value)} style={inputStyle} /></Field>
             </div>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
             <div style={{ ...labelStyle, marginBottom: 0 }}>Chakras</div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Chakra coronário"><input value={form.chakras?.coronario || ""} onChange={(event) => setNestedField("chakras", "coronario", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra coronÃ¡rio"><input value={form.chakras?.coronario || ""} onChange={(event) => setNestedField("chakras", "coronario", event.target.value)} style={inputStyle} /></Field>
               <Field label="Chakra frontal"><input value={form.chakras?.frontal || ""} onChange={(event) => setNestedField("chakras", "frontal", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Chakra laríngeo"><input value={form.chakras?.laringeo || ""} onChange={(event) => setNestedField("chakras", "laringeo", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Chakra cardíaco"><input value={form.chakras?.cardiaco || ""} onChange={(event) => setNestedField("chakras", "cardiaco", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra larÃ­ngeo"><input value={form.chakras?.laringeo || ""} onChange={(event) => setNestedField("chakras", "laringeo", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra cardÃ­aco"><input value={form.chakras?.cardiaco || ""} onChange={(event) => setNestedField("chakras", "cardiaco", event.target.value)} style={inputStyle} /></Field>
               <Field label="Chakra plexo solar"><input value={form.chakras?.plexoSolar || ""} onChange={(event) => setNestedField("chakras", "plexoSolar", event.target.value)} style={inputStyle} /></Field>
               <Field label="Chakra umbilical"><input value={form.chakras?.umbilical || ""} onChange={(event) => setNestedField("chakras", "umbilical", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Chakra básico"><input value={form.chakras?.basico || ""} onChange={(event) => setNestedField("chakras", "basico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Chakra bÃ¡sico"><input value={form.chakras?.basico || ""} onChange={(event) => setNestedField("chakras", "basico", event.target.value)} style={inputStyle} /></Field>
             </div>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ ...labelStyle, marginBottom: 0 }}>Funções</div>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>FunÃ§Ãµes</div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
-              <Field label="Função respiratória"><input value={form.funcoes?.respiratoria || ""} onChange={(event) => setNestedField("funcoes", "respiratoria", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função nutritiva"><input value={form.funcoes?.nutritiva || ""} onChange={(event) => setNestedField("funcoes", "nutritiva", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função digestiva"><input value={form.funcoes?.digestiva || ""} onChange={(event) => setNestedField("funcoes", "digestiva", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função circulatória"><input value={form.funcoes?.circulatoria || ""} onChange={(event) => setNestedField("funcoes", "circulatoria", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função relacional"><input value={form.funcoes?.relacional || ""} onChange={(event) => setNestedField("funcoes", "relacional", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função reprodutiva"><input value={form.funcoes?.reprodutiva || ""} onChange={(event) => setNestedField("funcoes", "reprodutiva", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função estruturante"><input value={form.funcoes?.estruturante || ""} onChange={(event) => setNestedField("funcoes", "estruturante", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função evolutiva"><input value={form.funcoes?.evolutiva || ""} onChange={(event) => setNestedField("funcoes", "evolutiva", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Função excretora"><input value={form.funcoes?.excretora || ""} onChange={(event) => setNestedField("funcoes", "excretora", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o respiratÃ³ria"><input value={form.funcoes?.respiratoria || ""} onChange={(event) => setNestedField("funcoes", "respiratoria", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o nutritiva"><input value={form.funcoes?.nutritiva || ""} onChange={(event) => setNestedField("funcoes", "nutritiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o digestiva"><input value={form.funcoes?.digestiva || ""} onChange={(event) => setNestedField("funcoes", "digestiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o circulatÃ³ria"><input value={form.funcoes?.circulatoria || ""} onChange={(event) => setNestedField("funcoes", "circulatoria", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o relacional"><input value={form.funcoes?.relacional || ""} onChange={(event) => setNestedField("funcoes", "relacional", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o reprodutiva"><input value={form.funcoes?.reprodutiva || ""} onChange={(event) => setNestedField("funcoes", "reprodutiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o estruturante"><input value={form.funcoes?.estruturante || ""} onChange={(event) => setNestedField("funcoes", "estruturante", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o evolutiva"><input value={form.funcoes?.evolutiva || ""} onChange={(event) => setNestedField("funcoes", "evolutiva", event.target.value)} style={inputStyle} /></Field>
+              <Field label="FunÃ§Ã£o excretora"><input value={form.funcoes?.excretora || ""} onChange={(event) => setNestedField("funcoes", "excretora", event.target.value)} style={inputStyle} /></Field>
             </div>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
             <div style={{ ...labelStyle, marginBottom: 0 }}>Campos</div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
-              <Field label="Campo energético"><input value={form.campos?.energetico || ""} onChange={(event) => setNestedField("campos", "energetico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo energÃ©tico"><input value={form.campos?.energetico || ""} onChange={(event) => setNestedField("campos", "energetico", event.target.value)} style={inputStyle} /></Field>
               <Field label="Campo mental"><input value={form.campos?.mental || ""} onChange={(event) => setNestedField("campos", "mental", event.target.value)} style={inputStyle} /></Field>
               <Field label="Campo vital"><input value={form.campos?.vital || ""} onChange={(event) => setNestedField("campos", "vital", event.target.value)} style={inputStyle} /></Field>
               <Field label="Campo emocional"><input value={form.campos?.emocional || ""} onChange={(event) => setNestedField("campos", "emocional", event.target.value)} style={inputStyle} /></Field>
               <Field label="Campo espiritual"><input value={form.campos?.espiritual || ""} onChange={(event) => setNestedField("campos", "espiritual", event.target.value)} style={inputStyle} /></Field>
-              <Field label="Campo físico"><input value={form.campos?.fisico || ""} onChange={(event) => setNestedField("campos", "fisico", event.target.value)} style={inputStyle} /></Field>
+              <Field label="Campo fÃ­sico"><input value={form.campos?.fisico || ""} onChange={(event) => setNestedField("campos", "fisico", event.target.value)} style={inputStyle} /></Field>
             </div>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
             <div style={{ ...labelStyle, marginBottom: 0 }}>Aura</div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <Field label="Proteção"><input value={form.aura?.protecao || ""} onChange={(event) => setNestedField("aura", "protecao", event.target.value)} style={inputStyle} /></Field>
+              <Field label="ProteÃ§Ã£o"><input value={form.aura?.protecao || ""} onChange={(event) => setNestedField("aura", "protecao", event.target.value)} style={inputStyle} /></Field>
               <Field label="Tamanho"><input value={form.aura?.tamanho || ""} onChange={(event) => setNestedField("aura", "tamanho", event.target.value)} style={inputStyle} /></Field>
               <Field label="Cor excesso"><input value={form.aura?.corExcesso || ""} onChange={(event) => setNestedField("aura", "corExcesso", event.target.value)} style={inputStyle} /></Field>
               <Field label="Cor falta"><input value={form.aura?.corFalta || ""} onChange={(event) => setNestedField("aura", "corFalta", event.target.value)} style={inputStyle} /></Field>
@@ -3112,7 +3113,7 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
         </div>
         <div style={{ display: "grid", gap: 12 }}>
           <Field label="Devolutiva final"><textarea value={form.devolutivaFinal} onChange={(event) => setField("devolutivaFinal", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Próximos passos"><textarea value={form.proximosPassos} onChange={(event) => setField("proximosPassos", event.target.value)} style={inputStyle} /></Field>
+          <Field label="PrÃ³ximos passos"><textarea value={form.proximosPassos} onChange={(event) => setField("proximosPassos", event.target.value)} style={inputStyle} /></Field>
         </div>
       </form>
     </Panel>
@@ -3131,16 +3132,16 @@ function FinalFeedback({ client }) {
         <div style={{ color: THEME.green, fontWeight: 800 }}>{client.statusPagamento === "Pago" ? "Pagamento regularizado" : "Pagamento em aberto"}</div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 12 }}>
-        <InfoCard label="Análise" value={currentAnalysis?.dataInicio ? formatFullDate(currentAnalysis.dataInicio) : "Sem data"} />
+        <InfoCard label="AnÃ¡lise" value={currentAnalysis?.dataInicio ? formatFullDate(currentAnalysis.dataInicio) : "Sem data"} />
         <InfoCard label="Protocolos" value={protocolLabel || "Sem protocolo"} />
-        <InfoCard label="Gráficos" value={activeGraphics.length ? `${activeGraphics.length} ativos` : "Nenhum"} />
+        <InfoCard label="GrÃ¡ficos" value={activeGraphics.length ? `${activeGraphics.length} ativos` : "Nenhum"} />
         <InfoCard label="Status" value={client.status} />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
-        <SummaryBlock title="Síntese" text={client.devolutivaFinal || client.diagnosticoEnergetico || "Ainda sem síntese registrada."} />
+        <SummaryBlock title="SÃ­ntese" text={client.devolutivaFinal || client.diagnosticoEnergetico || "Ainda sem sÃ­ntese registrada."} />
         <SummaryBlock title="Causas" text={client.causasIdentificadas || "Sem causas registradas."} />
-        <SummaryBlock title="Intervenções" text={client.intervencoesRealizadas || (activeGraphics.length ? activeGraphics.map((item) => `${item.nome} - ${item.protocol}`).join(", ") : "Sem intervenções registradas.")} />
-        <SummaryBlock title="Orientação final" text={client.proximosPassos || "Sem orientações finais definidas."} />
+        <SummaryBlock title="IntervenÃ§Ãµes" text={client.intervencoesRealizadas || (activeGraphics.length ? activeGraphics.map((item) => `${item.nome} - ${item.protocol}`).join(", ") : "Sem intervenÃ§Ãµes registradas.")} />
+        <SummaryBlock title="OrientaÃ§Ã£o final" text={client.proximosPassos || "Sem orientaÃ§Ãµes finais definidas."} />
         <SummaryBlock title="Texto consolidado" text={generatedSummary} />
       </div>
     </Panel>
@@ -3260,7 +3261,7 @@ function ClientListCard({ client, active, onClick }) {
         <StatusBadge status={client.status} />
       </div>
       <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>TGR - {formatProtocols(client)}</div>
-      <div style={{ color: THEME.muted, fontSize: 12, marginTop: 10 }}>{client.diasAtendimento} dias desde o início</div>
+      <div style={{ color: THEME.muted, fontSize: 12, marginTop: 10 }}>{client.diasAtendimento} dias desde o inÃ­cio</div>
     </button>
   );
 }
@@ -3282,7 +3283,7 @@ function ProtocolSaveBar({ title, text, onSave, dirty }) {
         <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.6 }}>{text}</div>
       </div>
       <button type="button" onClick={onSave} style={primaryButtonStyle}>
-        {dirty ? "Salvar alterações" : "Salvar protocolo"}
+        {dirty ? "Salvar alteraÃ§Ãµes" : "Salvar protocolo"}
       </button>
     </div>
   );
