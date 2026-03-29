@@ -1041,6 +1041,12 @@ function App() {
     setUiMessage("Nova analise iniciada.");
   }
 
+  function startNewClient() {
+    setDraftClient({ ...emptyClient, id: generateId() });
+    setSelectedId("__new__");
+    setMainTab("clientes");
+  }
+
   async function toggleClientProtocol(clientId, protocolName) {
     const currentClient = clients.find((item) => item.id === clientId);
     if (!currentClient) return;
@@ -1275,6 +1281,7 @@ function App() {
           appointments={appointments}
           filteredClients={filteredClients}
           selectedClient={selectedClient}
+          draftClient={draftClient}
           search={search}
           setSearch={setSearch}
           statusFilter={statusFilter}
@@ -1300,9 +1307,11 @@ function App() {
           setProtocolSupportForms={setProtocolSupportForms}
           relacoesContext={relacoesContext}
           clientDetailOpen={mainTab === "clientes" && Boolean(selectedClient)}
+          isCreatingClient={mainTab === "clientes" && selectedId === "__new__"}
           toggleClientProtocol={toggleClientProtocol}
           saveProtocolToClient={saveProtocolToClient}
           setMainTab={setMainTab}
+          startNewClient={startNewClient}
           openProtocolForClient={openProtocolForClient}
         />
       </div>
@@ -1319,6 +1328,7 @@ function MainContent(props) {
     appointments,
     filteredClients,
     selectedClient,
+    draftClient,
     search,
     setSearch,
     statusFilter,
@@ -1346,7 +1356,9 @@ function MainContent(props) {
     toggleClientProtocol,
     saveProtocolToClient,
     clientDetailOpen,
+    isCreatingClient,
     setMainTab,
+    startNewClient,
     openProtocolForClient,
   } = props;
 
@@ -1376,6 +1388,7 @@ function MainContent(props) {
         <ClientsView
           clients={filteredClients}
           selectedClient={selectedClient}
+          draftClient={draftClient}
           search={search}
           setSearch={setSearch}
           statusFilter={statusFilter}
@@ -1389,7 +1402,9 @@ function MainContent(props) {
           saving={saving}
           mobile={mobile}
           clientDetailOpen={clientDetailOpen}
+          isCreatingClient={isCreatingClient}
           openProtocolForClient={openProtocolForClient}
+          startNewClient={startNewClient}
           onBackToList={() => setSelectedId("")}
         />
     );
@@ -1516,7 +1531,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, openProtocolForClient, onBackToList }) {
+function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, onBackToList }) {
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
@@ -1536,12 +1551,32 @@ function ClientsView({ clients, selectedClient, search, setSearch, statusFilter,
     );
   }
 
+  if (isCreatingClient) {
+    return (
+      <section style={{ display: "grid", gap: 18 }}>
+        <Panel>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Novo cliente</div>
+              <div style={{ color: THEME.muted }}>Preencha a ficha inicial para criar o prontuário.</div>
+            </div>
+            <button type="button" onClick={onBackToList} style={secondaryButtonStyle}>Voltar para clientes</button>
+          </div>
+        </Panel>
+        <ClientRecord client={draftClient} onSave={saveClient} mobile={mobile} saving={saving} />
+      </section>
+    );
+  }
+
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <Panel>
         <div style={{ display: "grid", gap: 10 }}>
           <div style={{ fontSize: 22, fontWeight: 800 }}>Clientes</div>
           <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha uma cliente para abrir o prontuário em modo focado.</div>
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <button type="button" onClick={startNewClient} style={primaryButtonStyle}>Novo cliente</button>
         </div>
       </Panel>
 
