@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { hasSupabaseEnv } from "./lib/supabase";
 import { getCurrentSession, signInWithPassword, signOut } from "./services/auth";
 import { deleteClient, listClients, upsertClient } from "./services/clients";
@@ -1797,10 +1798,10 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
 }
 
 function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, updateClientAnalysisFields, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, onBackToList }) {
-  const [clientDetailTab, setClientDetailTab] = useState("resumo");
+  const [clientDetailTab, setClientDetailTab] = useState("ficha");
 
   useEffect(() => {
-    if (selectedClient?.id) setClientDetailTab("resumo");
+    if (selectedClient?.id) setClientDetailTab("ficha");
   }, [selectedClient?.id, selectedClient?.currentAnalysisId]);
 
   if (clientDetailOpen && selectedClient) {
@@ -1819,42 +1820,44 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
             </div>
           </div>
         </Panel>
-        <ClientHeader
-          client={selectedClient}
-          onDelete={removeClient}
-          onFinalize={finalizeClient}
-          onSelectAnalysis={switchClientAnalysis}
-          onNewAnalysis={createNewAnalysis}
-          onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
-          onOpenFeedback={openFeedbackForClient}
-          onBack={onBackToList}
-        />
-        {clientDetailTab === "resumo" ? (
-          <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
-        ) : null}
-        {clientDetailTab === "ficha" ? (
-          <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
-        ) : null}
-        {clientDetailTab === "checklist" ? (
-          <ClientChecklistPanel
+        <RenderGuard title="prontuário da cliente">
+          <ClientHeader
             client={selectedClient}
-            onToggleChecklist={(key, checked) =>
-              updateClientAnalysisFields(selectedClient.id, {
-                checklist: {
-                  ...(getAnalysisRecord(selectedClient)?.checklist || emptyAnalysis.checklist),
-                  [key]: checked,
-                },
-              }, "Checklist atualizada.")
-            }
-            onTogglePendingAction={(action) => {
-              const currentActions = getAnalysisRecord(selectedClient)?.pendingActions || [];
-              const nextActions = currentActions.includes(action)
-                ? currentActions.filter((item) => item !== action)
-                : [...currentActions, action];
-              return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "Pendências atualizadas.");
-            }}
+            onDelete={removeClient}
+            onFinalize={finalizeClient}
+            onSelectAnalysis={switchClientAnalysis}
+            onNewAnalysis={createNewAnalysis}
+            onOpenProtocol={(protocol) => openProtocolForClient(selectedClient, protocol)}
+            onOpenFeedback={openFeedbackForClient}
+            onBack={onBackToList}
           />
-        ) : null}
+          {clientDetailTab === "resumo" ? (
+            <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
+          ) : null}
+          {clientDetailTab === "ficha" ? (
+            <ClientRecord client={selectedClient} onSave={saveClient} mobile={mobile} saving={saving} />
+          ) : null}
+          {clientDetailTab === "checklist" ? (
+            <ClientChecklistPanel
+              client={selectedClient}
+              onToggleChecklist={(key, checked) =>
+                updateClientAnalysisFields(selectedClient.id, {
+                  checklist: {
+                    ...(getAnalysisRecord(selectedClient)?.checklist || emptyAnalysis.checklist),
+                    [key]: checked,
+                  },
+                }, "Checklist atualizada.")
+              }
+              onTogglePendingAction={(action) => {
+                const currentActions = getAnalysisRecord(selectedClient)?.pendingActions || [];
+                const nextActions = currentActions.includes(action)
+                  ? currentActions.filter((item) => item !== action)
+                  : [...currentActions, action];
+                return updateClientAnalysisFields(selectedClient.id, { pendingActions: nextActions }, "Pendências atualizadas.");
+              }}
+            />
+          ) : null}
+        </RenderGuard>
       </section>
     );
   }
@@ -3316,6 +3319,40 @@ function ProtocolStageTabs({ activeStage, onChange }) {
 
 function SectionTitle({ title }) {
   return <div style={{ fontSize: 12, fontWeight: 800, color: THEME.terracotta, textTransform: "uppercase", letterSpacing: 1, paddingTop: 4 }}>{title}</div>;
+}
+
+class RenderGuard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.title !== this.props.title && this.state.hasError) {
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Panel>
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 18, fontWeight: 800 }}>Algo falhou ao abrir este bloco</div>
+            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>
+              O sistema evitou a tela branca e manteve o restante do atendimento seguro. Tente voltar para a lista e abrir novamente.
+            </div>
+          </div>
+        </Panel>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 export default App;
