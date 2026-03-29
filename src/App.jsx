@@ -1480,38 +1480,6 @@ function App() {
                   Navegação reduzida para manter o atendimento mais seguro e direto.
                 </div>
               </div>
-              <div style={{ display: "none", gap: 8, flexWrap: "wrap" }}>
-                <button type="button" onClick={() => setMainTab("clientes")} style={secondaryButtonStyle}>Prontuário</button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveMethod("radiestesia");
-                    setActiveSubmethod("tgr");
-                    setActiveMethodTab("protocolos");
-                    setMainTab("metodos");
-                  }}
-                  style={secondaryButtonStyle}
-                >
-                  TGR
-                </button>
-                <button type="button" onClick={() => setMainTab("devolutivas")} style={secondaryButtonStyle}>Devolutiva</button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedId("");
-                    setRelacoesContext(null);
-                    setMainTab("dashboard");
-                  }}
-                  style={primaryButtonStyle}
-                >
-                  Menu central
-                </button>
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <StagePill label="Prontuario" active={mainTab === "clientes"} />
-                <StagePill label="TGR" active={mainTab === "metodos"} />
-                <StagePill label="Devolutiva" active={mainTab === "devolutivas"} />
-              </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button type="button" onClick={() => { if (!confirmUnsavedNavigation("o prontuario")) return; setMainTab("clientes"); }} style={mainTab === "clientes" ? primaryButtonStyle : secondaryButtonStyle}>Prontuario</button>
                 <button type="button" onClick={() => openTgrWorkspace()} style={mainTab === "metodos" ? primaryButtonStyle : secondaryButtonStyle}>TGR</button>
