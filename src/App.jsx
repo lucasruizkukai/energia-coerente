@@ -1517,6 +1517,7 @@ function MainContent(props) {
         appointments={appointments}
         metrics={metrics}
         mobile={mobile}
+        onNewClient={startNewClient}
         onOpenClient={(id) => {
           setSelectedId(id);
           setMainTab("clientes");
@@ -1629,32 +1630,57 @@ function TopMetrics({ metrics, mobile }) {
   );
 }
 
-function DashboardView({ clients, appointments, metrics, mobile, onOpenClient }) {
+function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, onNewClient }) {
   const highlighted = appointments.slice().sort((a, b) => a.diasAtendimento - b.diasAtendimento).slice(0, 4);
+  const latestClients = clients
+    .slice()
+    .sort((a, b) => String(getLatestAnalysis(b)?.dataInicio || "").localeCompare(String(getLatestAnalysis(a)?.dataInicio || "")))
+    .slice(0, 4);
+  const actionQueue = clients
+    .filter((client) => client.status === "Aguardando devolutiva" || client.status === "Em atendimento" || client.statusPagamento !== "Pago")
+    .slice()
+    .sort((a, b) => {
+      const statusWeight = (item) => (item.status === "Aguardando devolutiva" ? 0 : item.status === "Em atendimento" ? 1 : 2);
+      return statusWeight(a) - statusWeight(b);
+    })
+    .slice(0, 5);
+  const currentClient = clients.find((client) => client.status === "Em atendimento") || latestClients[0] || null;
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
-      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.05fr 0.95fr", gap: 18 }}>
+      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18 }}>
         <Panel>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Visao geral</div>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-            <ActionTile title="Clientes" text={`${clients.length} clientes cadastrados`} />
-            <ActionTile title="Atendimentos" text={`${appointments.length} atendimentos registrados`} />
-            <ActionTile title="Pendencias" text={`${metrics.pendingFeedback} aguardando devolutiva`} />
-            <ActionTile title="Fluxo principal" text="Cliente > prontuario > TGR > devolutiva." />
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Mesa de trabalho</div>
+              <div style={{ color: THEME.muted }}>Acesso rapido ao que precisa acao hoje.</div>
+            </div>
+            <button type="button" onClick={onNewClient} style={primaryButtonStyle}>Novo cliente</button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
+            <CommandCardButton title="Clientes" text={`${clients.length} prontuarios cadastrados`} onClick={() => onOpenClient(latestClients[0]?.id || currentClient?.id || "")} disabled={!clients.length} />
+            <CommandCardButton title="Retomar ultima analise" text={currentClient ? `${currentClient.nome} em foco` : "Nenhuma analise em andamento"} onClick={() => currentClient && onOpenClient(currentClient.id)} primary disabled={!currentClient} />
+            <CommandCardButton title="Pendencias do dia" text={`${metrics.pendingFeedback} aguardando devolutiva e ${metrics.pendingPayment} com financeiro pendente`} onClick={() => actionQueue[0] && onOpenClient(actionQueue[0].id)} disabled={!actionQueue.length} />
           </div>
         </Panel>
 
         <Panel>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Como navegar</div>
+          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 14 }}>Fila de agora</div>
           <div style={{ display: "grid", gap: 12 }}>
-            <ActionTile title="Abrir atendimento" text="Entre em Clientes e escolha o prontuario que deseja trabalhar." />
-            <ActionTile title="Usar TGR" text="Dentro da cliente, abra o TGR e selecione o protocolo da analise." />
+            {actionQueue.length ? actionQueue.map((client) => (
+              <button key={client.id} type="button" onClick={() => onOpenClient(client.id)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                  <div style={{ fontWeight: 800 }}>{client.nome}</div>
+                  <StatusBadge status={client.status} />
+                </div>
+                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>{getNextAction(client)}</div>
+              </button>
+            )) : <ActionTile title="Sem pendencias imediatas" text="O fluxo principal esta livre para iniciar novos atendimentos." />}
           </div>
         </Panel>
       </section>
 
-      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr", gap: 18 }}>
+      <section style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 18 }}>
         <Panel>
           <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Atendimentos em destaque</div>
           <div style={{ display: "grid", gap: 12 }}>
@@ -1670,6 +1696,24 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient })
                 <div style={{ color: THEME.muted, fontSize: 13, marginTop: 10 }}>{appointment.diasAtendimento} dias desde o inicio</div>
               </button>
             )) : <div style={{ color: THEME.muted }}>Nenhum atendimento em destaque.</div>}
+          </div>
+        </Panel>
+
+        <Panel>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Ultimos prontuarios</div>
+          <div style={{ display: "grid", gap: 12 }}>
+            {latestClients.length ? latestClients.map((client) => (
+              <button key={client.id} type="button" onClick={() => onOpenClient(client.id)} style={{ border: `1px solid ${THEME.line}`, background: "#fffdfa", borderRadius: 18, padding: "14px 16px", textAlign: "left", cursor: "pointer" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                  <div style={{ fontWeight: 800 }}>{client.nome}</div>
+                  <StatusBadge status={client.status} />
+                </div>
+                <div style={{ color: THEME.muted, fontSize: 13, marginTop: 6 }}>{formatProtocols(client)}</div>
+                <div style={{ color: THEME.muted, fontSize: 12, marginTop: 8 }}>
+                  Ultima analise: {getLatestAnalysis(client)?.dataInicio ? formatFullDate(getLatestAnalysis(client).dataInicio) : "Sem data"}
+                </div>
+              </button>
+            )) : <div style={{ color: THEME.muted }}>Nenhum prontuario recente.</div>}
           </div>
         </Panel>
       </section>
