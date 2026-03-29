@@ -9,7 +9,7 @@ const BRAND = {
 };
 
 const MAIN_TABS = [
-  { key: "dashboard", label: "Dashboard" },
+  { key: "dashboard", label: "Início" },
   { key: "clientes", label: "Clientes" },
   { key: "atendimentos", label: "Atendimentos" },
   { key: "financeiro", label: "Financeiro" },
@@ -1408,10 +1408,29 @@ function App() {
     <Shell>
       <Header user={user} onLogout={handleLogout} mobile={mobile} />
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "18px 14px 40px" : "24px 24px 48px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 16 }}>
+          <button
+            type="button"
+            onClick={() => {
+              if (!confirmUnsavedNavigation("o início")) return;
+              setSelectedId("");
+              setRelacoesContext(null);
+              setMainTab("dashboard");
+            }}
+            style={mainTab === "dashboard" && !clientFocusMode ? primaryButtonStyle : secondaryButtonStyle}
+          >
+            Início
+          </button>
+          {clientFocusMode ? (
+            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
+              Volte ao início quando quiser sair do atendimento em foco sem se perder na navegação.
+            </div>
+          ) : null}
+        </div>
         {!clientFocusMode ? <TopMetrics metrics={metrics} mobile={mobile} /> : null}
         {!clientFocusMode ? (
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, marginBottom: 18 }}>
-            {MAIN_TABS.map((tab) => (
+            {MAIN_TABS.filter((tab) => tab.key !== "dashboard").map((tab) => (
               <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
             ))}
           </div>
