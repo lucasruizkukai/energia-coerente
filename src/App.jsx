@@ -2027,32 +2027,66 @@ function MethodOverview({ appointments, mobile }) {
 }
 
 function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesForm, setRelacoesForm, protocolSupportForms, setProtocolSupportForms, relacoesContext, selectedClient, toggleClientProtocol, saveProtocolToClient, protocolDirtyState, hasUnsavedProtocolChanges }) {
-  const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol) || null;
-  const supportForm = selectedProtocol ? (protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm) : emptyProtocolSupportForm;
   const validProtocols = getValidProtocols(selectedClient?.protocolosUsados);
+  const selectedProtocol = TGR_PROTOCOLS.find((item) => item.slug === activeProtocol && validProtocols.includes(item.nome)) || null;
+  const supportForm = selectedProtocol ? (protocolSupportForms[selectedProtocol.slug] || emptyProtocolSupportForm) : emptyProtocolSupportForm;
   const activeProtocolDirty = selectedProtocol ? Boolean(protocolDirtyState?.[selectedProtocol.slug]) : false;
+
+  function handleProtocolChoice(protocol) {
+    const isActive = validProtocols.includes(protocol.nome);
+    if (!isActive && selectedClient) toggleClientProtocol(selectedClient.id, protocol.nome);
+    setActiveProtocol(protocol.slug);
+  }
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
       {selectedClient ? (
         <Panel>
           <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta analise</div>
-                <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque um ou mais protocolos para trabalhar na mesma analise e abra cada um pelo proprio chip.</div>
-              </div>
-              <button type="button" onClick={() => setActiveProtocol("")} style={secondaryButtonStyle}>Adicionar protocolo a analise</button>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta analise</div>
+              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha o protocolo neste unico bloco. Se ele ainda nao estiver ativo, entra na analise automaticamente.</div>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {PROTOCOL_OPTIONS.map((protocol) => (
-                <PillButton
-                  key={protocol}
-                  active={validProtocols.includes(protocol)}
-                  onClick={() => toggleClientProtocol(selectedClient.id, protocol)}
-                  label={protocol}
-                />
-              ))}
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
+              {TGR_PROTOCOLS.map((protocol) => {
+                const isActive = validProtocols.includes(protocol.nome);
+                const isSelected = selectedProtocol?.slug === protocol.slug;
+                return (
+                  <button
+                    key={protocol.slug}
+                    type="button"
+                    onClick={() => handleProtocolChoice(protocol)}
+                    style={{
+                      border: `1px solid ${isSelected ? THEME.green : THEME.line}`,
+                      background: isSelected ? "#f7fbf4" : "#fffdfa",
+                      borderRadius: 18,
+                      padding: "14px 16px",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      display: "grid",
+                      gap: 6,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <div style={{ fontWeight: 800, color: isSelected ? THEME.green : THEME.text }}>{protocol.nome}</div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: isActive ? THEME.green : THEME.muted }}>
+                        {isSelected ? "ABERTO" : isActive ? "ATIVO" : "ADICIONAR"}
+                      </span>
+                    </div>
+                    <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.55 }}>{protocol.resumo}</div>
+                  </button>
+                );
+              })}
+            </div>
+            {validProtocols.length ? (
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {validProtocols.map((protocol) => (
+                  <PillButton key={protocol} active={selectedProtocol?.nome === protocol} onClick={() => setActiveProtocol(findProtocolSlugByName(protocol))} label={protocol} />
+                ))}
+              </div>
+            ) : null}
+            <div style={{ color: THEME.muted, fontSize: 13 }}>
+              {selectedProtocol ? <>Protocolo aberto agora: <strong style={{ color: THEME.text }}>{selectedProtocol.nome}</strong></> : "Nenhum protocolo aberto ainda. Escolha um card acima para continuar."}
             </div>
             {hasUnsavedProtocolChanges ? (
               <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff8f2", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", display: "grid", gap: 4 }}>
@@ -2063,18 +2097,17 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
           </div>
         </Panel>
       ) : null}
-      <MethodCatalog title="Protocolos TGR" items={TGR_PROTOCOLS} mobile={mobile} activeSlug={selectedProtocol?.slug} onSelect={setActiveProtocol} />
       {!selectedProtocol ? (
         <Panel>
           <div style={{ display: "grid", gap: 8 }}>
-            <div style={{ fontSize: 18, fontWeight: 800 }}>Escolha o protocolo para iniciar</div>
+            <div style={{ fontSize: 18, fontWeight: 800 }}>Escolha um protocolo para preencher</div>
             <div style={{ color: THEME.muted, lineHeight: 1.6 }}>
               Selecione entre Relações, Limpeza e Proteção ou Prosperidade para começar a preencher a análise.
             </div>
           </div>
         </Panel>
       ) : selectedProtocol.slug === "relacoes" ? (
-        <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} onSave={() => saveProtocolToClient("relacoes", relacoesForm)} isDirty={activeProtocolDirty} />
+        <RelacoesProtocolView mobile={mobile} form={relacoesForm} setForm={setRelacoesForm} context={relacoesContext} currentProtocolName={selectedProtocol.nome} onSave={() => saveProtocolToClient("relacoes", relacoesForm)} isDirty={activeProtocolDirty} />
       ) : (
         <GenericProtocolView
           mobile={mobile}
@@ -2089,6 +2122,7 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
             }))
           }
           context={relacoesContext}
+          currentProtocolName={selectedProtocol.nome}
           onSave={() => saveProtocolToClient(selectedProtocol.slug, supportForm)}
           isDirty={activeProtocolDirty}
         />
@@ -2097,7 +2131,7 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
   );
 }
 
-function RelacoesProtocolView({ mobile, form, setForm, context, onSave, isDirty }) {
+function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolName, onSave, isDirty }) {
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(TGR_GRAPHIC_GROUPS[0].slug);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
   const currentGraphicGroup = TGR_GRAPHIC_GROUPS.find((item) => item.slug === activeGraphicGroup) || TGR_GRAPHIC_GROUPS[0];
@@ -2155,7 +2189,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, onSave, isDirty 
           <div style={{ border: `1px solid ${THEME.green}`, background: "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "grid", gap: 4 }}>
             <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
             <div style={{ color: THEME.muted }}>{context.clientName}</div>
-            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
+            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo aberto agora: {currentProtocolName || context.protocolName}</div>
           </div>
         ) : null}
 
@@ -2299,7 +2333,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, onSave, isDirty 
   );
 }
 
-function GenericProtocolView({ mobile, protocol, form, setForm, context, onSave, isDirty }) {
+function GenericProtocolView({ mobile, protocol, form, setForm, context, currentProtocolName, onSave, isDirty }) {
   const defaultGraphicConfig = PROTOCOL_GRAPHIC_DEFAULTS[protocol.slug] || { group: TGR_GRAPHIC_GROUPS[0].slug, context: protocol.nome };
   const [activeGraphicGroup, setActiveGraphicGroup] = useState(defaultGraphicConfig.group);
   const [expandedGraphicConfigs, setExpandedGraphicConfigs] = useState({});
@@ -2364,7 +2398,7 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, onSave,
           <div style={{ border: `1px solid ${THEME.green}`, background: "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "grid", gap: 4 }}>
             <div style={{ fontWeight: 800 }}>Atendimento vinculado</div>
             <div style={{ color: THEME.muted }}>{context.clientName}</div>
-            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo atual do atendimento: {context.protocolName}</div>
+            <div style={{ color: THEME.muted, fontSize: 13 }}>Protocolo aberto agora: {currentProtocolName || context.protocolName}</div>
           </div>
         ) : null}
 
