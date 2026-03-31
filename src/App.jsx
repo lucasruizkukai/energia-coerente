@@ -269,6 +269,8 @@ const emptyClient = {
   nome: "",
   whatsapp: "",
   email: "",
+  dataNascimento: "",
+  endereco: "",
   analyses: [],
   currentAnalysisId: "",
   dataInicio: "",
@@ -3011,7 +3013,11 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
           <Field label="WhatsApp"><input value={form.whatsapp} onChange={(event) => setField("whatsapp", event.target.value)} style={inputStyle} /></Field>
           <Field label="Email"><input value={form.email} onChange={(event) => setField("email", event.target.value)} style={inputStyle} /></Field>
           <Field label="Data de início"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
+          <Field label="Data de nascimento"><input type="date" value={form.dataNascimento} onChange={(event) => setField("dataNascimento", event.target.value)} style={inputStyle} /></Field>
           <Field label="Método"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginTop: 12 }}>
+          <Field label="Endereço"><input value={form.endereco} onChange={(event) => setField("endereco", event.target.value)} style={inputStyle} placeholder="Rua, número, bairro, cidade..." /></Field>
         </div>
         <SectionTitle title="Direção do atendimento" />
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
