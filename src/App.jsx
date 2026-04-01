@@ -1477,7 +1477,7 @@ function App() {
               <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
             ))}
           </div>
-        ) : (
+        ) : (mainTab === "clientes" && Boolean(selectedClient) ? null : (
           <Panel style={{ marginTop: 10, marginBottom: 18, padding: "16px 18px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
             <div style={{ display: "grid", gap: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -1658,6 +1658,12 @@ function MainContent(props) {
           openProtocolForClient={openProtocolForClient}
           startNewClient={startNewClient}
           openFeedbackForClient={() => setMainTab("devolutivas")}
+          openTgrForClient={() => openProtocolForClient(selectedClient, "")}
+          onBackToMenu={() => {
+            setSelectedId("");
+            setRelacoesContext(null);
+            setMainTab("dashboard");
+          }}
           onBackToList={() => setSelectedId("")}
         />
     );
@@ -1806,7 +1812,7 @@ function DashboardView({ clients, appointments, metrics, mobile, onOpenClient, o
   );
 }
 
-function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, updateClientAnalysisFields, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, onBackToList }) {
+function ClientsView({ clients, selectedClient, draftClient, search, setSearch, statusFilter, setStatusFilter, setSelectedId, saveClient, saveClientAndOpenTgr, removeClient, finalizeClient, switchClientAnalysis, createNewAnalysis, updateClientAnalysisFields, saving, mobile, clientDetailOpen, isCreatingClient, openProtocolForClient, startNewClient, openFeedbackForClient, openTgrForClient, onBackToMenu, onBackToList }) {
   const [clientDetailTab, setClientDetailTab] = useState("ficha");
 
   useEffect(() => {
@@ -1836,6 +1842,12 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
                   <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Tudo do prontuário fica aqui, sem perder o fio do atendimento.</div>
                 </div>
                 <div style={{ color: THEME.terracotta, fontSize: 12, fontWeight: 800, letterSpacing: 0.4, textTransform: "uppercase" }}>Atendimento em foco</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" style={primaryButtonStyle}>Prontuário</button>
+                <button type="button" onClick={openTgrForClient} style={secondaryButtonStyle}>TGR</button>
+                <button type="button" onClick={openFeedbackForClient} style={secondaryButtonStyle}>Devolutiva</button>
+                <button type="button" onClick={onBackToMenu} style={secondaryButtonStyle}>Voltar ao menu</button>
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 {CLIENT_DETAIL_TABS.map((tab) => (
