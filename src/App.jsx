@@ -2747,30 +2747,27 @@ function FinancialView({ clients, mobile }) {
     </div>
   );
 }
-
 function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAnalysis, onOpenProtocol, onOpenFeedback, onBack, mobile }) {
   const currentAnalysis = getAnalysisRecord(client);
   const validProtocols = getValidProtocols(currentAnalysis.protocolosUsados);
   const attendanceDateOptions = buildAttendanceDateOptions(client);
-  const activeGraphics = getActiveGraphicsFromAnalysis(currentAnalysis);
   const latestAnalysis = getLatestAnalysis(client);
   const nextAction = getNextAction(client);
   const canFinalize = client.status !== "Concluído";
 
   return (
-    <Panel>
+    <Panel style={{ padding: mobile ? "16px 16px" : "18px 20px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,242,235,0.96) 100%)" }}>
       <div style={{ display: "grid", gap: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
           <div style={{ display: "grid", gap: 8 }}>
             {onBack ? <button type="button" onClick={onBack} style={{ ...secondaryButtonStyle, justifySelf: "start" }}>Voltar para clientes</button> : null}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-              <div style={{ fontSize: 28, fontWeight: 800 }}>{client.nome}</div>
+              <div style={{ fontSize: mobile ? 24 : 28, fontWeight: 800, lineHeight: 1.2 }}>{client.nome}</div>
               <StatusBadge status={client.status} />
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, color: THEME.muted, fontSize: 14, lineHeight: 1.6 }}>
               <span>{client.whatsapp || "Contato não informado"}</span>
               <span>{client.email || "Sem email"}</span>
-              <span>{validProtocols.length ? validProtocols.join(", ") : "Sem protocolo ativo"}</span>
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -2787,47 +2784,20 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           </div>
         </div>
 
-        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 26, background: "linear-gradient(180deg, #fffdfa 0%, #f9f3ea 100%)", padding: mobile ? "18px 16px" : "22px 22px", display: "grid", gap: 18, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)" }}>
-          <div style={{ display: "grid", gap: 4 }}>
-            <div style={{ ...labelStyle, marginBottom: 0 }}>Análise atual</div>
-            <div style={{ fontSize: mobile ? 18 : 20, fontWeight: 800, lineHeight: 1.35 }}>
-              {validProtocols.length ? validProtocols.join(", ") : "Sem protocolo ativo"}
-            </div>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.2fr minmax(240px, 320px)", gap: 14, alignItems: "end" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <StagePill label={validProtocols.length ? validProtocols.join(" · ") : "Sem protocolo ativo"} active={Boolean(validProtocols.length)} />
+            <StagePill label={latestAnalysis?.dataInicio ? `Última análise: ${formatFullDate(latestAnalysis.dataInicio)}` : "Sem data"} active={false} />
+            <StagePill label={`Próxima ação: ${nextAction}`} active={false} />
           </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-            <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum"} />
-            <InfoCard label="Status" value={client.status} />
-            <InfoCard label="Última análise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
-            <InfoCard label="Próxima ação" value={nextAction} />
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "minmax(250px, 320px) 1fr", gap: 12, alignItems: "end" }}>
-            <Field label="Histórico por data">
-              <select value={client.currentAnalysisId || attendanceDateOptions[0]?.value || ""} onChange={(event) => onSelectAnalysis(client.id, event.target.value)} style={inputStyle}>
-                {attendanceDateOptions.map((item) => (
-                  <option key={item.value} value={item.value}>{item.label}</option>
-                ))}
-              </select>
-            </Field>
-            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.55 }}>
-              Escolha a data para abrir outra análise deste prontuário sem perder o que já foi feito.
-            </div>
-          </div>
-        </div>
-
-        {activeGraphics.length ? (
-          <div style={{ display: "grid", gap: 8 }}>
-            <div style={{ ...labelStyle, marginBottom: 0 }}>Gráficos ativos nesta análise</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {activeGraphics.map((item) => (
-                <span key={`${item.protocol}-${item.nome}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 999, padding: "9px 13px", background: "#fffdfa", fontSize: 13, fontWeight: 800, color: THEME.text }}>
-                  {item.nome} · {item.protocol}
-                </span>
+          <Field label="Histórico por data">
+            <select value={client.currentAnalysisId || attendanceDateOptions[0]?.value || ""} onChange={(event) => onSelectAnalysis(client.id, event.target.value)} style={inputStyle}>
+              {attendanceDateOptions.map((item) => (
+                <option key={item.value} value={item.value}>{item.label}</option>
               ))}
-            </div>
-          </div>
-        ) : null}
+            </select>
+          </Field>
+        </div>
       </div>
     </Panel>
   );
