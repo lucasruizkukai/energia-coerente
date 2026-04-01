@@ -2814,19 +2814,25 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Resumo da análise</div>
-            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Visão rápida do momento atual da cliente e do que já está em andamento.</div>
+            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Leitura rápida do momento atual, do foco terapêutico e do que já está sustentando esta análise.</div>
           </div>
           <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o início</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 18 }}>
           <InfoCard label="Método" value="TGR" />
-          <InfoCard label="Protocolos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum protocolo"} />
           <InfoCard label="Início" value={formatDate(client.dataInicio)} />
           <InfoCard label="Pagamento" value={client.statusPagamento} />
           <InfoCard label="Status" value={client.status} />
-          <InfoCard label="Gráficos ativos" value={activeGraphics.length ? String(activeGraphics.length) : "0"} />
-          <InfoCard label="Queixa" value={client.queixaPrincipal || "Não registrada"} />
-          <InfoCard label="Objetivo" value={client.objetivo || "Não registrado"} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14, marginTop: 16 }}>
+          <SummaryBlock
+            title="Direção do atendimento"
+            text={`Protocolos ativos: ${validProtocols.length ? validProtocols.join(", ") : "nenhum protocolo definido"}.\nGráficos ativos: ${activeGraphics.length ? `${activeGraphics.length} em uso` : "nenhum gráfico registrado"}.`}
+          />
+          <SummaryBlock
+            title="Foco atual"
+            text={`Queixa principal: ${client.queixaPrincipal || "não registrada"}.\nObjetivo: ${client.objetivo || "não registrado"}.`}
+          />
         </div>
         {activeGraphics.length ? (
           <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
@@ -2983,10 +2989,13 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
   }
 
   return (
-    <Panel>
+    <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(249,243,234,0.94) 100%)" }}>
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Ficha do atendimento</div>
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ fontSize: 20, fontWeight: 800 }}>Ficha do atendimento</div>
+            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Registro-base da cliente, da leitura e da condução deste atendimento.</div>
+          </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {onSaveAndOpenTgr ? (
               <button type="button" onClick={handleSaveAndOpenTgr} disabled={saving} style={{ ...secondaryButtonStyle, opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>
@@ -2997,60 +3006,70 @@ function ClientRecord({ client, onSave, onSaveAndOpenTgr, mobile, saving = false
           </div>
         </div>
         {formError ? <div style={{ border: `1px solid ${THEME.terracotta}`, background: "#fff5f1", borderRadius: 16, padding: "12px 14px", color: "#8a4f38", fontWeight: 700 }}>{formError}</div> : null}
-        <SectionTitle title="Cliente e método" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Nome"><input value={form.nome} onChange={(event) => setField("nome", event.target.value)} style={inputStyle} /></Field>
-          <Field label="WhatsApp"><input value={form.whatsapp} onChange={(event) => setField("whatsapp", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Email"><input value={form.email} onChange={(event) => setField("email", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Data de início"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Data de nascimento"><input type="date" value={form.dataNascimento} onChange={(event) => setField("dataNascimento", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Método"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: 18, background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.04)" }}>
+          <SectionTitle title="Cliente e método" />
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+            <Field label="Nome"><input value={form.nome} onChange={(event) => setField("nome", event.target.value)} style={inputStyle} /></Field>
+            <Field label="WhatsApp"><input value={form.whatsapp} onChange={(event) => setField("whatsapp", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Email"><input value={form.email} onChange={(event) => setField("email", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Data de início"><input type="date" value={form.dataInicio} onChange={(event) => setField("dataInicio", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Data de nascimento"><input type="date" value={form.dataNascimento} onChange={(event) => setField("dataNascimento", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Método"><input value="TGR" readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginTop: 12 }}>
+            <Field label="Endereço"><input value={form.endereco} onChange={(event) => setField("endereco", event.target.value)} style={inputStyle} placeholder="Rua, número, bairro, cidade..." /></Field>
+          </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginTop: 12 }}>
-          <Field label="Endereço"><input value={form.endereco} onChange={(event) => setField("endereco", event.target.value)} style={inputStyle} placeholder="Rua, número, bairro, cidade..." /></Field>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: 18, background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.04)" }}>
+          <SectionTitle title="Direção do atendimento" />
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+            <Field label="Status"><select value={form.status} onChange={(event) => setField("status", event.target.value)} style={inputStyle}>{STATUS_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
+            <Field label="Dias desde o início"><input value={form.dataInicio ? getDaysSinceStart(form.dataInicio) : ""} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+            <Field label="Queixa principal"><textarea value={form.queixaPrincipal} onChange={(event) => setField("queixaPrincipal", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Objetivo"><textarea value={form.objetivo} onChange={(event) => setField("objetivo", event.target.value)} style={inputStyle} /></Field>
+          </div>
         </div>
-        <SectionTitle title="Direção do atendimento" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Status"><select value={form.status} onChange={(event) => setField("status", event.target.value)} style={inputStyle}>{STATUS_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
-          <Field label="Dias desde o início"><input value={form.dataInicio ? getDaysSinceStart(form.dataInicio) : ""} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
-          <Field label="Queixa principal"><textarea value={form.queixaPrincipal} onChange={(event) => setField("queixaPrincipal", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Objetivo"><textarea value={form.objetivo} onChange={(event) => setField("objetivo", event.target.value)} style={inputStyle} /></Field>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: 18, background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.04)" }}>
+          <SectionTitle title="Leitura e intervenção" />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <button type="button" onClick={() => applyGeneratedField("diagnosticoEnergetico", buildDiagnosticSuggestion)} style={secondaryButtonStyle}>Preencher diagnóstico base</button>
+            <button type="button" onClick={() => applyGeneratedField("causasIdentificadas", buildCausesSuggestion)} style={secondaryButtonStyle}>Puxar leitura para causas</button>
+            <button type="button" onClick={() => applyGeneratedField("areasAfetadas", buildAreasSuggestion)} style={secondaryButtonStyle}>Listar áreas afetadas</button>
+            <button type="button" onClick={() => applyGeneratedField("intervencoesRealizadas", buildInterventionsSuggestion)} style={secondaryButtonStyle}>Montar intervenções base</button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+            <Field label="Diagnóstico energético"><textarea value={form.diagnosticoEnergetico} onChange={(event) => setField("diagnosticoEnergetico", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Causas identificadas"><textarea value={form.causasIdentificadas} onChange={(event) => setField("causasIdentificadas", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Ãreas afetadas"><textarea value={form.areasAfetadas} onChange={(event) => setField("areasAfetadas", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Intervenções realizadas"><textarea value={form.intervencoesRealizadas} onChange={(event) => setField("intervencoesRealizadas", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Evolução"><textarea value={form.evolucao} onChange={(event) => setField("evolucao", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Observações"><textarea value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} style={inputStyle} /></Field>
+          </div>
         </div>
-        <SectionTitle title="Leitura e intervenção" />
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="button" onClick={() => applyGeneratedField("diagnosticoEnergetico", buildDiagnosticSuggestion)} style={secondaryButtonStyle}>Preencher diagnóstico base</button>
-          <button type="button" onClick={() => applyGeneratedField("causasIdentificadas", buildCausesSuggestion)} style={secondaryButtonStyle}>Puxar leitura para causas</button>
-          <button type="button" onClick={() => applyGeneratedField("areasAfetadas", buildAreasSuggestion)} style={secondaryButtonStyle}>Listar áreas afetadas</button>
-          <button type="button" onClick={() => applyGeneratedField("intervencoesRealizadas", buildInterventionsSuggestion)} style={secondaryButtonStyle}>Montar intervenções base</button>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: 18, background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.04)" }}>
+          <SectionTitle title="Leitura inicial" />
+          <div style={{ display: "grid", gap: 12 }}>
+            <Field label="Leitura inicial">
+              <textarea
+                value={form.leituraInicial || ""}
+                onChange={(event) => setField("leituraInicial", event.target.value)}
+                style={{ ...inputStyle, minHeight: 240 }}
+                placeholder="Preencha aqui toda a leitura inicial da forma que a Jack preferir."
+              />
+            </Field>
+          </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          <Field label="Diagnóstico energético"><textarea value={form.diagnosticoEnergetico} onChange={(event) => setField("diagnosticoEnergetico", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Causas identificadas"><textarea value={form.causasIdentificadas} onChange={(event) => setField("causasIdentificadas", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Ãreas afetadas"><textarea value={form.areasAfetadas} onChange={(event) => setField("areasAfetadas", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Intervenções realizadas"><textarea value={form.intervencoesRealizadas} onChange={(event) => setField("intervencoesRealizadas", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Evolução"><textarea value={form.evolucao} onChange={(event) => setField("evolucao", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Observações"><textarea value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} style={inputStyle} /></Field>
-        </div>
-        <SectionTitle title="Leitura inicial" />
-        <div style={{ display: "grid", gap: 12 }}>
-          <Field label="Leitura inicial">
-            <textarea
-              value={form.leituraInicial || ""}
-              onChange={(event) => setField("leituraInicial", event.target.value)}
-              style={{ ...inputStyle, minHeight: 240 }}
-              placeholder="Preencha aqui toda a leitura inicial da forma que a Jack preferir."
-            />
-          </Field>
-        </div>
-        <SectionTitle title="Financeiro e devolutiva" />
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
-          <Field label="Valor"><input value={form.valor} onChange={(event) => setField("valor", event.target.value.replace(/[^\d,.]/g, ""))} style={inputStyle} placeholder="Ex.: 480,00" /></Field>
-          <Field label="Status do pagamento"><select value={form.statusPagamento} onChange={(event) => setField("statusPagamento", event.target.value)} style={inputStyle}>{PAYMENT_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
-          <Field label="Protocolos selecionados"><input value={(form.protocolosUsados || []).join(", ")} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
-        </div>
-        <div style={{ display: "grid", gap: 12 }}>
-          <Field label="Devolutiva final"><textarea value={form.devolutivaFinal} onChange={(event) => setField("devolutivaFinal", event.target.value)} style={inputStyle} /></Field>
-          <Field label="Próximos passos"><textarea value={form.proximosPassos} onChange={(event) => setField("proximosPassos", event.target.value)} style={inputStyle} /></Field>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: 18, background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.04)" }}>
+          <SectionTitle title="Financeiro e devolutiva" />
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
+            <Field label="Valor"><input value={form.valor} onChange={(event) => setField("valor", event.target.value.replace(/[^\d,.]/g, ""))} style={inputStyle} placeholder="Ex.: 480,00" /></Field>
+            <Field label="Status do pagamento"><select value={form.statusPagamento} onChange={(event) => setField("statusPagamento", event.target.value)} style={inputStyle}>{PAYMENT_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select></Field>
+            <Field label="Protocolos selecionados"><input value={(form.protocolosUsados || []).join(", ")} readOnly style={{ ...inputStyle, background: "#f4efe8" }} /></Field>
+          </div>
+          <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+            <Field label="Devolutiva final"><textarea value={form.devolutivaFinal} onChange={(event) => setField("devolutivaFinal", event.target.value)} style={inputStyle} /></Field>
+            <Field label="Próximos passos"><textarea value={form.proximosPassos} onChange={(event) => setField("proximosPassos", event.target.value)} style={inputStyle} /></Field>
+          </div>
         </div>
       </form>
     </Panel>
@@ -3213,7 +3232,7 @@ function SummaryBlock({ title, text }) {
   return (
     <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: "17px 18px", background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.05)" }}>
       <div style={{ fontWeight: 800, marginBottom: 8, fontSize: 16 }}>{title}</div>
-      <div style={{ color: THEME.muted, lineHeight: 1.72 }}>{text}</div>
+      <div style={{ color: THEME.muted, lineHeight: 1.72, whiteSpace: "pre-line" }}>{text}</div>
     </div>
   );
 }
