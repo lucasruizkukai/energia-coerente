@@ -1053,10 +1053,11 @@ function App() {
     clientsWithProgress.find((client) => client.id === selectedId) ||
     null;
   const selectedAnalysis = selectedClient ? getAnalysisRecord(selectedClient) : null;
+  const focusedClientId = relacoesContext?.clientId || selectedId;
   const clientFocusMode =
     (mainTab === "clientes" && Boolean(selectedId)) ||
-    (mainTab === "metodos" && Boolean(relacoesContext?.clientId || selectedId)) ||
-    (mainTab === "devolutivas" && Boolean(selectedId));
+    (mainTab === "metodos" && Boolean(focusedClientId)) ||
+    (mainTab === "devolutivas" && Boolean(focusedClientId));
 
   useEffect(() => {
     if (!selectedClient) {
@@ -1456,13 +1457,19 @@ function App() {
             type="button"
             onClick={() => {
               if (!confirmUnsavedNavigation("o início")) return;
+              if (mainTab !== "clientes" && focusedClientId) {
+                if (!confirmUnsavedNavigation("o prontuÃ¡rio")) return;
+                setSelectedId(focusedClientId);
+                setMainTab("clientes");
+                return;
+              }
               setSelectedId("");
               setRelacoesContext(null);
               setMainTab("dashboard");
             }}
             style={mainTab === "dashboard" && !clientFocusMode ? primaryButtonStyle : secondaryButtonStyle}
           >
-            Início
+            {mainTab !== "clientes" && focusedClientId ? "Voltar ao prontuário" : "Início"}
           </button>
           {clientFocusMode ? (
           <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5, padding: "10px 14px", borderRadius: 999, background: "rgba(255,255,255,0.55)", border: `1px solid ${THEME.line}` }}>
@@ -1627,7 +1634,16 @@ function MainContent(props) {
           isCreatingClient={isCreatingClient}
           openProtocolForClient={openProtocolForClient}
           startNewClient={startNewClient}
-          openFeedbackForClient={() => setMainTab("devolutivas")}
+          openFeedbackForClient={() => {
+            if (selectedClient) {
+              setRelacoesContext({
+                clientId: selectedClient.id,
+                clientName: selectedClient.nome,
+                protocolName: "",
+              });
+            }
+            setMainTab("devolutivas");
+          }}
           openTgrForClient={() => openProtocolForClient(selectedClient, "")}
           onBackToMenu={() => {
             setSelectedId("");
