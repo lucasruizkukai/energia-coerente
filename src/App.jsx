@@ -1814,13 +1814,16 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
-        <Panel>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
-              <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Use estas abas para não se perder no prontuário. A devolutiva continua no menu principal do atendimento.</div>
+        <Panel style={{ padding: mobile ? "16px 16px" : "18px 20px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
+          <div style={{ display: "grid", gap: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
+                <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Tudo do prontuário fica aqui, sem perder o fio do atendimento.</div>
+              </div>
+              <div style={{ color: THEME.terracotta, fontSize: 12, fontWeight: 800, letterSpacing: 0.4, textTransform: "uppercase" }}>Atendimento em foco</div>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {CLIENT_DETAIL_TABS.map((tab) => (
                 <TabButton key={tab.key} active={clientDetailTab === tab.key} onClick={() => setClientDetailTab(tab.key)} label={tab.label} />
               ))}
@@ -2782,15 +2785,22 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           </div>
         </div>
 
-        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 24, background: "#fffdfa", padding: "20px 20px", display: "grid", gap: 16, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 26, background: "linear-gradient(180deg, #fffdfa 0%, #f9f3ea 100%)", padding: mobile ? "18px 16px" : "22px 22px", display: "grid", gap: 18, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ ...labelStyle, marginBottom: 0 }}>Análise atual</div>
+            <div style={{ fontSize: mobile ? 18 : 20, fontWeight: 800, lineHeight: 1.35 }}>
+              {validProtocols.length ? validProtocols.join(", ") : "Sem protocolo ativo"}
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
             <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum"} />
             <InfoCard label="Status" value={client.status} />
             <InfoCard label="Última análise" value={latestAnalysis?.dataInicio ? formatFullDate(latestAnalysis.dataInicio) : "Sem data"} />
             <InfoCard label="Próxima ação" value={nextAction} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "minmax(240px, 320px) 1fr", gap: 12, alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "minmax(250px, 320px) 1fr", gap: 12, alignItems: "end" }}>
             <Field label="Histórico por data">
               <select value={client.currentAnalysisId || attendanceDateOptions[0]?.value || ""} onChange={(event) => onSelectAnalysis(client.id, event.target.value)} style={inputStyle}>
                 {attendanceDateOptions.map((item) => (
@@ -2826,15 +2836,17 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
   const validProtocols = getValidProtocols(currentAnalysis.protocolosUsados);
   const activeGraphics = getActiveGraphicsFromAnalysis(currentAnalysis);
   const attendanceHistory = buildAnalysisHistoryCards(client);
-
   return (
     <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr 0.9fr", gap: 18 }}>
-      <Panel>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Resumo da análise</div>
+      <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,241,231,0.92) 100%)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Resumo da análise</div>
+            <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Visão rápida do momento atual da cliente e do que já está em andamento.</div>
+          </div>
           <div style={{ color: THEME.terracotta, fontWeight: 800 }}>{client.diasAtendimento} dias desde o início</div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(4, 1fr)", gap: 12, marginTop: 18 }}>
           <InfoCard label="Método" value="TGR" />
           <InfoCard label="Protocolos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum protocolo"} />
           <InfoCard label="Início" value={formatDate(client.dataInicio)} />
@@ -2845,10 +2857,10 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
           <InfoCard label="Objetivo" value={client.objetivo || "Não registrado"} />
         </div>
         {activeGraphics.length ? (
-          <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
+          <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
             <div style={{ ...labelStyle, marginBottom: 0 }}>Gráficos ativos por protocolo</div>
             {activeGraphics.map((item) => (
-              <div key={`${item.protocol}-${item.nome}-${item.contexto}-${item.tempo}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "12px 14px", background: "#fffdfa", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.1fr .9fr .8fr", gap: 10 }}>
+              <div key={`${item.protocol}-${item.nome}-${item.contexto}-${item.tempo}`} style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 16px", background: "#fffdfa", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1.2fr .9fr .8fr", gap: 10, boxShadow: "0 8px 18px rgba(62,49,40,0.04)" }}>
                 <div><strong>{item.nome}</strong> <span style={{ color: THEME.muted }}>· {item.protocol}</span></div>
                 <div style={{ color: THEME.muted }}>{item.contexto || "Sem contexto"}</div>
                 <div style={{ color: THEME.muted }}>{item.tempo || "Sem tempo"}</div>
@@ -2858,11 +2870,11 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
         ) : null}
       </Panel>
 
-      <Panel>
-        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>Histórico por data</div>
+      <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(250,245,238,0.94) 100%)" }}>
+        <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>Histórico por data</div>
         <div style={{ display: "grid", gap: 10 }}>
           {attendanceHistory.map((item) => (
-            <button key={item.id} type="button" onClick={() => onSelectAnalysis(client.id, item.id)} style={{ border: `1px solid ${item.isCurrent ? THEME.green : THEME.line}`, background: item.isCurrent ? "#f7fbf4" : "#fffdfa", borderRadius: 16, padding: "12px 14px", textAlign: "left", cursor: "pointer", display: "grid", gap: 6 }}>
+            <button key={item.id} type="button" onClick={() => onSelectAnalysis(client.id, item.id)} style={{ border: `1px solid ${item.isCurrent ? THEME.green : THEME.line}`, background: item.isCurrent ? "#f7fbf4" : "#fffdfa", borderRadius: 18, padding: "14px 15px", textAlign: "left", cursor: "pointer", display: "grid", gap: 7, boxShadow: item.isCurrent ? "0 10px 22px rgba(110,127,95,0.10)" : "0 6px 14px rgba(62,49,40,0.04)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ fontWeight: 800 }}>{item.dateLabel}</div>
                 <StatusBadge status={item.status} />
@@ -2879,6 +2891,7 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
         </div>
       </Panel>
     </div>
+  );
   );
 }
 
@@ -3077,20 +3090,22 @@ function FinalFeedback({ client }) {
   const currentAnalysis = getAnalysisRecord(client);
   const activeGraphics = getActiveGraphicsFromAnalysis(currentAnalysis);
   const protocolLabel = getValidProtocols(currentAnalysis.protocolosUsados).join(", ");
-  const generatedSummary = buildFinalSummary(client);
   return (
-    <Panel>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
-        <div style={{ fontSize: 22, fontWeight: 800 }}>Devolutiva final</div>
+    <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,241,231,0.94) 100%)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap", marginBottom: 18 }}>
+        <div style={{ display: "grid", gap: 5 }}>
+          <div style={{ fontSize: 24, fontWeight: 800 }}>Devolutiva final</div>
+          <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Fechamento da análise com os principais pontos, intervenções e orientação final.</div>
+        </div>
         <div style={{ color: THEME.green, fontWeight: 800 }}>{client.statusPagamento === "Pago" ? "Pagamento regularizado" : "Pagamento em aberto"}</div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 16 }}>
         <InfoCard label="Análise" value={currentAnalysis?.dataInicio ? formatFullDate(currentAnalysis.dataInicio) : "Sem data"} />
         <InfoCard label="Protocolos" value={protocolLabel || "Sem protocolo"} />
         <InfoCard label="Gráficos" value={activeGraphics.length ? `${activeGraphics.length} ativos` : "Nenhum"} />
         <InfoCard label="Status" value={client.status} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
         <SummaryBlock title="Síntese" text={client.devolutivaFinal || client.diagnosticoEnergetico || "Ainda sem síntese registrada."} />
         <SummaryBlock title="Causas" text={client.causasIdentificadas || "Sem causas registradas."} />
         <SummaryBlock title="Intervenções" text={client.intervencoesRealizadas || (activeGraphics.length ? activeGraphics.map((item) => `${item.nome} - ${item.protocol}`).join(", ") : "Sem intervenções registradas.")} />
@@ -3175,9 +3190,9 @@ function StatusBadge({ status }) {
 
 function InfoCard({ label, value }) {
   return (
-    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 15px", background: "#fffdfa", boxShadow: "0 6px 16px rgba(62,49,40,0.04)" }}>
-      <div style={{ ...labelStyle, marginBottom: 5 }}>{label}</div>
-      <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.45 }}>{value}</div>
+    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 20, padding: "15px 16px", background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.05)" }}>
+      <div style={{ ...labelStyle, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.5 }}>{value}</div>
     </div>
   );
 }
@@ -3224,9 +3239,9 @@ function ClientListCard({ client, active, onClick }) {
 
 function SummaryBlock({ title, text }) {
   return (
-    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 20, padding: "16px 17px", background: "#fffdfa", boxShadow: "0 6px 16px rgba(62,49,40,0.04)" }}>
-      <div style={{ fontWeight: 800, marginBottom: 6 }}>{title}</div>
-      <div style={{ color: THEME.muted, lineHeight: 1.65 }}>{text}</div>
+    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: "17px 18px", background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", boxShadow: "0 8px 18px rgba(62,49,40,0.05)" }}>
+      <div style={{ fontWeight: 800, marginBottom: 8, fontSize: 16 }}>{title}</div>
+      <div style={{ color: THEME.muted, lineHeight: 1.72 }}>{text}</div>
     </div>
   );
 }
