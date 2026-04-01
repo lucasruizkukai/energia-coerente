@@ -1816,22 +1816,6 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
   if (clientDetailOpen && selectedClient) {
     return (
       <section style={{ display: "grid", gap: 18 }}>
-        <Panel style={{ padding: mobile ? "16px 16px" : "18px 20px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
-          <div style={{ display: "grid", gap: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
-                <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Tudo do prontuário fica aqui, sem perder o fio do atendimento.</div>
-              </div>
-              <div style={{ color: THEME.terracotta, fontSize: 12, fontWeight: 800, letterSpacing: 0.4, textTransform: "uppercase" }}>Atendimento em foco</div>
-            </div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {CLIENT_DETAIL_TABS.map((tab) => (
-                <TabButton key={tab.key} active={clientDetailTab === tab.key} onClick={() => setClientDetailTab(tab.key)} label={tab.label} />
-              ))}
-            </div>
-          </div>
-        </Panel>
         <RenderGuard title="prontuário da cliente">
           <ClientHeader
             client={selectedClient}
@@ -1844,6 +1828,22 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
             onBack={onBackToList}
             mobile={mobile}
           />
+          <Panel style={{ padding: mobile ? "16px 16px" : "18px 20px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
+            <div style={{ display: "grid", gap: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
+                  <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Tudo do prontuário fica aqui, sem perder o fio do atendimento.</div>
+                </div>
+                <div style={{ color: THEME.terracotta, fontSize: 12, fontWeight: 800, letterSpacing: 0.4, textTransform: "uppercase" }}>Atendimento em foco</div>
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {CLIENT_DETAIL_TABS.map((tab) => (
+                  <TabButton key={tab.key} active={clientDetailTab === tab.key} onClick={() => setClientDetailTab(tab.key)} label={tab.label} />
+                ))}
+              </div>
+            </div>
+          </Panel>
           {clientDetailTab === "resumo" ? (
             <ClientJourney client={selectedClient} mobile={mobile} onSelectAnalysis={switchClientAnalysis} />
           ) : null}
