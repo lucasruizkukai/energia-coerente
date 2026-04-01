@@ -2892,7 +2892,6 @@ function ClientJourney({ client, mobile, onSelectAnalysis }) {
       </Panel>
     </div>
   );
-  );
 }
 
 function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction }) {
@@ -3090,6 +3089,7 @@ function FinalFeedback({ client }) {
   const currentAnalysis = getAnalysisRecord(client);
   const activeGraphics = getActiveGraphicsFromAnalysis(currentAnalysis);
   const protocolLabel = getValidProtocols(currentAnalysis.protocolosUsados).join(", ");
+  const generatedSummary = buildFinalSummary(client);
   return (
     <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,241,231,0.94) 100%)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap", marginBottom: 18 }}>
