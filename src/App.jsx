@@ -918,26 +918,28 @@ function serializeFormState(value) {
 
 const primaryButtonStyle = {
   border: "none",
-  borderRadius: 20,
-  background: THEME.text,
+  borderRadius: 22,
+  background: "linear-gradient(180deg, #4f3d31 0%, #3e3128 100%)",
   color: "#fff",
   padding: "14px 22px",
   cursor: "pointer",
   fontWeight: 800,
   fontSize: 14,
-  boxShadow: "0 14px 28px rgba(62,49,40,0.18)",
+  letterSpacing: 0.15,
+  boxShadow: "0 16px 30px rgba(62,49,40,0.20)",
 };
 
 const secondaryButtonStyle = {
   border: `1px solid ${THEME.line}`,
-  borderRadius: 18,
-  background: "#fffdfa",
+  borderRadius: 20,
+  background: "linear-gradient(180deg, #fffdfa 0%, #fbf5ec 100%)",
   color: THEME.text,
   padding: "12px 16px",
   cursor: "pointer",
   fontWeight: 800,
   fontSize: 14,
-  boxShadow: "0 8px 18px rgba(62,49,40,0.05)",
+  letterSpacing: 0.1,
+  boxShadow: "0 10px 22px rgba(62,49,40,0.06)",
 };
 
 function App() {
@@ -1449,7 +1451,7 @@ function App() {
     <Shell>
       <Header user={user} onLogout={handleLogout} mobile={mobile} />
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "18px 14px 40px" : "24px 24px 48px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 18 }}>
           <button
             type="button"
             onClick={() => {
@@ -1463,7 +1465,7 @@ function App() {
             Início
           </button>
           {clientFocusMode ? (
-            <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5 }}>
+          <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.5, padding: "10px 14px", borderRadius: 999, background: "rgba(255,255,255,0.55)", border: `1px solid ${THEME.line}` }}>
               Volte ao início quando quiser sair do atendimento em foco sem se perder na navegação.
             </div>
           ) : null}
@@ -1476,13 +1478,13 @@ function App() {
             ))}
           </div>
         ) : (
-          <Panel style={{ marginTop: 10, marginBottom: 18, padding: "14px 16px" }}>
+          <Panel style={{ marginTop: 10, marginBottom: 18, padding: "16px 18px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
             <div style={{ display: "grid", gap: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ fontSize: 18, fontWeight: 800 }}>
                   {selectedClient?.nome || relacoesContext?.clientName || "Atendimento em foco"}
                 </div>
-                <div style={{ color: THEME.muted, fontSize: 13 }}>
+                <div style={{ color: THEME.muted, fontSize: 13, padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,0.55)", border: `1px solid ${THEME.line}` }}>
                   Navegação reduzida para manter o atendimento mais seguro e direto.
                 </div>
               </div>
@@ -1708,15 +1710,15 @@ function MainContent(props) {
 
 function Header({ user, onLogout, mobile }) {
   return (
-    <header style={{ borderBottom: `1px solid ${THEME.line}`, background: "rgba(251,247,241,0.92)", backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 5 }}>
+    <header style={{ borderBottom: `1px solid ${THEME.line}`, background: "rgba(251,247,241,0.82)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 5, boxShadow: "0 10px 26px rgba(62,49,40,0.05)" }}>
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: mobile ? "14px 14px" : "18px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
-            <div style={{ fontSize: mobile ? 24 : 32, fontWeight: 800, letterSpacing: 0.1 }}>{BRAND.name}</div>
-            <div style={{ color: THEME.terracotta, fontSize: 14, fontWeight: 800, letterSpacing: 1.3, textTransform: "uppercase" }}>{BRAND.subtitle}</div>
+            <div style={{ fontSize: mobile ? 24 : 32, fontWeight: 800, letterSpacing: 0.1, marginBottom: 2 }}>{BRAND.name}</div>
+            <div style={{ color: THEME.terracotta, fontSize: 13, fontWeight: 800, letterSpacing: 1.4, textTransform: "uppercase" }}>{BRAND.subtitle}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ color: THEME.muted, fontSize: 14 }}>{user?.email}</span>
+            <span style={{ color: THEME.muted, fontSize: 14, padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,0.55)", border: `1px solid ${THEME.line}` }}>{user?.email}</span>
             <button type="button" onClick={onLogout} style={secondaryButtonStyle}>Sair</button>
           </div>
         </div>
@@ -1727,7 +1729,7 @@ function Header({ user, onLogout, mobile }) {
 
 function TopMetrics({ metrics, mobile }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 14 }}>
       <MetricTile label="Em andamento" value={metrics.active} accent={THEME.green} />
       <MetricTile label="Devolutivas" value={metrics.pendingFeedback} accent={THEME.terracotta} />
       <MetricTile label="Financeiro" value={metrics.pendingPayment} accent={THEME.text} />
@@ -2156,15 +2158,15 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
   return (
     <div style={{ display: "grid", gap: 18 }}>
       {selectedClient ? (
-        <Panel>
-          <div style={{ display: "grid", gap: 12 }}>
+        <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
+          <div style={{ display: "grid", gap: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Protocolos desta análise</div>
                 <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Escolha só um protocolo por vez para preencher. Se ele ainda não estiver ativo, entra na análise automaticamente.</div>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 14 }}>
               {TGR_PROTOCOLS.map((protocol) => {
                 const isActive = validProtocols.includes(protocol.nome);
                 const isSelected = selectedProtocol?.slug === protocol.slug;
@@ -2177,28 +2179,28 @@ function TgrProtocolsView({ mobile, activeProtocol, setActiveProtocol, relacoesF
                     style={{
                       border: `1px solid ${isSelected ? protocolTheme.color : isActive ? protocolTheme.soft : THEME.line}`,
                       background: isSelected ? protocolTheme.soft : "#fffdfa",
-                      borderRadius: 20,
-                      padding: "15px 16px",
+                      borderRadius: 24,
+                      padding: "18px 18px",
                       textAlign: "left",
                       cursor: "pointer",
                       display: "grid",
-                      gap: 8,
-                      boxShadow: isSelected ? "0 12px 24px rgba(62,49,40,0.08)" : "none",
+                      gap: 10,
+                      boxShadow: isSelected ? "0 16px 30px rgba(62,49,40,0.12)" : "0 8px 18px rgba(62,49,40,0.04)",
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                      <div style={{ fontWeight: 800, fontSize: 16, color: isSelected ? protocolTheme.color : THEME.text }}>{protocol.nome}</div>
-                      <span style={{ fontSize: 11, fontWeight: 800, color: isActive ? protocolTheme.color : THEME.muted }}>
+                      <div style={{ fontWeight: 800, fontSize: 17, color: isSelected ? protocolTheme.color : THEME.text }}>{protocol.nome}</div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: isActive ? protocolTheme.color : THEME.muted, letterSpacing: 0.5 }}>
                         {isSelected ? "EM USO" : isActive ? "ATIVO" : "ADICIONAR"}
                       </span>
                     </div>
-                    <div style={{ color: THEME.muted, fontSize: 14, lineHeight: 1.6 }}>{protocol.resumo}</div>
+                    <div style={{ color: THEME.muted, fontSize: 14, lineHeight: 1.7 }}>{protocol.resumo}</div>
                   </button>
                 );
               })}
             </div>
             {hasUnsavedProtocolChanges ? (
-              <div style={{ border: `1px solid ${selectedProtocolTheme.color}`, background: selectedProtocolTheme.soft, borderRadius: 18, padding: "12px 14px", color: selectedProtocolTheme.color, display: "grid", gap: 4 }}>
+              <div style={{ border: `1px solid ${selectedProtocolTheme.color}`, background: selectedProtocolTheme.soft, borderRadius: 20, padding: "14px 16px", color: selectedProtocolTheme.color, display: "grid", gap: 4, boxShadow: "0 8px 18px rgba(62,49,40,0.05)" }}>
                 <div style={{ fontWeight: 800 }}>Há alterações não salvas</div>
                 <div style={{ fontSize: 13, lineHeight: 1.6 }}>Salve o protocolo atual antes de trocar de análise ou sair do TGR.</div>
               </div>
@@ -2900,14 +2902,14 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
   const pendingActions = analysis?.pendingActions || [];
 
   return (
-    <Panel>
-      <div style={{ display: "grid", gap: 18 }}>
+        <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,241,231,0.94) 100%)" }}>
+          <div style={{ display: "grid", gap: 20 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Checklist do atendimento</div>
           <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Marque o que já foi feito nesta análise e escolha apenas as pendências que devem aparecer no início.</div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
           {CHECKLIST_OPTIONS.map((item) => (
             <button
               key={item.key}
@@ -2915,41 +2917,41 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
               onClick={() => onToggleChecklist(item.key, !Boolean(checklist[item.key]))}
               style={{
                 border: `1px solid ${checklist[item.key] ? THEME.green : THEME.line}`,
-                borderRadius: 18,
-                padding: "15px 16px",
-                background: checklist[item.key] ? "#f7fbf4" : "#fffdfa",
+                borderRadius: 22,
+                padding: "17px 18px",
+                background: checklist[item.key] ? "linear-gradient(180deg, #f7fbf4 0%, #eef6e7 100%)" : "linear-gradient(180deg, #fffdfa 0%, #fbf5ec 100%)",
                 display: "flex",
                 gap: 10,
                 alignItems: "center",
                 cursor: "pointer",
                 textAlign: "left",
-                boxShadow: checklist[item.key] ? "0 10px 22px rgba(110,127,95,0.10)" : "none",
+                boxShadow: checklist[item.key] ? "0 14px 28px rgba(110,127,95,0.14)" : "0 8px 18px rgba(62,49,40,0.05)",
               }}
             >
               <span
                 aria-hidden="true"
                 style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 6,
+                  width: 20,
+                  height: 20,
+                  borderRadius: 7,
                   border: `1px solid ${checklist[item.key] ? THEME.green : THEME.line}`,
                   background: checklist[item.key] ? THEME.greenSoft : "#fff",
                   display: "inline-grid",
                   placeItems: "center",
                   color: THEME.green,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: 800,
                   flexShrink: 0,
                 }}
               >
                 {checklist[item.key] ? "✓" : ""}
               </span>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>{item.label}</span>
+              <span style={{ fontWeight: 800, fontSize: 15 }}>{item.label}</span>
             </button>
           ))}
         </div>
 
-        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 20, padding: "16px 18px", background: "#fffdfa", display: "grid", gap: 12 }}>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, padding: "18px 18px", background: "linear-gradient(180deg, #fffdfa 0%, #fbf6ee 100%)", display: "grid", gap: 12, boxShadow: "0 8px 18px rgba(62,49,40,0.05)" }}>
           <div style={{ ...labelStyle, marginBottom: 0 }}>Pendências visíveis no início</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {PENDING_ACTION_OPTIONS.map((action) => (
@@ -3175,10 +3177,10 @@ function PillButton({ active, onClick, label }) {
 
 function MetricTile({ label, value, accent }) {
   return (
-    <div style={{ background: "linear-gradient(180deg, #fffdfa 0%, #f8f1e7 100%)", border: `1px solid ${THEME.line}`, borderRadius: 22, padding: "18px 16px", boxShadow: "0 10px 20px rgba(62,49,40,0.06)" }}>
-      <div style={{ width: 42, height: 4, borderRadius: 999, background: accent, marginBottom: 14 }} />
-      <div style={{ color: accent, fontSize: 28, fontWeight: 800, marginBottom: 6 }}>{value}</div>
-      <div style={{ color: THEME.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 800 }}>{label}</div>
+    <div style={{ background: "linear-gradient(180deg, #fffdfa 0%, #f8f1e7 100%)", border: `1px solid ${THEME.line}`, borderRadius: 24, padding: "20px 18px", boxShadow: "0 14px 28px rgba(62,49,40,0.08)" }}>
+      <div style={{ width: 48, height: 5, borderRadius: 999, background: accent, marginBottom: 16 }} />
+      <div style={{ color: accent, fontSize: 30, fontWeight: 800, marginBottom: 7 }}>{value}</div>
+      <div style={{ color: THEME.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.9, fontWeight: 800 }}>{label}</div>
     </div>
   );
 }
@@ -3205,8 +3207,8 @@ function CommandCardButton({ title, text, onClick, primary = false, disabled = f
       disabled={disabled}
       style={{
         border: `1px solid ${primary ? THEME.text : THEME.line}`,
-        borderRadius: 24,
-        padding: "18px 20px",
+        borderRadius: 26,
+        padding: "20px 22px",
         background: primary ? THEME.text : "linear-gradient(180deg, #fffdfa 0%, #f8f1e7 100%)",
         color: primary ? "#fff" : THEME.text,
         textAlign: "left",
@@ -3214,12 +3216,12 @@ function CommandCardButton({ title, text, onClick, primary = false, disabled = f
         opacity: disabled ? 0.6 : 1,
         display: "grid",
         gap: 7,
-        boxShadow: primary ? "0 14px 28px rgba(62,49,40,0.18)" : "0 10px 20px rgba(62,49,40,0.06)",
+        boxShadow: primary ? "0 18px 34px rgba(62,49,40,0.22)" : "0 12px 24px rgba(62,49,40,0.08)",
         transition: "all 160ms ease",
       }}
     >
-      <span style={{ fontWeight: 800, fontSize: 16 }}>{title}</span>
-      <span style={{ color: primary ? "rgba(255,255,255,0.82)" : THEME.muted, lineHeight: 1.6, fontSize: 14 }}>{text}</span>
+      <span style={{ fontWeight: 800, fontSize: 17 }}>{title}</span>
+      <span style={{ color: primary ? "rgba(255,255,255,0.82)" : THEME.muted, lineHeight: 1.7, fontSize: 14 }}>{text}</span>
     </button>
   );
 }
