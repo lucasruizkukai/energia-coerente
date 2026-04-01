@@ -1804,25 +1804,31 @@ function ClientsView({ clients, selectedClient, draftClient, search, setSearch, 
             onBack={onBackToList}
             mobile={mobile}
           />
-          <Panel style={{ padding: mobile ? "16px 16px" : "18px 20px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
-            <div style={{ display: "grid", gap: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <Panel style={{ padding: mobile ? "14px 16px" : "16px 20px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,243,236,0.95) 100%)" }}>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
                 <div>
                   <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Navegação da cliente</div>
                   <div style={{ color: THEME.muted, lineHeight: 1.6 }}>Tudo do prontuário fica aqui, sem perder o fio do atendimento.</div>
                 </div>
                 <div style={{ color: THEME.terracotta, fontSize: 12, fontWeight: 800, letterSpacing: 0.4, textTransform: "uppercase" }}>Atendimento em foco</div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button type="button" style={primaryButtonStyle}>Prontuário</button>
-                <button type="button" onClick={openTgrForClient} style={secondaryButtonStyle}>TGR</button>
-                <button type="button" onClick={openFeedbackForClient} style={secondaryButtonStyle}>Devolutiva</button>
-                <button type="button" onClick={onBackToMenu} style={secondaryButtonStyle}>Voltar ao menu</button>
+              <div style={{ display: "grid", gap: 10, borderTop: `1px solid ${THEME.line}`, paddingTop: 12 }}>
+                <div style={{ ...labelStyle, marginBottom: 0 }}>Fluxo do atendimento</div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button type="button" style={{ ...primaryButtonStyle, padding: "11px 18px", borderRadius: 18 }}>Prontuário</button>
+                  <button type="button" onClick={openTgrForClient} style={{ ...secondaryButtonStyle, padding: "11px 16px", borderRadius: 18 }}>TGR</button>
+                  <button type="button" onClick={openFeedbackForClient} style={{ ...secondaryButtonStyle, padding: "11px 16px", borderRadius: 18 }}>Devolutiva</button>
+                  <button type="button" onClick={onBackToMenu} style={{ ...secondaryButtonStyle, padding: "11px 16px", borderRadius: 18 }}>Voltar ao menu</button>
+                </div>
               </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                {CLIENT_DETAIL_TABS.map((tab) => (
-                  <TabButton key={tab.key} active={clientDetailTab === tab.key} onClick={() => setClientDetailTab(tab.key)} label={tab.label} />
-                ))}
+              <div style={{ display: "grid", gap: 10, borderTop: `1px solid ${THEME.line}`, paddingTop: 12 }}>
+                <div style={{ ...labelStyle, marginBottom: 0 }}>Abas do prontuário</div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {CLIENT_DETAIL_TABS.map((tab) => (
+                    <TabButton key={tab.key} active={clientDetailTab === tab.key} onClick={() => setClientDetailTab(tab.key)} label={tab.label} />
+                  ))}
+                </div>
               </div>
             </div>
           </Panel>
