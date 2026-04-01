@@ -1477,37 +1477,7 @@ function App() {
               <TabButton key={tab.key} active={mainTab === tab.key} onClick={() => handleTabChange(tab.key)} label={tab.label} />
             ))}
           </div>
-        ) : (mainTab === "clientes" && Boolean(selectedClient) ? null : (
-          <Panel style={{ marginTop: 10, marginBottom: 18, padding: "16px 18px", background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(247,241,232,0.94) 100%)" }}>
-            <div style={{ display: "grid", gap: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                <div style={{ fontSize: 18, fontWeight: 800 }}>
-                  {selectedClient?.nome || relacoesContext?.clientName || "Atendimento em foco"}
-                </div>
-                <div style={{ color: THEME.muted, fontSize: 13, padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,0.55)", border: `1px solid ${THEME.line}` }}>
-                  Navegação reduzida para manter o atendimento mais seguro e direto.
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button type="button" onClick={() => { if (!confirmUnsavedNavigation("o prontuário")) return; setMainTab("clientes"); }} style={mainTab === "clientes" ? primaryButtonStyle : secondaryButtonStyle}>Prontuário</button>
-                <button type="button" onClick={() => openTgrWorkspace()} style={mainTab === "metodos" ? primaryButtonStyle : secondaryButtonStyle}>TGR</button>
-                <button type="button" onClick={() => { if (!confirmUnsavedNavigation("a devolutiva")) return; setMainTab("devolutivas"); }} style={mainTab === "devolutivas" ? primaryButtonStyle : secondaryButtonStyle}>Devolutiva</button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!confirmUnsavedNavigation("o menu central")) return;
-                    setSelectedId("");
-                    setRelacoesContext(null);
-                    setMainTab("dashboard");
-                  }}
-                  style={secondaryButtonStyle}
-                >
-                  Voltar ao menu
-                </button>
-              </div>
-            </div>
-          </Panel>
-        )}
+        ) : null}
         {uiMessage ? (
           <div style={{ marginBottom: 16 }}>
             <Panel style={{ padding: "12px 16px", background: "#fff8ef" }}>
