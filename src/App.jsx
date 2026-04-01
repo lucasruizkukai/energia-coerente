@@ -915,24 +915,26 @@ function serializeFormState(value) {
 
 const primaryButtonStyle = {
   border: "none",
-  borderRadius: 18,
+  borderRadius: 20,
   background: THEME.text,
   color: "#fff",
-  padding: "13px 20px",
+  padding: "14px 22px",
   cursor: "pointer",
   fontWeight: 800,
   fontSize: 14,
+  boxShadow: "0 14px 28px rgba(62,49,40,0.18)",
 };
 
 const secondaryButtonStyle = {
   border: `1px solid ${THEME.line}`,
-  borderRadius: 16,
+  borderRadius: 18,
   background: "#fffdfa",
   color: THEME.text,
-  padding: "11px 15px",
+  padding: "12px 16px",
   cursor: "pointer",
   fontWeight: 800,
   fontSize: 14,
+  boxShadow: "0 8px 18px rgba(62,49,40,0.05)",
 };
 
 function App() {
@@ -3200,7 +3202,7 @@ function ActionTile({ title, text }) {
 }
 
 function TabButton({ active, onClick, label }) {
-  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.text : THEME.line}`, background: active ? THEME.text : "#fffdfa", color: active ? "#fff" : THEME.muted, padding: "11px 16px", borderRadius: 999, cursor: "pointer", fontWeight: 800, fontSize: 14 }}>{label}</button>;
+  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.text : THEME.line}`, background: active ? THEME.text : "#fffdfa", color: active ? "#fff" : THEME.muted, padding: "12px 18px", borderRadius: 999, cursor: "pointer", fontWeight: 800, fontSize: 14, boxShadow: active ? "0 10px 20px rgba(62,49,40,0.15)" : "none", transition: "all 160ms ease" }}>{label}</button>;
 }
 
 function StagePill({ label, active }) {
@@ -3208,13 +3210,14 @@ function StagePill({ label, active }) {
 }
 
 function PillButton({ active, onClick, label }) {
-  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "9px 13px", cursor: "pointer", fontWeight: 800, fontSize: 13 }}>{label}</button>;
+  return <button type="button" onClick={onClick} style={{ border: `1px solid ${active ? THEME.green : THEME.line}`, background: active ? THEME.greenSoft : "#fffdfa", color: active ? THEME.green : THEME.muted, borderRadius: 999, padding: "10px 14px", cursor: "pointer", fontWeight: 800, fontSize: 13, boxShadow: active ? "0 8px 18px rgba(110,127,95,0.10)" : "none", transition: "all 160ms ease" }}>{label}</button>;
 }
 
 function MetricTile({ label, value, accent }) {
   return (
-    <div style={{ background: "#fffdfa", border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "16px 14px" }}>
-      <div style={{ color: accent, fontSize: 24, fontWeight: 800, marginBottom: 5 }}>{value}</div>
+    <div style={{ background: "linear-gradient(180deg, #fffdfa 0%, #f8f1e7 100%)", border: `1px solid ${THEME.line}`, borderRadius: 22, padding: "18px 16px", boxShadow: "0 10px 20px rgba(62,49,40,0.06)" }}>
+      <div style={{ width: 42, height: 4, borderRadius: 999, background: accent, marginBottom: 14 }} />
+      <div style={{ color: accent, fontSize: 28, fontWeight: 800, marginBottom: 6 }}>{value}</div>
       <div style={{ color: THEME.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 800 }}>{label}</div>
     </div>
   );
@@ -3227,7 +3230,7 @@ function StatusBadge({ status }) {
 
 function InfoCard({ label, value }) {
   return (
-    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 16, padding: "13px 14px", background: "#fffdfa" }}>
+    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 15px", background: "#fffdfa", boxShadow: "0 6px 16px rgba(62,49,40,0.04)" }}>
       <div style={{ ...labelStyle, marginBottom: 5 }}>{label}</div>
       <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.45 }}>{value}</div>
     </div>
@@ -3242,15 +3245,17 @@ function CommandCardButton({ title, text, onClick, primary = false, disabled = f
       disabled={disabled}
       style={{
         border: `1px solid ${primary ? THEME.text : THEME.line}`,
-        borderRadius: 20,
-        padding: "16px 18px",
-        background: primary ? THEME.text : "#fffdfa",
+        borderRadius: 24,
+        padding: "18px 20px",
+        background: primary ? THEME.text : "linear-gradient(180deg, #fffdfa 0%, #f8f1e7 100%)",
         color: primary ? "#fff" : THEME.text,
         textAlign: "left",
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.6 : 1,
         display: "grid",
         gap: 7,
+        boxShadow: primary ? "0 14px 28px rgba(62,49,40,0.18)" : "0 10px 20px rgba(62,49,40,0.06)",
+        transition: "all 160ms ease",
       }}
     >
       <span style={{ fontWeight: 800, fontSize: 16 }}>{title}</span>
@@ -3274,7 +3279,7 @@ function ClientListCard({ client, active, onClick }) {
 
 function SummaryBlock({ title, text }) {
   return (
-    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "15px 16px", background: "#fffdfa" }}>
+    <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 20, padding: "16px 17px", background: "#fffdfa", boxShadow: "0 6px 16px rgba(62,49,40,0.04)" }}>
       <div style={{ fontWeight: 800, marginBottom: 6 }}>{title}</div>
       <div style={{ color: THEME.muted, lineHeight: 1.65 }}>{text}</div>
     </div>
@@ -3283,7 +3288,7 @@ function SummaryBlock({ title, text }) {
 
 function ProtocolSaveBar({ title, text, onSave, dirty }) {
   return (
-    <div style={{ border: `1px solid ${dirty ? THEME.terracotta : THEME.green}`, background: dirty ? "#fff8f2" : "#f7fbf4", borderRadius: 18, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+    <div style={{ border: `1px solid ${dirty ? THEME.terracotta : THEME.green}`, background: dirty ? "#fff8f2" : "#f7fbf4", borderRadius: 20, padding: "15px 17px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", boxShadow: "0 8px 18px rgba(62,49,40,0.05)" }}>
       <div style={{ display: "grid", gap: 4 }}>
         <div style={{ fontWeight: 800 }}>{title}</div>
         <div style={{ color: THEME.muted, fontSize: 13, lineHeight: 1.6 }}>{text}</div>
@@ -3297,7 +3302,7 @@ function ProtocolSaveBar({ title, text, onSave, dirty }) {
 
 function ProtocolStageTabs({ activeStage, onChange }) {
   return (
-    <div style={{ display: "grid", gap: 10 }}>
+    <div style={{ display: "grid", gap: 10, border: `1px solid ${THEME.line}`, borderRadius: 20, padding: "14px 16px", background: "#fffdfa" }}>
       <div style={{ ...labelStyle, marginBottom: 0 }}>Etapas do protocolo</div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {TGR_FLOW_STAGES.map((stage) => (
