@@ -2289,7 +2289,7 @@ function RelacoesProtocolView({ mobile, form, setForm, context, currentProtocolN
   }
 
   return (
-    <Panel>
+    <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(248,242,235,0.98) 100%)" }}>
       <div style={{ display: "grid", gap: 18 }}>
         <ProtocolSaveBar
           title="Salvar protocolo"
@@ -2503,8 +2503,8 @@ function GenericProtocolView({ mobile, protocol, form, setForm, context, current
   }
 
   return (
-    <Panel>
-      <div style={{ display: "grid", gap: 18 }}>
+    <Panel style={{ background: "linear-gradient(180deg, rgba(255,253,249,0.98) 0%, rgba(250,246,240,0.98) 100%)" }}>
+      <div style={{ display: "grid", gap: 20 }}>
         <ProtocolSaveBar
           title="Salvar protocolo"
           text={isDirty ? "Você fez alterações neste protocolo. Salve para registrar no prontuário." : "Salve este protocolo para registrar a etapa atual no prontuário."}
@@ -2779,7 +2779,7 @@ function ClientHeader({ client, onDelete, onFinalize, onSelectAnalysis, onNewAna
           </div>
         </div>
 
-        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 22, background: "#fffdfa", padding: "18px 18px", display: "grid", gap: 14 }}>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 24, background: "#fffdfa", padding: "20px 20px", display: "grid", gap: 16, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
             <InfoCard label="Protocolos ativos" value={validProtocols.length ? validProtocols.join(", ") : "Nenhum"} />
             <InfoCard label="Status" value={client.status} />
@@ -2900,14 +2900,15 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
               onClick={() => onToggleChecklist(item.key, !Boolean(checklist[item.key]))}
               style={{
                 border: `1px solid ${checklist[item.key] ? THEME.green : THEME.line}`,
-                borderRadius: 16,
-                padding: "13px 14px",
+                borderRadius: 18,
+                padding: "15px 16px",
                 background: checklist[item.key] ? "#f7fbf4" : "#fffdfa",
                 display: "flex",
                 gap: 10,
                 alignItems: "center",
                 cursor: "pointer",
                 textAlign: "left",
+                boxShadow: checklist[item.key] ? "0 10px 22px rgba(110,127,95,0.10)" : "none",
               }}
             >
               <span
@@ -2928,12 +2929,12 @@ function ClientChecklistPanel({ client, onToggleChecklist, onTogglePendingAction
               >
                 {checklist[item.key] ? "✓" : ""}
               </span>
-              <span style={{ fontWeight: 700 }}>{item.label}</span>
+              <span style={{ fontWeight: 700, fontSize: 15 }}>{item.label}</span>
             </button>
           ))}
         </div>
 
-        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 18, padding: "14px 16px", background: "#fffdfa", display: "grid", gap: 10 }}>
+        <div style={{ border: `1px solid ${THEME.line}`, borderRadius: 20, padding: "16px 18px", background: "#fffdfa", display: "grid", gap: 12 }}>
           <div style={{ ...labelStyle, marginBottom: 0 }}>Pendências visíveis no início</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {PENDING_ACTION_OPTIONS.map((action) => (
